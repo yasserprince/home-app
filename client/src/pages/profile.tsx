@@ -93,7 +93,7 @@ export default function Profile() {
           <Button
             variant="ghost"
             className="w-full justify-between p-4 h-auto"
-            disabled
+            onClick={() => window.location.href = '/profile/edit'}
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -107,7 +107,7 @@ export default function Profile() {
           <Button
             variant="ghost"
             className="w-full justify-between p-4 h-auto"
-            disabled
+            onClick={() => window.location.href = '/profile/payment-methods'}
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -121,7 +121,7 @@ export default function Profile() {
           <Button
             variant="ghost"
             className="w-full justify-between p-4 h-auto"
-            disabled
+            onClick={() => window.location.href = '/profile/addresses'}
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -135,7 +135,7 @@ export default function Profile() {
           <Button
             variant="ghost"
             className="w-full justify-between p-4 h-auto"
-            disabled
+            onClick={() => window.location.href = '/profile/notifications'}
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -149,7 +149,7 @@ export default function Profile() {
           <Button
             variant="ghost"
             className="w-full justify-between p-4 h-auto"
-            disabled
+            onClick={() => window.location.href = '/profile/help'}
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">

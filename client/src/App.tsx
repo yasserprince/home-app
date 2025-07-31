@@ -12,6 +12,11 @@ import ProviderDetail from "@/pages/provider-detail";
 import Booking from "@/pages/booking";
 import Bookings from "@/pages/bookings";
 import Profile from "@/pages/profile";
+import ProfileEdit from "@/pages/profile-edit";
+import PaymentMethods from "@/pages/payment-methods";
+import SavedAddresses from "@/pages/saved-addresses";
+import Notifications from "@/pages/notifications";
+import HelpSupport from "@/pages/help-support";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -28,6 +33,11 @@ function Router() {
           <Route path="/booking" component={Booking} />
           <Route path="/bookings" component={Bookings} />
           <Route path="/profile" component={Profile} />
+          <Route path="/profile/edit" component={ProfileEdit} />
+          <Route path="/profile/payment-methods" component={PaymentMethods} />
+          <Route path="/profile/addresses" component={SavedAddresses} />
+          <Route path="/profile/notifications" component={Notifications} />
+          <Route path="/profile/help" component={HelpSupport} />
         </>
       )}
       <Route component={NotFound} />
