@@ -1,0 +1,246 @@
+import {
+  users,
+  serviceCategories,
+  serviceProviders,
+  bookings,
+  reviews,
+  type User,
+  type UpsertUser,
+  type ServiceCategory,
+  type InsertServiceCategory,
+  type ServiceProvider,
+  type InsertServiceProvider,
+  type Booking,
+  type InsertBooking,
+  type Review,
+  type InsertReview,
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, and, ilike, sql } from "drizzle-orm";
+
+// Interface for storage operations
+export interface IStorage {
+  // User operations (IMPORTANT: mandatory for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
+  // Service Category operations
+  getServiceCategories(): Promise<ServiceCategory[]>;
+  createServiceCategory(category: InsertServiceCategory): Promise<ServiceCategory>;
+  
+  // Service Provider operations
+  getServiceProviders(categoryId?: string, search?: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]>;
+  getServiceProviderById(id: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory }) | undefined>;
+  createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider>;
+  updateServiceProviderRating(providerId: string): Promise<void>;
+  
+  // Booking operations
+  createBooking(booking: InsertBooking): Promise<Booking>;
+  getUserBookings(userId: string): Promise<(Booking & { provider: ServiceProvider & { user: User } })[]>;
+  getBookingById(id: string): Promise<(Booking & { provider: ServiceProvider & { user: User }; user: User }) | undefined>;
+  updateBookingStatus(id: string, status: string): Promise<Booking | undefined>;
+  
+  // Review operations
+  createReview(review: InsertReview): Promise<Review>;
+  getProviderReviews(providerId: string): Promise<(Review & { user: User })[]>;
+}
+
+export class DatabaseStorage implements IStorage {
+  // User operations (IMPORTANT: mandatory for Replit Auth)
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  // Service Category operations
+  async getServiceCategories(): Promise<ServiceCategory[]> {
+    return await db.select().from(serviceCategories);
+  }
+
+  async createServiceCategory(category: InsertServiceCategory): Promise<ServiceCategory> {
+    const [newCategory] = await db
+      .insert(serviceCategories)
+      .values(category)
+      .returning();
+    return newCategory;
+  }
+
+  // Service Provider operations
+  async getServiceProviders(categoryId?: string, search?: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]> {
+    let query = db
+      .select()
+      .from(serviceProviders)
+      .innerJoin(users, eq(serviceProviders.userId, users.id))
+      .innerJoin(serviceCategories, eq(serviceProviders.categoryId, serviceCategories.id))
+      .where(eq(serviceProviders.isAvailable, true));
+
+    if (categoryId) {
+      query = query.where(eq(serviceProviders.categoryId, categoryId));
+    }
+
+    if (search) {
+      query = query.where(
+        ilike(serviceProviders.businessName, `%${search}%`)
+      );
+    }
+
+    const results = await query.orderBy(desc(serviceProviders.rating));
+    
+    return results.map(result => ({
+      ...result.service_providers,
+      user: result.users,
+      category: result.service_categories,
+    }));
+  }
+
+  async getServiceProviderById(id: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory }) | undefined> {
+    const [result] = await db
+      .select()
+      .from(serviceProviders)
+      .innerJoin(users, eq(serviceProviders.userId, users.id))
+      .innerJoin(serviceCategories, eq(serviceProviders.categoryId, serviceCategories.id))
+      .where(eq(serviceProviders.id, id));
+
+    if (!result) return undefined;
+
+    return {
+      ...result.service_providers,
+      user: result.users,
+      category: result.service_categories,
+    };
+  }
+
+  async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
+    const [newProvider] = await db
+      .insert(serviceProviders)
+      .values(provider)
+      .returning();
+    return newProvider;
+  }
+
+  async updateServiceProviderRating(providerId: string): Promise<void> {
+    const [ratingResult] = await db
+      .select({
+        avgRating: sql<number>`AVG(${reviews.rating})`,
+        count: sql<number>`COUNT(${reviews.id})`,
+      })
+      .from(reviews)
+      .where(eq(reviews.providerId, providerId));
+
+    if (ratingResult) {
+      await db
+        .update(serviceProviders)
+        .set({
+          rating: ratingResult.avgRating?.toString() || "0",
+          reviewCount: ratingResult.count || 0,
+          updatedAt: new Date(),
+        })
+        .where(eq(serviceProviders.id, providerId));
+    }
+  }
+
+  // Booking operations
+  async createBooking(booking: InsertBooking): Promise<Booking> {
+    const [newBooking] = await db
+      .insert(bookings)
+      .values(booking)
+      .returning();
+    return newBooking;
+  }
+
+  async getUserBookings(userId: string): Promise<(Booking & { provider: ServiceProvider & { user: User } })[]> {
+    const results = await db
+      .select()
+      .from(bookings)
+      .innerJoin(serviceProviders, eq(bookings.providerId, serviceProviders.id))
+      .innerJoin(users, eq(serviceProviders.userId, users.id))
+      .where(eq(bookings.userId, userId))
+      .orderBy(desc(bookings.createdAt));
+
+    return results.map(result => ({
+      ...result.bookings,
+      provider: {
+        ...result.service_providers,
+        user: result.users,
+      },
+    }));
+  }
+
+  async getBookingById(id: string): Promise<(Booking & { provider: ServiceProvider & { user: User }; user: User }) | undefined> {
+    const [result] = await db
+      .select()
+      .from(bookings)
+      .innerJoin(serviceProviders, eq(bookings.providerId, serviceProviders.id))
+      .innerJoin(users, eq(serviceProviders.userId, users.id))
+      .where(eq(bookings.id, id));
+
+    if (!result) return undefined;
+
+    const [userResult] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, result.bookings.userId));
+
+    return {
+      ...result.bookings,
+      provider: {
+        ...result.service_providers,
+        user: result.users,
+      },
+      user: userResult,
+    };
+  }
+
+  async updateBookingStatus(id: string, status: string): Promise<Booking | undefined> {
+    const [updatedBooking] = await db
+      .update(bookings)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(bookings.id, id))
+      .returning();
+    return updatedBooking;
+  }
+
+  // Review operations
+  async createReview(review: InsertReview): Promise<Review> {
+    const [newReview] = await db
+      .insert(reviews)
+      .values(review)
+      .returning();
+    
+    // Update provider rating
+    await this.updateServiceProviderRating(review.providerId);
+    
+    return newReview;
+  }
+
+  async getProviderReviews(providerId: string): Promise<(Review & { user: User })[]> {
+    const results = await db
+      .select()
+      .from(reviews)
+      .innerJoin(users, eq(reviews.userId, users.id))
+      .where(eq(reviews.providerId, providerId))
+      .orderBy(desc(reviews.createdAt));
+
+    return results.map(result => ({
+      ...result.reviews,
+      user: result.users,
+    }));
+  }
+}
+
+export const storage = new DatabaseStorage();
