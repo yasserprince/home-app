@@ -118,23 +118,39 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {categories?.map((category: any) => (
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {categories?.slice(0, 6).map((category: any) => (
               <Link key={category.id} href={`/providers?category=${category.id}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center mb-2 mx-auto"
                       style={{ backgroundColor: `${category.color}20` }}
                     >
-                      <i className={`${category.icon} text-xl`} style={{ color: category.color }}></i>
+                      <i className={`${category.icon} text-lg`} style={{ color: category.color }}></i>
                     </div>
-                    <h3 className="font-semibold text-gray-900">{category.name}</h3>
-                    <p className="text-sm text-gray-600">{category.description}</p>
+                    <h3 className="font-medium text-gray-900 text-xs text-center leading-tight">{category.name}</h3>
                   </CardContent>
                 </Card>
               </Link>
             ))}
+          </div>
+        )}
+        
+        {/* Show More Services */}
+        {categories && categories.length > 6 && (
+          <div className="mb-6">
+            <Link href="/providers">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed border-2 border-gray-300">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i className="fas fa-plus text-gray-400 text-xl"></i>
+                  </div>
+                  <h3 className="font-medium text-gray-900 text-sm">View All Services</h3>
+                  <p className="text-xs text-gray-600">+{categories.length - 6} more categories</p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         )}
 

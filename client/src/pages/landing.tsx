@@ -13,32 +13,45 @@ export default function Landing() {
             </div>
             
             <div className="mb-8">
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 bg-blue-50 rounded-xl">
-                  <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <i className="fas fa-wrench text-primary text-xl"></i>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="p-3 bg-blue-50 rounded-xl">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i className="fas fa-faucet text-blue-600 text-lg"></i>
                   </div>
-                  <p className="text-sm font-medium text-gray-700">Plumbing</p>
+                  <p className="text-xs font-medium text-gray-700">Plumbing</p>
                 </div>
-                <div className="p-4 bg-yellow-50 rounded-xl">
-                  <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <i className="fas fa-bolt text-yellow-600 text-xl"></i>
+                <div className="p-3 bg-yellow-50 rounded-xl">
+                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i className="fas fa-bolt text-yellow-600 text-lg"></i>
                   </div>
-                  <p className="text-sm font-medium text-gray-700">Electrical</p>
+                  <p className="text-xs font-medium text-gray-700">Electrical</p>
                 </div>
-                <div className="p-4 bg-green-50 rounded-xl">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <i className="fas fa-snowflake text-green-600 text-xl"></i>
+                <div className="p-3 bg-indigo-50 rounded-xl">
+                  <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i className="fas fa-thermometer-half text-indigo-600 text-lg"></i>
                   </div>
-                  <p className="text-sm font-medium text-gray-700">AC Repair</p>
+                  <p className="text-xs font-medium text-gray-700">HVAC</p>
                 </div>
-                <div className="p-4 bg-purple-50 rounded-xl">
-                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <i className="fas fa-broom text-purple-600 text-xl"></i>
+                <div className="p-3 bg-purple-50 rounded-xl">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i className="fas fa-broom text-purple-600 text-lg"></i>
                   </div>
-                  <p className="text-sm font-medium text-gray-700">Cleaning</p>
+                  <p className="text-xs font-medium text-gray-700">Cleaning</p>
+                </div>
+                <div className="p-3 bg-orange-50 rounded-xl">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i className="fas fa-hammer text-orange-600 text-lg"></i>
+                  </div>
+                  <p className="text-xs font-medium text-gray-700">Handyman</p>
+                </div>
+                <div className="p-3 bg-green-50 rounded-xl">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i className="fas fa-seedling text-green-600 text-lg"></i>
+                  </div>
+                  <p className="text-xs font-medium text-gray-700">Landscaping</p>
                 </div>
               </div>
+              <p className="text-center text-xs text-gray-500">...and 6 more services</p>
             </div>
 
             <div className="space-y-4">
