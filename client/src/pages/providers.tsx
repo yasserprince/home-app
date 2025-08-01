@@ -5,15 +5,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { calculateDistance, formatDistance, getStoredLocation, getCurrentLocationAndStore, sortProvidersByDistance } from "@/lib/location";
+import LocationPermission from "@/components/location-permission";
+import { MapPin, Navigation } from "lucide-react";
 
 export default function Providers() {
   const [location] = useLocation();
   const [searchParams] = useState(() => new URLSearchParams(location.split('?')[1] || ''));
   const categoryId = searchParams.get('category');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const { data: providers, isLoading } = useQuery({
-    queryKey: ["/api/providers", categoryId],
+    queryKey: ["/api/providers", categoryId, userLocation],
     enabled: true,
   });
 
@@ -22,6 +33,83 @@ export default function Providers() {
   });
 
   const currentCategory = categories?.find((cat: any) => cat.id === categoryId);
+
+  // Initialize user location
+  useEffect(() => {
+    // Check if user has location enabled
+    if (user?.locationEnabled && user?.latitude && user?.longitude) {
+      setUserLocation({
+        lat: parseFloat(user.latitude),
+        lng: parseFloat(user.longitude),
+      });
+    } else {
+      // Check for stored location
+      const stored = getStoredLocation();
+      if (stored) {
+        setUserLocation(stored);
+      }
+    }
+  }, [user]);
+
+  // Handle location-based filtering
+  const handleNearbyFilter = () => {
+    if (!userLocation) {
+      setShowLocationPrompt(true);
+    } else {
+      setActiveFilter('nearby');
+    }
+  };
+
+  const handleLocationAllow = (location: { lat: number; lng: number }) => {
+    setUserLocation(location);
+    setShowLocationPrompt(false);
+    setActiveFilter('nearby');
+    
+    // Store in localStorage
+    localStorage.setItem('userLocation', JSON.stringify({
+      ...location,
+      timestamp: Date.now(),
+    }));
+    
+    toast({
+      title: "Location Enabled",
+      description: "Now showing nearby service providers",
+    });
+  };
+
+  const handleLocationDeny = () => {
+    setShowLocationPrompt(false);
+    toast({
+      title: "Location Not Enabled",
+      description: "You can enable location later in settings to see nearby providers",
+    });
+  };
+
+  // Process providers based on location and filter
+  const processedProviders = providers ? (() => {
+    let filtered = [...providers];
+    
+    // Add distance information if user location is available
+    if (userLocation) {
+      filtered = sortProvidersByDistance(filtered, userLocation);
+    }
+    
+    // Apply filters
+    switch (activeFilter) {
+      case 'nearby':
+        // Only show providers with location and within reasonable distance
+        filtered = filtered.filter(p => p.distance !== null && p.distance <= 50);
+        break;
+      case 'toprated':
+        filtered = filtered.sort((a, b) => parseFloat(b.rating || '0') - parseFloat(a.rating || '0'));
+        break;
+      default:
+        // 'all' - already processed
+        break;
+    }
+    
+    return filtered;
+  })() : [];
 
   if (isLoading) {
     return (
@@ -74,9 +162,10 @@ export default function Providers() {
           <Button
             size="sm"
             variant={activeFilter === 'nearby' ? 'default' : 'secondary'}
-            onClick={() => setActiveFilter('nearby')}
+            onClick={handleNearbyFilter}
             className="rounded-full"
           >
+            <Navigation className="w-3 h-3 mr-1" />
             Nearby
           </Button>
           <Button
@@ -92,8 +181,28 @@ export default function Providers() {
 
       {/* Provider List */}
       <div className="p-4 space-y-4">
-        {providers && providers.length > 0 ? (
-          providers.map((provider: any) => (
+        {activeFilter === 'nearby' && !userLocation && (
+          <Card className="bg-blue-50 border-blue-200">
+            <CardContent className="p-4 text-center">
+              <MapPin className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <h3 className="font-medium text-blue-900 mb-1">Enable Location for Nearby Services</h3>
+              <p className="text-sm text-blue-700 mb-3">
+                Find service providers close to you with accurate distance information
+              </p>
+              <Button 
+                size="sm" 
+                onClick={() => setShowLocationPrompt(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <MapPin className="w-4 h-4 mr-1" />
+                Enable Location
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+        
+        {processedProviders && processedProviders.length > 0 ? (
+          processedProviders.map((provider: any) => (
             <Link key={provider.id} href={`/provider/${provider.id}`}>
               <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="p-4">
@@ -143,8 +252,13 @@ export default function Providers() {
                             {provider.rating || "4.8"} ({provider.reviewCount || 0})
                           </span>
                         </div>
-                        <span className="text-sm text-gray-600">
-                          {provider.location || "2.3 km away"}
+                        <span className="text-sm text-gray-600 flex items-center">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {provider.distance !== null ? (
+                            `${formatDistance(provider.distance)} away`
+                          ) : (
+                            provider.location || "Distance unavailable"
+                          )}
                         </span>
                       </div>
 

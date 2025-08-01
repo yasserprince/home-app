@@ -94,6 +94,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Location update endpoint
+  app.put('/api/location', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { locationEnabled, latitude, longitude } = req.body;
+      
+      const updateData: any = {
+        locationEnabled,
+        lastLocationUpdate: new Date(),
+      };
+      
+      if (locationEnabled && latitude !== undefined && longitude !== undefined) {
+        updateData.latitude = latitude.toString();
+        updateData.longitude = longitude.toString();
+      }
+      
+      const updatedUser = await storage.updateUser(userId, updateData);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating location:", error);
+      res.status(500).json({ message: "Failed to update location" });
+    }
+  });
+
   // Service Categories
   app.get('/api/categories', async (req, res) => {
     try {
@@ -108,10 +132,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Service Providers
   app.get('/api/providers', async (req, res) => {
     try {
-      const { categoryId, search } = req.query;
+      const { categoryId, search, latitude, longitude, radius } = req.query;
       const providers = await storage.getServiceProviders(
         categoryId as string,
-        search as string
+        search as string,
+        latitude ? parseFloat(latitude as string) : undefined,
+        longitude ? parseFloat(longitude as string) : undefined,
+        radius ? parseInt(radius as string) : undefined
       );
       res.json(providers);
     } catch (error) {

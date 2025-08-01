@@ -30,7 +30,7 @@ export interface IStorage {
   createServiceCategory(category: InsertServiceCategory): Promise<ServiceCategory>;
   
   // Service Provider operations
-  getServiceProviders(categoryId?: string, search?: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]>;
+  getServiceProviders(categoryId?: string, search?: string, userLat?: number, userLng?: number, radius?: number): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]>;
   getServiceProviderById(id: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory }) | undefined>;
   createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider>;
   updateServiceProviderRating(providerId: string): Promise<void>;
@@ -94,7 +94,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Service Provider operations
-  async getServiceProviders(categoryId?: string, search?: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]> {
+  async getServiceProviders(categoryId?: string, search?: string, userLat?: number, userLng?: number, radius?: number): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]> {
     let query = db
       .select()
       .from(serviceProviders)
@@ -112,13 +112,52 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
+    // If user location is provided, we can filter by distance
+    // Note: For more complex distance queries, consider using PostGIS
+    // For now, we'll fetch all and filter in memory for simplicity
     const results = await query.orderBy(desc(serviceProviders.rating));
     
-    return results.map(result => ({
+    let providers = results.map(result => ({
       ...result.service_providers,
       user: result.users,
       category: result.service_categories,
     }));
+
+    // Filter by location radius if provided
+    if (userLat !== undefined && userLng !== undefined && radius !== undefined) {
+      providers = providers.filter(provider => {
+        if (!provider.latitude || !provider.longitude) return false;
+        
+        const distance = this.calculateDistance(
+          userLat,
+          userLng,
+          parseFloat(provider.latitude),
+          parseFloat(provider.longitude)
+        );
+        
+        return distance <= radius;
+      });
+    }
+
+    return providers;
+  }
+
+  // Helper method to calculate distance between two coordinates
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = this.deg2rad(lat2 - lat1);
+    const dLon = this.deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+  }
+
+  private deg2rad(deg: number): number {
+    return deg * (Math.PI / 180);
   }
 
   async getServiceProviderById(id: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory }) | undefined> {
