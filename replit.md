@@ -66,6 +66,15 @@ Preferred communication style: Simple, everyday language.
 - **Real-time Status**: Live verification progress tracking
 - **Security**: Encrypted document storage and time-limited tokens
 
+### Internationalization System
+- **Multi-language Support**: English, French, and Arabic with full RTL support
+- **Translation Management**: Centralized translation system using Zustand for state management
+- **Language Persistence**: User language preference stored locally and persists across sessions
+- **Dynamic Language Switching**: Real-time language switching without page reload
+- **RTL Support**: Proper right-to-left text direction for Arabic language
+- **Comprehensive Coverage**: All UI elements, messages, and content fully translated
+- **Language Selector**: Compact and full variants available throughout the application
+
 ## Data Flow
 
 ### User Authentication Flow

@@ -23,12 +23,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Users, Shield, UserCheck, UserX, Trash2 } from "lucide-react";
+import { Users, Shield, UserCheck, UserX, Trash2, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
 import type { User } from "@shared/schema";
+import { useTranslation, getLanguageDirection, translations } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/language-selector";
 
 export default function AdminPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t, language } = useTranslation();
   
   const { data: users = [], isLoading } = useQuery<User[]>({
     queryKey: ['/api/admin/users'],
@@ -47,13 +51,13 @@ export default function AdminPanel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       toast({
-        title: "Success",
-        description: "User role updated successfully",
+        title: t('success'),
+        description: t('userRoleUpdated'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to update user role",
         variant: "destructive",
       });
@@ -73,13 +77,13 @@ export default function AdminPanel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       toast({
-        title: "Success",
-        description: "User status updated successfully",
+        title: t('success'),
+        description: t('userStatusUpdated'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to update user status",
         variant: "destructive",
       });
@@ -97,13 +101,13 @@ export default function AdminPanel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       toast({
-        title: "Success",
-        description: "User deleted successfully",
+        title: t('success'),
+        description: t('userDeleted'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to delete user",
         variant: "destructive",
       });
@@ -126,24 +130,33 @@ export default function AdminPanel() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" dir={getLanguageDirection(language)}>
         <div className="text-center">
           <Shield className="mx-auto h-12 w-12 text-muted-foreground animate-pulse mb-4" />
-          <p className="text-muted-foreground">Loading admin panel...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8" dir={getLanguageDirection(language)}>
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="mr-3">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t('back')}
+            </Button>
+          </Link>
           <Shield className="h-8 w-8 text-red-600" />
-          <h1 className="text-3xl font-bold">Admin Panel</h1>
+          <h1 className="text-3xl font-bold">{t('adminPanel')}</h1>
+          <div className="ml-auto">
+            <LanguageSelector variant="compact" />
+          </div>
         </div>
         <p className="text-muted-foreground">
-          Manage all user accounts and system access
+          {t('manageUsers')}
         </p>
       </div>
 
@@ -153,7 +166,7 @@ export default function AdminPanel() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('totalUsers')}</p>
                 <p className="text-2xl font-bold">{users.length}</p>
               </div>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -165,7 +178,7 @@ export default function AdminPanel() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Service Seekers</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('serviceSeekers')}</p>
                 <p className="text-2xl font-bold">
                   {users.filter(u => u.role === 'service_seeker').length}
                 </p>
@@ -179,7 +192,7 @@ export default function AdminPanel() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Service Providers</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('serviceProviders')}</p>
                 <p className="text-2xl font-bold">
                   {users.filter(u => u.role === 'service_provider').length}
                 </p>
@@ -193,7 +206,7 @@ export default function AdminPanel() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Companies</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('companies')}</p>
                 <p className="text-2xl font-bold">
                   {users.filter(u => u.role === 'company').length}
                 </p>
@@ -207,7 +220,7 @@ export default function AdminPanel() {
       {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle>All Users</CardTitle>
+          <CardTitle>{t('allUsers')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -244,11 +257,11 @@ export default function AdminPanel() {
 
                 <div className="flex items-center gap-2">
                   <Badge variant={getRoleBadgeVariant(user.role!)}>
-                    {user.role?.replace('_', ' ')}
+                    {t(user.role?.replace('_', '') as keyof typeof translations.en) || user.role?.replace('_', ' ')}
                   </Badge>
                   
                   <Badge variant={getStatusBadgeVariant(user.isActive!)}>
-                    {user.isActive ? 'Active' : 'Inactive'}
+                    {user.isActive ? t('active') : t('inactive')}
                   </Badge>
 
                   <Select
@@ -261,11 +274,11 @@ export default function AdminPanel() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="service_seeker">Service Seeker</SelectItem>
-                      <SelectItem value="service_provider">Service Provider</SelectItem>
-                      <SelectItem value="company">Company</SelectItem>
-                      <SelectItem value="support">Support</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="service_seeker">{t('serviceSeeker')}</SelectItem>
+                      <SelectItem value="service_provider">{t('serviceProvider')}</SelectItem>
+                      <SelectItem value="company">{t('company')}</SelectItem>
+                      <SelectItem value="support">{t('support')}</SelectItem>
+                      <SelectItem value="admin">{t('administrator')}</SelectItem>
                     </SelectContent>
                   </Select>
 
@@ -290,18 +303,18 @@ export default function AdminPanel() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete User</AlertDialogTitle>
+                        <AlertDialogTitle>{t('deleteUser')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete this user? This action cannot be undone.
+                          {t('deleteUserConfirm')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => deleteUserMutation.mutate(user.id)}
                           className="bg-red-600 hover:bg-red-700"
                         >
-                          Delete
+                          {t('delete')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

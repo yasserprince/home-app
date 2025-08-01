@@ -18,10 +18,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation, getLanguageDirection } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/language-selector";
 
 export default function Home() {
   const { user, isLoading: userLoading } = useAuth();
   const { toast } = useToast();
+  const { t, language } = useTranslation();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -185,22 +188,23 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-20" dir={getLanguageDirection(language)}>
       {/* Header */}
       <div className="bg-primary text-white p-6 pt-12">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-semibold">
-              Hello, {user?.firstName || "User"}!
+              {t('hello')}, {user?.firstName || "User"}!
             </h1>
-            <p className="text-blue-200 text-sm">What service do you need today?</p>
+            <p className="text-blue-200 text-sm">{t('whatServiceToday')}</p>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSelector variant="compact" className="mr-2" />
             {user?.role === 'admin' && (
               <Link href="/admin">
                 <div className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium hover:bg-red-600 transition-colors">
                   <Shield className="h-3 w-3" />
-                  Admin
+                  {t('admin')}
                 </div>
               </Link>
             )}
@@ -235,13 +239,13 @@ export default function Home() {
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
                     <UserIcon className="h-4 w-4" />
-                    Profile
+                    {t('profile')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
                     <Settings className="h-4 w-4" />
-                    Settings
+                    {t('settings')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -251,7 +255,7 @@ export default function Home() {
                     className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
                   >
                     <LogOut className="h-4 w-4" />
-                    Logout
+                    {t('logout')}
                   </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -264,7 +268,7 @@ export default function Home() {
           <Input
             ref={searchInputRef}
             type="text"
-            placeholder="Search for services..."
+            placeholder={t('searchServices')}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -331,7 +335,7 @@ export default function Home() {
 
       {/* Service Categories */}
       <div className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Popular Services</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('popularServices')}</h2>
         {categoriesLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             {[...Array(6)].map((_, i) => (
@@ -373,8 +377,8 @@ export default function Home() {
                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                     <ServiceIcon iconName="search" className="w-6 h-6 text-gray-400" />
                   </div>
-                  <h3 className="font-medium text-gray-900 text-sm">View All Services</h3>
-                  <p className="text-xs text-gray-600">+{(categories as any[]).length - 6} more categories</p>
+                  <h3 className="font-medium text-gray-900 text-sm">{t('viewAllServices')}</h3>
+                  <p className="text-xs text-gray-600">+{(categories as any[]).length - 6} {t('moreCategories')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -384,9 +388,9 @@ export default function Home() {
         {/* Recent Bookings */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Bookings</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('recentBookings')}</h2>
             <Link href="/bookings">
-              <button className="text-primary text-sm font-medium">View All</button>
+              <button className="text-primary text-sm font-medium">{t('viewAll')}</button>
             </Link>
           </div>
 
@@ -442,9 +446,9 @@ export default function Home() {
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <i className="fas fa-calendar text-gray-400 text-2xl"></i>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-2">No bookings yet</h3>
+                <h3 className="font-medium text-gray-900 mb-2">{t('noBookingsYet')}</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Book your first service to get started
+                  {t('bookFirstService')}
                 </p>
               </CardContent>
             </Card>
