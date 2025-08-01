@@ -41,17 +41,22 @@ export async function setupGoogleAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
   
+  // For now, use production URL for both dev and prod since Google Cloud Console is configured for it
+  // TODO: Add localhost URL to Google Cloud Console authorized redirect URIs
+  const callbackURL = "https://home-serve-katiflam1.replit.app/api/auth/google/callback";
+    
   console.log("Setting up Google OAuth with:", {
     clientId: process.env.GOOGLE_CLIENT_ID?.substring(0, 10) + "...",
     hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://home-serve-katiflam1.replit.app/api/auth/google/callback"
+    callbackURL,
+    nodeEnv: process.env.NODE_ENV
   });
 
   // Google OAuth Strategy
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: "https://home-serve-katiflam1.replit.app/api/auth/google/callback"
+    callbackURL
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       console.log("Google OAuth profile received:", JSON.stringify(profile, null, 2));
@@ -85,6 +90,7 @@ export async function setupGoogleAuth(app: Express) {
       return done(null, user);
     } catch (error) {
       console.error("Error in Google OAuth strategy:", error);
+      console.error("Error details:", error.message, error.stack);
       return done(error, undefined);
     }
   }));
@@ -126,7 +132,12 @@ export async function setupGoogleAuth(app: Express) {
     })(req, res, (err) => {
       if (err) {
         console.error("OAuth callback error:", err);
+        console.error("Error details:", err.message, err.stack);
         return res.redirect("/?error=auth_failed");
+      }
+      if (!req.user) {
+        console.error("No user found after authentication");
+        return res.redirect("/?error=no_user");
       }
       console.log("OAuth callback successful, user authenticated:", req.user);
       res.redirect("/");
@@ -139,6 +150,16 @@ export async function setupGoogleAuth(app: Express) {
         return res.status(500).json({ message: "Logout failed" });
       }
       res.json({ message: "Logged out successfully" });
+    });
+  });
+  
+  // Debug endpoint to test session
+  app.get("/api/debug-session", (req, res) => {
+    res.json({
+      isAuthenticated: req.isAuthenticated(),
+      user: req.user,
+      sessionID: req.sessionID,
+      hasSession: !!req.session
     });
   });
 }
