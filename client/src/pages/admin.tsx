@@ -113,6 +113,7 @@ export default function AdminPanel() {
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'admin': return 'destructive';
+      case 'support': return 'default';
       case 'service_provider': return 'default';
       case 'company': return 'secondary';
       default: return 'outline';
@@ -263,6 +264,7 @@ export default function AdminPanel() {
                       <SelectItem value="service_seeker">Service Seeker</SelectItem>
                       <SelectItem value="service_provider">Service Provider</SelectItem>
                       <SelectItem value="company">Company</SelectItem>
+                      <SelectItem value="support">Support</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                     </SelectContent>
                   </Select>

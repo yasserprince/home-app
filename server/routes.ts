@@ -178,13 +178,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin middleware
+  // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {
     try {
       const userId = req.user.claims.sub;
+      const userEmail = req.user.claims.email;
       const user = await storage.getUser(userId);
       
-      if (!user || user.role !== 'admin') {
+      // Only allow admin access for katiflam1@gmail.com
+      if (!user || user.role !== 'admin' || userEmail !== 'katiflam1@gmail.com') {
         return res.status(403).json({ message: "Admin access required" });
       }
       
@@ -194,7 +196,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
 
-  // Admin routes
+  // Support middleware - limited permissions
+  const isSupport: RequestHandler = async (req: any, res, next) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || (user.role !== 'admin' && user.role !== 'support')) {
+        return res.status(403).json({ message: "Support access required" });
+      }
+      
+      next();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to verify support status" });
+    }
+  };
+
+  // Admin routes (full permissions)
   app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const users = await storage.getAllUsers();
@@ -209,6 +227,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { role } = req.body;
+      
+      // Prevent changing own role
+      const currentUserId = req.user.claims.sub;
+      if (id === currentUserId) {
+        return res.status(400).json({ message: "Cannot change your own role" });
+      }
+      
       const user = await storage.updateUserRole(id, role);
       res.json(user);
     } catch (error) {
@@ -221,6 +246,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { isActive } = req.body;
+      
+      // Prevent deactivating own account
+      const currentUserId = req.user.claims.sub;
+      if (id === currentUserId) {
+        return res.status(400).json({ message: "Cannot deactivate your own account" });
+      }
+      
       const user = await storage.updateUserStatus(id, isActive);
       res.json(user);
     } catch (error) {
@@ -232,11 +264,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { id } = req.params;
+      
+      // Prevent deleting own account
+      const currentUserId = req.user.claims.sub;
+      if (id === currentUserId) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+      
       await storage.deleteUser(id);
       res.json({ message: "User deleted successfully" });
     } catch (error) {
       console.error("Error deleting user:", error);
       res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Support routes (limited permissions - view only)
+  app.get('/api/support/users', isAuthenticated, isSupport, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Support can only see basic user info, not sensitive data
+      const safeUsers = users.map(user => ({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        lastLoginAt: user.lastLoginAt
+      }));
+      res.json(safeUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Support can only activate/deactivate users, not change roles or delete
+  app.put('/api/support/users/:id/status', isAuthenticated, isSupport, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      
+      // Support cannot deactivate admin users
+      const targetUser = await storage.getUser(id);
+      if (targetUser?.role === 'admin') {
+        return res.status(403).json({ message: "Cannot modify admin users" });
+      }
+      
+      const user = await storage.updateUserStatus(id, isActive);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      res.status(500).json({ message: "Failed to update user status" });
     }
   });
 
