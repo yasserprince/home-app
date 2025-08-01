@@ -249,14 +249,20 @@ export default function Home() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <a 
-                    href="/api/logout" 
-                    className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {t('logout')}
-                  </a>
+                <DropdownMenuItem 
+                  onClick={async () => {
+                    try {
+                      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+                      window.location.href = '/';
+                    } catch (error) {
+                      console.error('Logout error:', error);
+                      window.location.href = '/';
+                    }
+                  }}
+                  className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                >
+                  <LogOut className="h-4 w-4" />
+                  {t('logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

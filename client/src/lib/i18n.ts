@@ -51,6 +51,7 @@ export const translations = {
     
     // Auth & Profile
     getStarted: 'Get Started',
+    signInWithGoogle: 'Sign in with Google',
     firstName: 'First Name',
     lastName: 'Last Name',
     email: 'Email',
@@ -219,6 +220,10 @@ export const translations = {
     search: 'Rechercher',
     logout: 'Déconnexion',
     login: 'Connexion',
+    
+    // Auth & Profile
+    getStarted: 'Commencer',
+    signInWithGoogle: 'Se connecter avec Google',
     
     // Home Page
     hello: 'Bonjour',
@@ -417,6 +422,7 @@ export const translations = {
     
     // Auth & Profile
     getStarted: 'ابدأ الآن',
+    signInWithGoogle: 'تسجيل الدخول باستخدام جوجل',
     firstName: 'الاسم الأول',
     lastName: 'اسم العائلة',
     email: 'البريد الإلكتروني',

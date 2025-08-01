@@ -65,15 +65,15 @@ export default function Landing() {
             <div className="space-y-4">
               <Button 
                 className="w-full py-6 text-lg font-semibold"
-                onClick={() => window.location.href = '/signup'}
+                onClick={() => window.location.href = '/api/auth/google'}
               >
-                {t('createAccount')}
+                {t('signInWithGoogle')}
               </Button>
               
               <Button 
                 variant="outline"
                 className="w-full py-6 text-lg font-semibold"
-                onClick={() => window.location.href = '/api/login'}
+                onClick={() => window.location.href = '/api/auth/google'}
               >
                 {t('signIn')}
               </Button>
