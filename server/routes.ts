@@ -280,22 +280,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // One-time admin setup endpoint (use only once in production)
-  app.post('/api/setup-admin', isAuthenticated, async (req, res) => {
+  app.post('/api/setup-admin', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
-      const userEmail = req.user?.claims?.email;
+      // Try different ways to get user info based on environment
+      const userId = req.user?.claims?.sub || req.user?.sub || req.user?.id;
+      const userEmail = req.user?.claims?.email || req.user?.email;
       
-      if (!userId || userEmail !== 'katiflam1@gmail.com') {
-        return res.status(403).json({ message: "Access denied" });
+      console.log("Admin setup attempt:", { userId, userEmail, user: req.user });
+      
+      if (!userId) {
+        return res.status(400).json({ message: "User ID not found" });
+      }
+      
+      if (userEmail !== 'katiflam1@gmail.com') {
+        return res.status(403).json({ message: "Access denied - not authorized email" });
       }
 
       // Update user to admin role
       await storage.updateUserRole(userId, 'admin');
       
-      res.json({ message: "Admin role assigned successfully" });
+      res.json({ message: "Admin role assigned successfully", userId, userEmail });
     } catch (error) {
       console.error("Error setting up admin:", error);
-      res.status(500).json({ message: "Failed to setup admin" });
+      res.status(500).json({ message: "Failed to setup admin", error: error.message });
     }
   });
 
