@@ -40,6 +40,12 @@ export async function setupGoogleAuth(app: Express) {
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
+  
+  console.log("Setting up Google OAuth with:", {
+    clientId: process.env.GOOGLE_CLIENT_ID?.substring(0, 10) + "...",
+    hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "https://home-serve-katiflam1.replit.app/api/auth/google/callback"
+  });
 
   // Google OAuth Strategy
   passport.use(new GoogleStrategy({
@@ -107,7 +113,14 @@ export async function setupGoogleAuth(app: Express) {
   });
 
   app.get("/api/auth/google/callback", (req, res, next) => {
-    console.log("OAuth callback reached");
+    console.log("OAuth callback reached with query:", req.query);
+    
+    // Check for OAuth errors in the callback
+    if (req.query.error) {
+      console.error("OAuth error from Google:", req.query.error);
+      return res.redirect("/?error=oauth_denied");
+    }
+    
     passport.authenticate("google", { 
       failureRedirect: "/?error=auth_failed",
     })(req, res, (err) => {
@@ -115,8 +128,7 @@ export async function setupGoogleAuth(app: Express) {
         console.error("OAuth callback error:", err);
         return res.redirect("/?error=auth_failed");
       }
-      console.log("OAuth callback successful, redirecting to home");
-      // Successful authentication
+      console.log("OAuth callback successful, user authenticated:", req.user);
       res.redirect("/");
     });
   });
