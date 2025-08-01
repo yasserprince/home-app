@@ -42,19 +42,25 @@ export async function setupGoogleAuth(app: Express) {
       : "http://localhost:5000/api/auth/google/callback"
   }, async (accessToken, refreshToken, profile, done) => {
     try {
+      console.log("Google OAuth profile received:", JSON.stringify(profile, null, 2));
+      
       // Extract user info from Google profile
       const email = profile.emails?.[0]?.value;
       const firstName = profile.name?.givenName;
       const lastName = profile.name?.familyName;
       const profileImageUrl = profile.photos?.[0]?.value;
 
+      console.log("Extracted profile data:", { email, firstName, lastName, profileImageUrl });
+
       if (!email) {
+        console.error("No email found in Google profile");
         return done(new Error("No email found in Google profile"), undefined);
       }
 
       // Upsert user in database - use google_ prefix for Google OAuth users
       const userId = `google_${profile.id}`;
       console.log("Creating/updating user:", { id: userId, email, firstName, lastName });
+      
       const user = await storage.upsertUser({
         id: userId,
         email,
@@ -63,9 +69,10 @@ export async function setupGoogleAuth(app: Express) {
         profileImageUrl,
       });
       
-      console.log("User created/updated successfully:", user.id);
+      console.log("User created/updated successfully:", user);
       return done(null, user);
     } catch (error) {
+      console.error("Error in Google OAuth strategy:", error);
       return done(error, undefined);
     }
   }));
