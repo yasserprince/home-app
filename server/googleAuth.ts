@@ -52,15 +52,18 @@ export async function setupGoogleAuth(app: Express) {
         return done(new Error("No email found in Google profile"), undefined);
       }
 
-      // Upsert user in database
+      // Upsert user in database - use google_ prefix for Google OAuth users
+      const userId = `google_${profile.id}`;
+      console.log("Creating/updating user:", { id: userId, email, firstName, lastName });
       const user = await storage.upsertUser({
-        id: profile.id,
+        id: userId,
         email,
         firstName,
         lastName,
         profileImageUrl,
       });
-
+      
+      console.log("User created/updated successfully:", user.id);
       return done(null, user);
     } catch (error) {
       return done(error, undefined);
@@ -89,12 +92,20 @@ export async function setupGoogleAuth(app: Express) {
     passport.authenticate("google", { scope: ["profile", "email"] })
   );
 
-  app.get("/api/auth/google/callback",
+  app.get("/api/auth/google/callback", (req, res, next) => {
+    console.log("OAuth callback reached");
     passport.authenticate("google", { 
-      failureRedirect: "/",
-      successRedirect: "/"
-    })
-  );
+      failureRedirect: "/?error=auth_failed",
+    })(req, res, (err) => {
+      if (err) {
+        console.error("OAuth callback error:", err);
+        return res.redirect("/?error=auth_failed");
+      }
+      console.log("OAuth callback successful, redirecting to home");
+      // Successful authentication
+      res.redirect("/");
+    });
+  });
 
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
