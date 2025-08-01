@@ -10,7 +10,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 import { ServiceIcon } from "@/components/service-icon";
-import { Search, X, ArrowRight } from "lucide-react";
+import { Search, X, ArrowRight, Shield } from "lucide-react";
 
 export default function Home() {
   const { user, isLoading: userLoading } = useAuth();
@@ -152,7 +152,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (user && !categoriesLoading && (!categories || categories.length === 0)) {
+    if (user && !categoriesLoading && (!categories || (categories as any[]).length === 0)) {
       initDataMutation.mutate();
     }
   }, [user, categories, categoriesLoading]);
@@ -188,17 +188,27 @@ export default function Home() {
             </h1>
             <p className="text-blue-200 text-sm">What service do you need today?</p>
           </div>
-          {user?.profileImageUrl ? (
-            <img
-              src={user.profileImageUrl}
-              alt="Profile"
-              className="w-12 h-12 rounded-full object-cover border-2 border-blue-300"
-            />
-          ) : (
-            <div className="w-12 h-12 bg-blue-300 rounded-full flex items-center justify-center">
-              <i className="fas fa-user text-primary"></i>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {user?.role === 'admin' && (
+              <Link href="/admin">
+                <div className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium hover:bg-red-600 transition-colors">
+                  <Shield className="h-3 w-3" />
+                  Admin
+                </div>
+              </Link>
+            )}
+            {user?.profileImageUrl ? (
+              <img
+                src={user.profileImageUrl}
+                alt="Profile"
+                className="w-12 h-12 rounded-full object-cover border-2 border-blue-300"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-blue-300 rounded-full flex items-center justify-center text-blue-600 font-semibold">
+                {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search Bar */}

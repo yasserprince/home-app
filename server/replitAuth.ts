@@ -57,12 +57,18 @@ function updateUserSession(
 async function upsertUser(
   claims: any,
 ) {
+  // Get role from session storage or default to service_seeker
+  const role = 'service_seeker'; // Default role, can be updated later
+  
   await storage.upsertUser({
     id: claims["sub"],
     email: claims["email"],
     firstName: claims["first_name"],
     lastName: claims["last_name"],
     profileImageUrl: claims["profile_image_url"],
+    role,
+    accountType: 'individual',
+    lastLoginAt: new Date(),
   });
 }
 

@@ -20,12 +20,16 @@ import LocationSettings from "@/pages/location-settings";
 import Verification from "@/pages/verification";
 import Notifications from "@/pages/notifications";
 import HelpSupport from "@/pages/help-support";
+import AdminPanel from "@/pages/admin";
+import SignupChoice from "@/pages/signup-choice";
+import { AdminNav } from "@/components/admin-nav";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   return (
     <Switch>
+      <Route path="/signup" component={SignupChoice} />
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (
@@ -44,6 +48,9 @@ function Router() {
           <Route path="/profile/verification" component={Verification} />
           <Route path="/profile/notifications" component={Notifications} />
           <Route path="/profile/help" component={HelpSupport} />
+          {user?.role === 'admin' && (
+            <Route path="/admin" component={AdminPanel} />
+          )}
         </>
       )}
       <Route component={NotFound} />
@@ -57,6 +64,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <AdminNav />
       </TooltipProvider>
     </QueryClientProvider>
   );

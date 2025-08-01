@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, RequestHandler } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -175,6 +175,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Admin middleware
+  const isAdmin: RequestHandler = async (req: any, res, next) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.role !== 'admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      
+      next();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to verify admin status" });
+    }
+  };
+
+  // Admin routes
+  app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { role } = req.body;
+      const user = await storage.updateUserRole(id, role);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ message: "Failed to update user role" });
+    }
+  });
+
+  app.put('/api/admin/users/:id/status', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      const user = await storage.updateUserStatus(id, isActive);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      res.status(500).json({ message: "Failed to update user status" });
+    }
+  });
+
+  app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteUser(id);
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
     }
   });
 
@@ -379,6 +441,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching reviews:", error);
       res.status(500).json({ message: "Failed to fetch reviews" });
+    }
+  });
+
+  // Create admin user endpoint (for setup)
+  app.post('/api/setup-admin', async (req, res) => {
+    try {
+      const { adminId } = req.body;
+      if (!adminId) {
+        return res.status(400).json({ message: "Admin ID is required" });
+      }
+      
+      // Update the specified user to admin role
+      const adminUser = await storage.updateUserRole(adminId, 'admin');
+      res.json({ message: "Admin user created successfully", user: adminUser });
+    } catch (error) {
+      console.error("Error creating admin user:", error);
+      res.status(500).json({ message: "Failed to create admin user" });
     }
   });
 
@@ -839,7 +918,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const query = q.toLowerCase().trim();
-    const suggestions = [];
+    const suggestions: Array<{
+      type: string;
+      text: string;
+      description: string;
+      icon: string;
+      color: string;
+      id: string;
+    }> = [];
     
     // Get categories
     const categories = await storage.getServiceCategories();
