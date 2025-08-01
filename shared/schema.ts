@@ -46,6 +46,16 @@ export const users = pgTable("users", {
   longitude: decimal("longitude", { precision: 11, scale: 8 }),
   locationEnabled: boolean("location_enabled").default(false),
   lastLocationUpdate: timestamp("last_location_update"),
+  // KYC and Verification fields
+  kycStatus: varchar("kyc_status").default("unverified"), // unverified, pending, verified, rejected
+  idVerificationStatus: varchar("id_verification_status").default("unverified"),
+  phoneVerificationStatus: varchar("phone_verification_status").default("unverified"),
+  emailVerificationStatus: varchar("email_verification_status").default("unverified"),
+  backgroundCheckStatus: varchar("background_check_status").default("not_required"),
+  verificationDocuments: jsonb("verification_documents"), // Store document verification results
+  trustScore: integer("trust_score").default(0), // 0-100 trust score
+  verificationDate: timestamp("verification_date"),
+  verificationProvider: varchar("verification_provider"), // didit, idenfy, etc.
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

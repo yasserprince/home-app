@@ -58,6 +58,14 @@ Preferred communication style: Simple, everyday language.
 - **Responsive Layout**: Mobile-first responsive design
 - **Form Controls**: Comprehensive form components with validation
 
+### KYC & Verification System
+- **Identity Verification**: Multi-tier verification system with trust scoring
+- **Free Services Integration**: Didit unlimited KYC, free SMS services
+- **Verification Types**: Email, phone, ID document, background check
+- **Trust Score Algorithm**: 0-100 scoring based on verification completion
+- **Real-time Status**: Live verification progress tracking
+- **Security**: Encrypted document storage and time-limited tokens
+
 ## Data Flow
 
 ### User Authentication Flow

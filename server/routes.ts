@@ -53,6 +53,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files
   app.use('/uploads', express.static(uploadDir));
 
+  // Verification endpoints
+  app.post('/api/verification/email', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Generate verification token
+      const verificationToken = Math.random().toString(36).substring(2, 15);
+      
+      // Update user with pending email verification
+      await storage.updateUser(userId, {
+        emailVerificationStatus: 'pending',
+        verificationDocuments: JSON.stringify({
+          emailToken: verificationToken,
+          emailTokenExpiry: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+        })
+      });
+
+      // In production, send actual email with verification link
+      // For demo purposes, we'll simulate success
+      console.log(`Email verification token for ${userId}: ${verificationToken}`);
+      
+      res.json({ 
+        message: "Verification email sent",
+        // In development, return token for testing
+        ...(process.env.NODE_ENV === 'development' && { token: verificationToken })
+      });
+    } catch (error) {
+      console.error("Error sending verification email:", error);
+      res.status(500).json({ message: "Failed to send verification email" });
+    }
+  });
+
+  app.post('/api/verification/phone', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Generate verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Update user with pending phone verification
+      await storage.updateUser(userId, {
+        phoneVerificationStatus: 'pending',
+        verificationDocuments: JSON.stringify({
+          phoneCode: verificationCode,
+          phoneCodeExpiry: Date.now() + 10 * 60 * 1000 // 10 minutes
+        })
+      });
+
+      // In production, send actual SMS using free services like:
+      // - Twilio free trial: $15 credit
+      // - TextBelt API: free tier available
+      // - SMSGateway24: free trial
+      console.log(`Phone verification code for ${userId}: ${verificationCode}`);
+      
+      res.json({ 
+        message: "Verification code sent",
+        // In development, return code for testing
+        ...(process.env.NODE_ENV === 'development' && { code: verificationCode })
+      });
+    } catch (error) {
+      console.error("Error sending verification code:", error);
+      res.status(500).json({ message: "Failed to send verification code" });
+    }
+  });
+
+  app.post('/api/verification/verify-email', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { token } = req.body;
+      
+      const user = await storage.getUser(userId);
+      const verificationData = user?.verificationDocuments ? JSON.parse(user.verificationDocuments as string) : {};
+      
+      if (verificationData.emailToken === token && Date.now() < verificationData.emailTokenExpiry) {
+        await storage.updateUser(userId, {
+          emailVerificationStatus: 'verified',
+          trustScore: (user?.trustScore || 0) + 25,
+          verificationDate: new Date()
+        });
+        res.json({ message: "Email verified successfully" });
+      } else {
+        res.status(400).json({ message: "Invalid or expired verification token" });
+      }
+    } catch (error) {
+      console.error("Error verifying email:", error);
+      res.status(500).json({ message: "Failed to verify email" });
+    }
+  });
+
+  app.post('/api/verification/verify-phone', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { code } = req.body;
+      
+      const user = await storage.getUser(userId);
+      const verificationData = user?.verificationDocuments ? JSON.parse(user.verificationDocuments as string) : {};
+      
+      if (verificationData.phoneCode === code && Date.now() < verificationData.phoneCodeExpiry) {
+        await storage.updateUser(userId, {
+          phoneVerificationStatus: 'verified',
+          trustScore: (user?.trustScore || 0) + 25,
+          verificationDate: new Date()
+        });
+        res.json({ message: "Phone verified successfully" });
+      } else {
+        res.status(400).json({ message: "Invalid or expired verification code" });
+      }
+    } catch (error) {
+      console.error("Error verifying phone:", error);
+      res.status(500).json({ message: "Failed to verify phone" });
+    }
+  });
+
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
