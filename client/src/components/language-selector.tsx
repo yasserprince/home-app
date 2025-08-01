@@ -21,8 +21,10 @@ export function LanguageSelector({ className = '', variant = 'default' }: Langua
   if (variant === 'compact') {
     return (
       <Select value={language} onValueChange={setLanguage}>
-        <SelectTrigger className={`w-16 h-8 p-1 ${className}`}>
-          <SelectValue />
+        <SelectTrigger className={`w-16 h-8 p-1 text-white border-white/20 ${className}`}>
+          <SelectValue>
+            {language.toUpperCase()}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {languages.map((lang) => (
@@ -40,7 +42,9 @@ export function LanguageSelector({ className = '', variant = 'default' }: Langua
       <Globe className="h-4 w-4 text-muted-foreground" />
       <Select value={language} onValueChange={setLanguage}>
         <SelectTrigger className="w-40">
-          <SelectValue />
+          <SelectValue>
+            {getLanguageName(language)}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {languages.map((lang) => (

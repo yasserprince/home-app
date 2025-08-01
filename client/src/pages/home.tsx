@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTranslation, getLanguageDirection } from "@/lib/i18n";
+import { useTranslation, getLanguageDirection, translateCategoryName } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 
 export default function Home() {
@@ -359,7 +359,7 @@ export default function Home() {
                       />
                     </div>
                     <h3 className="font-medium text-gray-900 text-xs text-center leading-tight line-clamp-2">
-                      {category.name}
+                      {translateCategoryName(category.name, language)}
                     </h3>
                   </CardContent>
                 </Card>

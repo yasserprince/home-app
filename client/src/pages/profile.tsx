@@ -5,9 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import BottomNavigation from "@/components/bottom-navigation";
 import { Shield, ShieldCheck, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import { useTranslation, getLanguageDirection, translations } from "@/lib/i18n";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
+  const { t, language } = useTranslation();
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
@@ -46,7 +48,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-20" dir={getLanguageDirection(language)}>
       {/* Header */}
       <div className="bg-primary text-white p-6 pt-12">
         <div className="flex items-center justify-between mb-4">
@@ -57,10 +59,10 @@ export default function Profile() {
               className="text-white hover:bg-blue-600 border border-white/20 hover:border-white/40 px-3 py-2"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              {t('back')}
             </Button>
           </Link>
-          <h1 className="text-xl font-semibold">Profile</h1>
+          <h1 className="text-xl font-semibold">{t('profile')}</h1>
           <div></div> {/* Spacer for center alignment */}
         </div>
         <div className="flex items-center space-x-4">
@@ -115,7 +117,7 @@ export default function Profile() {
             onClick={() => window.location.href = '/bookings'}
           >
             <i className="fas fa-calendar-check text-primary text-lg"></i>
-            <span className="text-sm font-medium">My Bookings</span>
+            <span className="text-sm font-medium">{t('myBookings')}</span>
           </Button>
           <Button
             variant="outline"
@@ -123,7 +125,7 @@ export default function Profile() {
             onClick={() => window.location.href = '/providers?favorites=true'}
           >
             <i className="fas fa-heart text-red-500 text-lg"></i>
-            <span className="text-sm font-medium">Favorites</span>
+            <span className="text-sm font-medium">{t('favorites')}</span>
           </Button>
         </div>
 
@@ -138,7 +140,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-user text-primary"></i>
               </div>
-              <span className="font-medium text-gray-900">Edit Profile</span>
+              <span className="font-medium text-gray-900">{t('editProfile')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>

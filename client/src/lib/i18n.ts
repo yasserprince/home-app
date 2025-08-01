@@ -101,6 +101,7 @@ export const translations = {
     plumbing: 'Plumbing',
     electrical: 'Electrical',
     hvac: 'HVAC',
+    acRepair: 'AC Repair',
     handyman: 'Handyman',
     painting: 'Painting',
     roofing: 'Roofing',
@@ -108,6 +109,10 @@ export const translations = {
     kitchenRemodeling: 'Kitchen Remodeling',
     bathroomRemodeling: 'Bathroom Remodeling',
     cleaning: 'Cleaning',
+    landscaping: 'Landscaping',
+    carpentry: 'Carpentry',
+    tiling: 'Tiling',
+    locksmith: 'Locksmith',
     
     // Roles
     serviceSeeker: 'Service Seeker',
@@ -213,6 +218,7 @@ export const translations = {
     plumbing: 'Plomberie',
     electrical: 'Électricité',
     hvac: 'CVC',
+    acRepair: 'Réparation de Climatisation',
     handyman: 'Bricoleur',
     painting: 'Peinture',
     roofing: 'Toiture',
@@ -220,6 +226,10 @@ export const translations = {
     kitchenRemodeling: 'Rénovation de Cuisine',
     bathroomRemodeling: 'Rénovation de Salle de Bain',
     cleaning: 'Nettoyage',
+    landscaping: 'Aménagement Paysager',
+    carpentry: 'Menuiserie',
+    tiling: 'Carrelage',
+    locksmith: 'Serrurier',
     
     // Roles
     serviceSeeker: 'Demandeur de Service',
@@ -325,6 +335,7 @@ export const translations = {
     plumbing: 'السباكة',
     electrical: 'الكهرباء',
     hvac: 'التدفئة والتهوية',
+    acRepair: 'إصلاح المكيفات',
     handyman: 'الصيانة العامة',
     painting: 'الطلاء',
     roofing: 'الأسقف',
@@ -332,6 +343,10 @@ export const translations = {
     kitchenRemodeling: 'تجديد المطبخ',
     bathroomRemodeling: 'تجديد الحمام',
     cleaning: 'التنظيف',
+    landscaping: 'تنسيق الحدائق',
+    carpentry: 'النجارة',
+    tiling: 'البلاط',
+    locksmith: 'الأقفال',
     
     // Roles
     serviceSeeker: 'طالب خدمة',
@@ -379,4 +394,18 @@ export const getLanguageName = (lang: Language): string => {
     ar: 'العربية'
   };
   return names[lang];
+};
+
+export const translateCategoryName = (categoryName: string, language: Language): string => {
+  // Convert category name to camelCase key
+  const key = categoryName
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, ' ')
+    .trim()
+    .split(' ')
+    .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
+  
+  // Return translated category name or original if not found
+  return translations[language][key as keyof typeof translations.en] || categoryName;
 };
