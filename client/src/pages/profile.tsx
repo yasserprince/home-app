@@ -135,6 +135,20 @@ export default function Profile() {
           <Button
             variant="ghost"
             className="w-full justify-between p-4 h-auto"
+            onClick={() => window.location.href = '/profile/location'}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <i className="fas fa-map-pin text-orange-600"></i>
+              </div>
+              <span className="font-medium text-gray-900">Location Settings</span>
+            </div>
+            <i className="fas fa-chevron-right text-gray-400"></i>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-between p-4 h-auto"
             onClick={() => window.location.href = '/profile/notifications'}
           >
             <div className="flex items-center space-x-3">

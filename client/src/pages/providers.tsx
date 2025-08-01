@@ -309,6 +309,15 @@ export default function Providers() {
           </Card>
         )}
       </div>
+
+      {/* Location Permission Modal */}
+      {showLocationPrompt && (
+        <LocationPermission
+          onAllow={handleLocationAllow}
+          onDeny={handleLocationDeny}
+          onClose={() => setShowLocationPrompt(false)}
+        />
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ import Profile from "@/pages/profile";
 import ProfileEdit from "@/pages/profile-edit";
 import PaymentMethods from "@/pages/payment-methods";
 import SavedAddresses from "@/pages/saved-addresses";
+import LocationSettings from "@/pages/location-settings";
 import Notifications from "@/pages/notifications";
 import HelpSupport from "@/pages/help-support";
 
@@ -36,6 +37,7 @@ function Router() {
           <Route path="/profile/edit" component={ProfileEdit} />
           <Route path="/profile/payment-methods" component={PaymentMethods} />
           <Route path="/profile/addresses" component={SavedAddresses} />
+          <Route path="/profile/location" component={LocationSettings} />
           <Route path="/profile/notifications" component={Notifications} />
           <Route path="/profile/help" component={HelpSupport} />
         </>
