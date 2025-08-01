@@ -79,7 +79,6 @@ const iconMap = {
   'cogs': Settings,
   'solar-panel': Sun,
   'temperature-low': Wind,
-  'swimming-pool': Waves,
 };
 
 interface ServiceIconProps {
