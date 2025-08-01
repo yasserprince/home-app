@@ -16,7 +16,7 @@ import {
   type InsertReview,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, ilike, sql } from "drizzle-orm";
+import { eq, desc, and, ilike, sql, or } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -95,27 +95,34 @@ export class DatabaseStorage implements IStorage {
 
   // Service Provider operations
   async getServiceProviders(categoryId?: string, search?: string, userLat?: number, userLng?: number, radius?: number): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]> {
-    let query = db
+    let whereConditions = [eq(serviceProviders.isAvailable, true)];
+
+    if (categoryId) {
+      whereConditions.push(eq(serviceProviders.categoryId, categoryId));
+    }
+
+    if (search) {
+      whereConditions.push(
+        or(
+          ilike(serviceProviders.businessName, `%${search}%`),
+          ilike(serviceProviders.description, `%${search}%`),
+          ilike(serviceCategories.name, `%${search}%`)
+        )
+      );
+    }
+
+    const query = db
       .select()
       .from(serviceProviders)
       .innerJoin(users, eq(serviceProviders.userId, users.id))
       .innerJoin(serviceCategories, eq(serviceProviders.categoryId, serviceCategories.id))
-      .where(eq(serviceProviders.isAvailable, true));
-
-    if (categoryId) {
-      query = query.where(eq(serviceProviders.categoryId, categoryId));
-    }
-
-    if (search) {
-      query = query.where(
-        ilike(serviceProviders.businessName, `%${search}%`)
-      );
-    }
+      .where(and(...whereConditions))
+      .orderBy(desc(serviceProviders.rating));
 
     // If user location is provided, we can filter by distance
     // Note: For more complex distance queries, consider using PostGIS
     // For now, we'll fetch all and filter in memory for simplicity
-    const results = await query.orderBy(desc(serviceProviders.rating));
+    const results = await query;
     
     let providers = results.map(result => ({
       ...result.service_providers,

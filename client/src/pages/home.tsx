@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,11 +9,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
+import { Search } from "lucide-react";
 
 export default function Home() {
   const { user, isLoading: userLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Initialize sample data
   const initDataMutation = useMutation({
@@ -102,9 +105,16 @@ export default function Home() {
           <Input
             type="text"
             placeholder="Search for services..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && searchQuery.trim()) {
+                setLocation(`/providers?search=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }}
             className="w-full py-3 px-4 pl-12 rounded-xl text-gray-900 bg-white border-0"
           />
-          <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
       </div>
 
@@ -140,7 +150,7 @@ export default function Home() {
         {/* Show More Services */}
         {categories && categories.length > 6 && (
           <div className="mb-6">
-            <Link href="/providers">
+            <Link href="/categories">
               <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed border-2 border-gray-300">
                 <CardContent className="p-4 text-center">
                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">

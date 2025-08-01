@@ -251,7 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         search as string,
         latitude ? parseFloat(latitude as string) : undefined,
         longitude ? parseFloat(longitude as string) : undefined,
-        radius ? parseInt(radius as string) : undefined
+        radius ? parseInt(radius as string) || 50 : undefined
       );
       res.json(providers);
     } catch (error) {

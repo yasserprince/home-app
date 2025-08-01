@@ -16,6 +16,7 @@ export default function Providers() {
   const [location] = useLocation();
   const [searchParams] = useState(() => new URLSearchParams(location.split('?')[1] || ''));
   const categoryId = searchParams.get('category');
+  const searchQuery = searchParams.get('search');
   const [activeFilter, setActiveFilter] = useState('all');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
@@ -31,7 +32,7 @@ export default function Providers() {
   };
 
   const { data: providers, isLoading } = useQuery<ProviderWithDetails[]>({
-    queryKey: ["/api/providers", categoryId, userLocation],
+    queryKey: ["/api/providers", categoryId, searchQuery, userLocation],
     enabled: true,
   });
 
@@ -92,9 +93,20 @@ export default function Providers() {
     });
   };
 
-  // Process providers based on location and filter
+  // Process providers based on location, search, and filter
   const processedProviders = providers ? (() => {
     let filtered: ProviderWithDetails[] = [...providers];
+    
+    // Apply search filter if search query exists
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(provider => 
+        provider.businessName.toLowerCase().includes(query) ||
+        provider.description?.toLowerCase().includes(query) ||
+        provider.category.name.toLowerCase().includes(query) ||
+        provider.services?.some(service => service.toLowerCase().includes(query))
+      );
+    }
     
     // Add distance information if user location is available
     if (userLocation) {
@@ -152,7 +164,7 @@ export default function Providers() {
             </Button>
           </Link>
           <h1 className="text-xl font-semibold text-gray-900">
-            {currentCategory?.name || 'All'} Services
+            {searchQuery ? `Search: "${searchQuery}"` : currentCategory?.name || 'All'} Services
           </h1>
         </div>
 

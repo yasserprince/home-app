@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
+import Categories from "@/pages/categories";
 import Providers from "@/pages/providers";
 import ProviderDetail from "@/pages/provider-detail";
 import Booking from "@/pages/booking";
@@ -30,6 +31,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/categories" component={Categories} />
           <Route path="/providers" component={Providers} />
           <Route path="/provider/:id" component={ProviderDetail} />
           <Route path="/booking" component={Booking} />
