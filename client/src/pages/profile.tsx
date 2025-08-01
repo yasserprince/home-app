@@ -140,7 +140,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-user text-primary"></i>
               </div>
-              <span className="font-medium text-gray-900">{t('editProfile')}</span>
+              <span className="font-medium text-gray-900">Edit Profile</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
