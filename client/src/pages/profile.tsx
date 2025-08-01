@@ -140,7 +140,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-user text-primary"></i>
               </div>
-              <span className="font-medium text-gray-900">Edit Profile</span>
+              <span className="font-medium text-gray-900">{t('editProfile')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -154,7 +154,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-credit-card text-green-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Payment Methods</span>
+              <span className="font-medium text-gray-900">{t('paymentMethods')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -168,7 +168,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-map-marker-alt text-yellow-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Saved Addresses</span>
+              <span className="font-medium text-gray-900">{t('savedAddresses')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -182,7 +182,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-map-pin text-orange-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Location Settings</span>
+              <span className="font-medium text-gray-900">{t('locationSettings')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -196,7 +196,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-chart-line text-green-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Earnings & Analytics</span>
+              <span className="font-medium text-gray-900">{t('earningsAnalytics')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -210,7 +210,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-star text-yellow-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Reviews & Ratings</span>
+              <span className="font-medium text-gray-900">{t('reviewsRatings')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -224,7 +224,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <ShieldCheck className="w-5 h-5 text-blue-600" />
               </div>
-              <span className="font-medium text-gray-900">Identity & Verification</span>
+              <span className="font-medium text-gray-900">{t('verificationCenter')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -238,7 +238,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-sliders-h text-indigo-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Preferences & Privacy</span>
+              <span className="font-medium text-gray-900">{t('preferencesPrivacy')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -252,7 +252,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-bell text-purple-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Notifications</span>
+              <span className="font-medium text-gray-900">{t('notifications')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
@@ -266,7 +266,7 @@ export default function Profile() {
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-headset text-gray-600"></i>
               </div>
-              <span className="font-medium text-gray-900">Help & Support</span>
+              <span className="font-medium text-gray-900">{t('helpCenter')}</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>

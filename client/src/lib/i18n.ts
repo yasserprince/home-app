@@ -80,6 +80,17 @@ export const translations = {
     language: 'Language',
     selectLanguage: 'Select Language',
     
+    // Profile Menu Items
+    editProfile: 'Edit Profile',
+    paymentMethods: 'Payment Methods',
+    savedAddresses: 'Saved Addresses',
+    locationSettings: 'Location Settings',
+    earningsAnalytics: 'Earnings & Analytics',
+    reviewsRatings: 'Reviews & Ratings',
+    verificationCenter: 'Identity & Verification',
+    preferencesPrivacy: 'Preferences & Privacy',
+    helpCenter: 'Help & Support',
+    
     // Admin Panel
     adminPanel: 'Admin Panel',
     manageUsers: 'Manage all user accounts and system access',
@@ -252,6 +263,17 @@ export const translations = {
     language: 'Langue',
     selectLanguage: 'Sélectionner la Langue',
     
+    // Profile Menu Items
+    editProfile: 'Modifier le Profil',
+    paymentMethods: 'Méthodes de Paiement',
+    savedAddresses: 'Adresses Sauvegardées',
+    locationSettings: 'Paramètres de Localisation',
+    earningsAnalytics: 'Revenus et Analyses',
+    reviewsRatings: 'Avis et Évaluations',
+    verificationCenter: 'Identité et Vérification',
+    preferencesPrivacy: 'Préférences et Confidentialité',
+    helpCenter: 'Aide et Support',
+    
     // Admin Panel
     adminPanel: 'Panneau d\'Administration',
     manageUsers: 'Gérer tous les comptes utilisateur et l\'accès au système',
@@ -423,6 +445,17 @@ export const translations = {
     signOutDescription: 'تسجيل الخروج من حسابك على هذا الجهاز',
     language: 'اللغة',
     selectLanguage: 'اختر اللغة',
+    
+    // Profile Menu Items
+    editProfile: 'تحرير الملف الشخصي',
+    paymentMethods: 'طرق الدفع',
+    savedAddresses: 'العناوين المحفوظة',
+    locationSettings: 'إعدادات الموقع',
+    earningsAnalytics: 'الأرباح والتحليلات',
+    reviewsRatings: 'المراجعات والتقييمات',
+    verificationCenter: 'الهوية والتحقق',
+    preferencesPrivacy: 'التفضيلات والخصوصية',
+    helpCenter: 'المساعدة والدعم',
     
     // Admin Panel
     adminPanel: 'لوحة الإدارة',
