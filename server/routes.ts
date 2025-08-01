@@ -389,77 +389,326 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (categories.length === 0) {
         // Create sample categories
         const sampleCategories = [
+          // Core Home Infrastructure
           {
             name: "Plumbing",
-            description: "Leak repair, drain cleaning, water heater",
+            description: "Pipe repair, drain cleaning, water heater service",
             icon: "fas fa-faucet",
             color: "hsl(207, 90%, 54%)",
           },
           {
             name: "Electrical",
-            description: "Wiring, panel upgrades, lighting",
+            description: "Wiring, panel upgrades, lighting installation",
             icon: "fas fa-bolt",
             color: "hsl(39, 96%, 49%)",
           },
           {
             name: "HVAC",
-            description: "Heating, cooling & air conditioning",
+            description: "Heating, cooling & air conditioning repair",
             icon: "fas fa-thermometer-half",
             color: "hsl(200, 70%, 45%)",
           },
-          {
-            name: "Cleaning",
-            description: "House cleaning & sanitization",
-            icon: "fas fa-broom",
-            color: "hsl(271, 81%, 56%)",
-          },
+          // Home Improvement & Construction
           {
             name: "Handyman",
-            description: "General repairs & maintenance",
+            description: "General repairs, furniture assembly, minor fixes",
             icon: "fas fa-hammer",
             color: "hsl(25, 85%, 55%)",
           },
           {
-            name: "Landscaping",
-            description: "Lawn care & garden design",
-            icon: "fas fa-seedling",
-            color: "hsl(150, 70%, 40%)",
-          },
-          {
-            name: "Pest Control",
-            description: "Insect & rodent removal",
-            icon: "fas fa-bug",
-            color: "hsl(350, 70%, 50%)",
-          },
-          {
-            name: "Appliance Repair",
-            description: "Washer, dryer & kitchen appliances",
-            icon: "fas fa-cog",
-            color: "hsl(220, 60%, 50%)",
-          },
-          {
-            name: "Roofing",
-            description: "Roof repair & installation",
-            icon: "fas fa-home",
-            color: "hsl(15, 75%, 45%)",
-          },
-          {
             name: "Painting",
-            description: "Interior & exterior painting",
+            description: "Interior & exterior painting, cabinet refinishing",
             icon: "fas fa-paint-roller",
             color: "hsl(300, 70%, 55%)",
           },
           {
+            name: "Roofing",
+            description: "Roof installation, repair & gutter services",
+            icon: "fas fa-home",
+            color: "hsl(15, 75%, 45%)",
+          },
+          {
             name: "Flooring",
-            description: "Installation & refinishing",
+            description: "Hardwood, tile, carpet installation & refinishing",
             icon: "fas fa-th-large",
             color: "hsl(35, 65%, 50%)",
           },
           {
-            name: "Security",
-            description: "Security systems & smart home",
-            icon: "fas fa-shield-alt",
+            name: "Kitchen Remodeling",
+            description: "Kitchen renovation & cabinet installation",
+            icon: "fas fa-utensils",
+            color: "hsl(120, 60%, 45%)",
+          },
+          {
+            name: "Bathroom Remodeling",
+            description: "Bathroom renovation & fixture installation",
+            icon: "fas fa-bath",
+            color: "hsl(180, 70%, 50%)",
+          },
+          {
+            name: "Carpentry",
+            description: "Custom woodwork, built-ins, trim installation",
+            icon: "fas fa-saw-blade",
+            color: "hsl(30, 80%, 45%)",
+          },
+          // Cleaning & Maintenance
+          {
+            name: "House Cleaning",
+            description: "Regular cleaning, deep cleaning, move-out cleaning",
+            icon: "fas fa-broom",
+            color: "hsl(271, 81%, 56%)",
+          },
+          {
+            name: "Carpet Cleaning",
+            description: "Professional carpet & upholstery cleaning",
+            icon: "fas fa-spray-can",
+            color: "hsl(210, 70%, 50%)",
+          },
+          {
+            name: "Window Cleaning",
+            description: "Interior & exterior window cleaning",
+            icon: "fas fa-window-maximize",
+            color: "hsl(195, 80%, 55%)",
+          },
+          {
+            name: "Pressure Washing",
+            description: "Driveway, siding & deck power washing",
+            icon: "fas fa-water",
+            color: "hsl(200, 85%, 60%)",
+          },
+          {
+            name: "Junk Removal",
+            description: "Furniture removal, garage cleanouts, hauling",
+            icon: "fas fa-truck",
+            color: "hsl(30, 70%, 50%)",
+          },
+          // Outdoor & Landscaping
+          {
+            name: "Landscaping",
+            description: "Lawn care, garden design, tree services",
+            icon: "fas fa-seedling",
+            color: "hsl(150, 70%, 40%)",
+          },
+          {
+            name: "Lawn Care",
+            description: "Mowing, fertilizing, weed control",
+            icon: "fas fa-leaf",
+            color: "hsl(120, 75%, 45%)",
+          },
+          {
+            name: "Tree Services",
+            description: "Tree trimming, removal & stump grinding",
+            icon: "fas fa-tree",
+            color: "hsl(90, 65%, 40%)",
+          },
+          {
+            name: "Fence Installation",
+            description: "Wood, vinyl & chain link fence installation",
+            icon: "fas fa-border-style",
+            color: "hsl(45, 70%, 50%)",
+          },
+          {
+            name: "Deck Building",
+            description: "Deck construction, repair & staining",
+            icon: "fas fa-th",
+            color: "hsl(20, 75%, 50%)",
+          },
+          // Appliances & Technology
+          {
+            name: "Appliance Repair",
+            description: "Washer, dryer, refrigerator & appliance service",
+            icon: "fas fa-cog",
+            color: "hsl(220, 60%, 50%)",
+          },
+          {
+            name: "TV Mounting",
+            description: "Wall mounting & entertainment system setup",
+            icon: "fas fa-tv",
+            color: "hsl(260, 70%, 55%)",
+          },
+          {
+            name: "Smart Home",
+            description: "Smart device installation & home automation",
+            icon: "fas fa-wifi",
             color: "hsl(240, 70%, 50%)",
+          },
+          {
+            name: "Security Systems",
+            description: "Security camera & alarm system installation",
+            icon: "fas fa-shield-alt",
+            color: "hsl(350, 70%, 50%)",
+          },
+          // Moving & Assembly
+          {
+            name: "Furniture Assembly",
+            description: "IKEA & furniture assembly services",
+            icon: "fas fa-chair",
+            color: "hsl(40, 80%, 55%)",
+          },
+          {
+            name: "Moving Services",
+            description: "Local moving, packing & heavy lifting",
+            icon: "fas fa-boxes",
+            color: "hsl(280, 70%, 50%)",
+          },
+          // Specialized Services
+          {
+            name: "Pool Services",
+            description: "Pool cleaning, maintenance & repair",
+            icon: "fas fa-swimming-pool",
+            color: "hsl(190, 80%, 55%)",
+          },
+          {
+            name: "Pest Control",
+            description: "Insect, rodent & termite removal",
+            icon: "fas fa-bug",
+            color: "hsl(350, 70%, 50%)",
+          },
+          {
+            name: "Driveway Services",
+            description: "Concrete, asphalt installation & repair",
+            icon: "fas fa-road",
+            color: "hsl(0, 0%, 45%)",
+          },
+          {
+            name: "Garage Door",
+            description: "Garage door installation & repair",
+            icon: "fas fa-warehouse",
+            color: "hsl(10, 70%, 50%)",
+          },
+          // Personal & Lifestyle Services
+          {
+            name: "Pet Services",
+            description: "Dog walking, pet sitting & grooming",
+            icon: "fas fa-paw",
+            color: "hsl(320, 70%, 55%)",
+          },
+          {
+            name: "Personal Training",
+            description: "In-home fitness & personal training",
+            icon: "fas fa-dumbbell",
+            color: "hsl(0, 80%, 55%)",
+          },
+          {
+            name: "Tutoring",
+            description: "Academic tutoring & test preparation",
+            icon: "fas fa-graduation-cap",
+            color: "hsl(230, 70%, 50%)",
+          },
+          {
+            name: "Photography",
+            description: "Event, portrait & real estate photography",
+            icon: "fas fa-camera",
+            color: "hsl(50, 80%, 50%)",
+          },
+          // Wellness & Care
+          {
+            name: "Massage Therapy",
+            description: "Therapeutic & relaxation massage",
+            icon: "fas fa-spa",
+            color: "hsl(280, 60%, 55%)",
+          },
+          {
+            name: "Elder Care",
+            description: "Senior companion & assistance services",
+            icon: "fas fa-heart",
+            color: "hsl(340, 70%, 55%)",
+          },
+          // Event & Party Services
+          {
+            name: "Event Planning",
+            description: "Party planning & event coordination",
+            icon: "fas fa-calendar-alt",
+            color: "hsl(300, 80%, 60%)",
+          },
+          {
+            name: "Catering",
+            description: "Event catering & private chef services",
+            icon: "fas fa-utensils",
+            color: "hsl(20, 85%, 55%)",
+          },
+          {
+            name: "DJ Services",
+            description: "Music entertainment for events",
+            icon: "fas fa-music",
+            color: "hsl(260, 80%, 60%)",
+          },
+          {
+            name: "Bartending",
+            description: "Professional bartending for events",
+            icon: "fas fa-cocktail",
+            color: "hsl(340, 85%, 55%)",
+          },
+          // Automotive & Transportation
+          {
+            name: "Auto Repair",
+            description: "Mobile car repair & maintenance",
+            icon: "fas fa-car",
+            color: "hsl(0, 70%, 50%)",
+          },
+          {
+            name: "Car Detailing",
+            description: "Auto detailing & car wash services",
+            icon: "fas fa-car-wash",
+            color: "hsl(210, 80%, 55%)",
+          },
+          // Professional Services
+          {
+            name: "Accounting",
+            description: "Tax preparation & bookkeeping",
+            icon: "fas fa-calculator",
+            color: "hsl(120, 50%, 45%)",
+          },
+          {
+            name: "Legal Services",
+            description: "Notary & legal consultation",
+            icon: "fas fa-gavel",
+            color: "hsl(30, 60%, 40%)",
+          },
+          {
+            name: "Web Design",
+            description: "Website design & development",
+            icon: "fas fa-code",
+            color: "hsl(200, 80%, 50%)",
+          },
+          // Seasonal Services
+          {
+            name: "Snow Removal",
+            description: "Snow plowing & ice removal",
+            icon: "fas fa-snowflake",
+            color: "hsl(190, 70%, 55%)",
+          },
+          {
+            name: "Holiday Decorating",
+            description: "Christmas & holiday decoration services",
+            icon: "fas fa-star",
+            color: "hsl(360, 80%, 60%)",
+          },
+          // Repair & Restoration
+          {
+            name: "Furniture Repair",
+            description: "Furniture restoration & upholstery",
+            icon: "fas fa-couch",
+            color: "hsl(25, 70%, 50%)",
+          },
+          {
+            name: "Small Engine Repair",
+            description: "Lawnmower & small engine repair",
+            icon: "fas fa-cogs",
+            color: "hsl(60, 70%, 45%)",
+          },
+          // Energy & Environmental
+          {
+            name: "Solar Installation",
+            description: "Solar panel installation & maintenance",
+            icon: "fas fa-solar-panel",
+            color: "hsl(45, 90%, 55%)",
+          },
+          {
+            name: "Insulation",
+            description: "Home insulation & weatherization",
+            icon: "fas fa-temperature-low",
+            color: "hsl(200, 60%, 50%)",
           },
         ];
 
