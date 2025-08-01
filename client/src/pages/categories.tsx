@@ -190,24 +190,24 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
   return (
     <Link href={`/providers?category=${category.id}`}>
       <Card className="hover:shadow-md transition-all duration-200 cursor-pointer hover:scale-[1.02]">
-        <CardContent className={viewMode === 'grid' ? "p-4" : "p-4 flex items-center space-x-4"}>
+        <CardContent className={viewMode === 'grid' ? "p-3 sm:p-4" : "p-4 flex items-center space-x-4"}>
           {viewMode === 'grid' ? (
             <>
               <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-2 sm:mb-3 mx-auto flex-shrink-0"
                 style={{ backgroundColor: `${category.color}20` }}
               >
                 <ServiceIcon 
-                  iconName={category.icon} 
-                  className="w-6 h-6" 
-                  style={{ color: category.color }} 
+                  iconName={category.icon || 'search'} 
+                  className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" 
+                  style={{ color: category.color || '#6B7280' }} 
                 />
               </div>
               <div className="text-center">
-                <h3 className="font-medium text-gray-900 text-sm mb-1 leading-tight">
+                <h3 className="font-semibold text-gray-900 text-xs sm:text-sm mb-1 group-hover:text-primary transition-colors line-clamp-2">
                   {category.name}
                 </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-gray-600 line-clamp-2">
                   {category.description}
                 </p>
               </div>
@@ -219,13 +219,13 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
                 style={{ backgroundColor: `${category.color}20` }}
               >
                 <ServiceIcon 
-                  iconName={category.icon} 
-                  className="w-5 h-5" 
-                  style={{ color: category.color }} 
+                  iconName={category.icon || 'search'} 
+                  className="w-5 h-5 flex-shrink-0" 
+                  style={{ color: category.color || '#6B7280' }} 
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">
+                <h3 className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-primary transition-colors">
                   {category.name}
                 </h3>
                 <p className="text-xs text-gray-600 line-clamp-2">

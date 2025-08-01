@@ -79,6 +79,7 @@ const iconMap = {
   'cogs': Settings,
   'solar-panel': Sun,
   'temperature-low': Wind,
+  'swimming-pool': Waves,
 };
 
 interface ServiceIconProps {
@@ -88,10 +89,16 @@ interface ServiceIconProps {
 }
 
 export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceIconProps) {
+  // Handle empty or undefined iconName
+  if (!iconName || typeof iconName !== 'string') {
+    return <Search className={className} style={style} />;
+  }
+  
   const IconComponent = iconMap[iconName as keyof typeof iconMap];
   
   if (!IconComponent) {
     // Fallback to search icon for unknown icons
+    console.warn(`Icon "${iconName}" not found in iconMap, using fallback`);
     return <Search className={className} style={style} />;
   }
   

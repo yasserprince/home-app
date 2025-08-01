@@ -275,28 +275,30 @@ export default function Home() {
       <div className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Popular Services</h2>
         {categoriesLoading ? (
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-24" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-20 sm:h-24" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             {(categories as any[])?.slice(0, 6).map((category: any) => (
               <Link key={category.id} href={`/providers?category=${category.id}`}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-3">
+                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                  <CardContent className="p-3 flex flex-col items-center justify-center h-full min-h-[80px] sm:min-h-[96px]">
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center mb-2 mx-auto"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center mb-2 mx-auto flex-shrink-0"
                       style={{ backgroundColor: `${category.color}20` }}
                     >
                       <ServiceIcon 
-                        iconName={category.icon} 
-                        className="w-5 h-5" 
-                        style={{ color: category.color }} 
+                        iconName={category.icon || 'search'} 
+                        className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" 
+                        style={{ color: category.color || '#6B7280' }} 
                       />
                     </div>
-                    <h3 className="font-medium text-gray-900 text-xs text-center leading-tight">{category.name}</h3>
+                    <h3 className="font-medium text-gray-900 text-xs text-center leading-tight line-clamp-2">
+                      {category.name}
+                    </h3>
                   </CardContent>
                 </Card>
               </Link>
@@ -311,7 +313,7 @@ export default function Home() {
               <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed border-2 border-gray-300">
                 <CardContent className="p-4 text-center">
                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <i className="fas fa-plus text-gray-400 text-xl"></i>
+                    <ServiceIcon iconName="search" className="w-6 h-6 text-gray-400" />
                   </div>
                   <h3 className="font-medium text-gray-900 text-sm">View All Services</h3>
                   <p className="text-xs text-gray-600">+{(categories as any[]).length - 6} more categories</p>
