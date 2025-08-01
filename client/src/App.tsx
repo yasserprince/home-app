@@ -22,6 +22,7 @@ import Notifications from "@/pages/notifications";
 import HelpSupport from "@/pages/help-support";
 import AdminPanel from "@/pages/admin";
 import SignupChoice from "@/pages/signup-choice";
+import Settings from "@/pages/settings";
 import { AdminNav } from "@/components/admin-nav";
 
 function Router() {
@@ -48,6 +49,7 @@ function Router() {
           <Route path="/profile/verification" component={Verification} />
           <Route path="/profile/notifications" component={Notifications} />
           <Route path="/profile/help" component={HelpSupport} />
+          <Route path="/settings" component={Settings} />
           {user?.role === 'admin' && (
             <Route path="/admin" component={AdminPanel} />
           )}

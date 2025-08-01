@@ -10,7 +10,14 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 import { ServiceIcon } from "@/components/service-icon";
-import { Search, X, ArrowRight, Shield } from "lucide-react";
+import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Home() {
   const { user, isLoading: userLoading } = useAuth();
@@ -197,17 +204,58 @@ export default function Home() {
                 </div>
               </Link>
             )}
-            {user?.profileImageUrl ? (
-              <img
-                src={user.profileImageUrl}
-                alt="Profile"
-                className="w-12 h-12 rounded-full object-cover border-2 border-blue-300"
-              />
-            ) : (
-              <div className="w-12 h-12 bg-blue-300 rounded-full flex items-center justify-center text-blue-600 font-semibold">
-                {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
-              </div>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1 focus:outline-none">
+                  {user?.profileImageUrl ? (
+                    <img
+                      src={user.profileImageUrl}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-blue-300"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-blue-300 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                      {((user?.firstName?.[0] || '') + (user?.lastName?.[0] || user?.email?.[0] || '')).toUpperCase().slice(0, 2) || 'U'}
+                    </div>
+                  )}
+                  <ChevronDown className="h-3 w-3 text-blue-200" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5 text-sm font-medium">
+                  {user?.firstName && user?.lastName 
+                    ? `${user.firstName} ${user.lastName}`
+                    : user?.email
+                  }
+                </div>
+                <div className="px-2 py-1 text-xs text-muted-foreground">
+                  {user?.email}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                    <UserIcon className="h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="/api/logout" 
+                    className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
