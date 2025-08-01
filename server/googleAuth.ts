@@ -90,11 +90,10 @@ export async function setupGoogleAuth(app: Express) {
   );
 
   app.get("/api/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/" }),
-    (req, res) => {
-      // Successful authentication, redirect to home
-      res.redirect("/");
-    }
+    passport.authenticate("google", { 
+      failureRedirect: "/",
+      successRedirect: "/"
+    })
   );
 
   app.post("/api/logout", (req, res) => {

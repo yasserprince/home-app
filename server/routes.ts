@@ -179,8 +179,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {
     try {
-      const userId = req.user.claims.sub;
-      const userEmail = req.user.claims.email;
+      const userId = req.user?.id;
+      const userEmail = req.user?.email;
       const user = await storage.getUser(userId);
       
       // Only allow admin access for katiflam1@gmail.com
@@ -197,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Support middleware - limited permissions
   const isSupport: RequestHandler = async (req: any, res, next) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const user = await storage.getUser(userId);
       
       if (!user || (user.role !== 'admin' && user.role !== 'support')) {
@@ -227,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { role } = req.body;
       
       // Prevent changing own role
-      const currentUserId = req.user.claims.sub;
+      const currentUserId = (req.user as any)?.id;
       if (id === currentUserId) {
         return res.status(400).json({ message: "Cannot change your own role" });
       }
@@ -246,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { isActive } = req.body;
       
       // Prevent deactivating own account
-      const currentUserId = req.user.claims.sub;
+      const currentUserId = (req.user as any)?.id;
       if (id === currentUserId) {
         return res.status(400).json({ message: "Cannot deactivate your own account" });
       }
@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       
       // Prevent deleting own account
-      const currentUserId = req.user.claims.sub;
+      const currentUserId = (req.user as any)?.id;
       if (id === currentUserId) {
         return res.status(400).json({ message: "Cannot delete your own account" });
       }
