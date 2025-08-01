@@ -271,19 +271,38 @@ export default function Profile() {
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
 
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            disabled
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-cog text-gray-600"></i>
+          <Link href="/settings">
+            <Button
+              variant="ghost"
+              className="w-full justify-between p-4 h-auto"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <i className="fas fa-cog text-gray-600"></i>
+                </div>
+                <span className="font-medium text-gray-900">{t('settings')}</span>
               </div>
-              <span className="font-medium text-gray-900">Settings</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
+              <i className="fas fa-chevron-right text-gray-400"></i>
+            </Button>
+          </Link>
+
+          {/* Admin Panel - only show for admin users */}
+          {user?.role === 'admin' && (
+            <Link href="/admin">
+              <Button
+                variant="ghost"
+                className="w-full justify-between p-4 h-auto bg-red-50 hover:bg-red-100"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-red-600" />
+                  </div>
+                  <span className="font-medium text-red-900">{t('adminPanel')}</span>
+                </div>
+                <i className="fas fa-chevron-right text-red-400"></i>
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Logout Button */}

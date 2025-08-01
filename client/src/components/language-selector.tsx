@@ -21,7 +21,7 @@ export function LanguageSelector({ className = '', variant = 'default' }: Langua
   if (variant === 'button') {
     return (
       <Select value={language} onValueChange={setLanguage}>
-        <SelectTrigger className={`w-auto px-4 py-3 h-12 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors ${className}`}>
+        <SelectTrigger className={`w-auto px-4 py-3 h-12 bg-primary border border-primary rounded-lg font-semibold text-white hover:bg-primary/90 transition-colors ${className}`}>
           <Globe className="w-4 h-4 mr-2" />
           <SelectValue>
             {getLanguageName(language)}
