@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Search, Grid, List } from "lucide-react";
+import { ArrowLeft, Search, Grid, List, ChevronRight } from "lucide-react";
+import { ServiceIcon } from "@/components/service-icon";
 import { ServiceCategory } from "@shared/schema";
 
 export default function Categories() {
@@ -196,10 +197,11 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
                 className="w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto"
                 style={{ backgroundColor: `${category.color}20` }}
               >
-                <i 
-                  className={`${category.icon} text-xl`} 
-                  style={{ color: category.color }}
-                ></i>
+                <ServiceIcon 
+                  iconName={category.icon} 
+                  className="w-6 h-6" 
+                  style={{ color: category.color }} 
+                />
               </div>
               <div className="text-center">
                 <h3 className="font-medium text-gray-900 text-sm mb-1 leading-tight">
@@ -216,10 +218,11 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
                 className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: `${category.color}20` }}
               >
-                <i 
-                  className={`${category.icon} text-lg`} 
-                  style={{ color: category.color }}
-                ></i>
+                <ServiceIcon 
+                  iconName={category.icon} 
+                  className="w-5 h-5" 
+                  style={{ color: category.color }} 
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">
@@ -230,7 +233,7 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
                 </p>
               </div>
               <div className="flex-shrink-0">
-                <i className="fas fa-chevron-right text-gray-400 text-sm"></i>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </>
           )}

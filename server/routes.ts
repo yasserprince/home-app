@@ -393,131 +393,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
           {
             name: "Plumbing",
             description: "Pipe repair, drain cleaning, water heater service",
-            icon: "fas fa-faucet",
+            icon: "wrench",
             color: "hsl(207, 90%, 54%)",
           },
           {
             name: "Electrical",
             description: "Wiring, panel upgrades, lighting installation",
-            icon: "fas fa-bolt",
+            icon: "zap",
             color: "hsl(39, 96%, 49%)",
           },
           {
             name: "HVAC",
             description: "Heating, cooling & air conditioning repair",
-            icon: "fas fa-thermometer-half",
+            icon: "thermometer",
             color: "hsl(200, 70%, 45%)",
           },
           // Home Improvement & Construction
           {
             name: "Handyman",
             description: "General repairs, furniture assembly, minor fixes",
-            icon: "fas fa-hammer",
+            icon: "hammer",
             color: "hsl(25, 85%, 55%)",
           },
           {
             name: "Painting",
             description: "Interior & exterior painting, cabinet refinishing",
-            icon: "fas fa-paint-roller",
+            icon: "paintbrush",
             color: "hsl(300, 70%, 55%)",
           },
           {
             name: "Roofing",
             description: "Roof installation, repair & gutter services",
-            icon: "fas fa-home",
+            icon: "home",
             color: "hsl(15, 75%, 45%)",
           },
           {
             name: "Flooring",
             description: "Hardwood, tile, carpet installation & refinishing",
-            icon: "fas fa-th-large",
+            icon: "grid",
             color: "hsl(35, 65%, 50%)",
           },
           {
             name: "Kitchen Remodeling",
             description: "Kitchen renovation & cabinet installation",
-            icon: "fas fa-utensils",
+            icon: "chef-hat",
             color: "hsl(120, 60%, 45%)",
           },
           {
             name: "Bathroom Remodeling",
             description: "Bathroom renovation & fixture installation",
-            icon: "fas fa-bath",
+            icon: "bath",
             color: "hsl(180, 70%, 50%)",
           },
           {
             name: "Carpentry",
             description: "Custom woodwork, built-ins, trim installation",
-            icon: "fas fa-saw-blade",
+            icon: "saw",
             color: "hsl(30, 80%, 45%)",
           },
           // Cleaning & Maintenance
           {
             name: "House Cleaning",
             description: "Regular cleaning, deep cleaning, move-out cleaning",
-            icon: "fas fa-broom",
+            icon: "sparkles",
             color: "hsl(271, 81%, 56%)",
           },
           {
             name: "Carpet Cleaning",
             description: "Professional carpet & upholstery cleaning",
-            icon: "fas fa-spray-can",
+            icon: "spray",
             color: "hsl(210, 70%, 50%)",
           },
           {
             name: "Window Cleaning",
             description: "Interior & exterior window cleaning",
-            icon: "fas fa-window-maximize",
+            icon: "square",
             color: "hsl(195, 80%, 55%)",
           },
           {
             name: "Pressure Washing",
             description: "Driveway, siding & deck power washing",
-            icon: "fas fa-water",
+            icon: "droplets",
             color: "hsl(200, 85%, 60%)",
           },
           {
             name: "Junk Removal",
             description: "Furniture removal, garage cleanouts, hauling",
-            icon: "fas fa-truck",
+            icon: "truck",
             color: "hsl(30, 70%, 50%)",
           },
           // Outdoor & Landscaping
           {
             name: "Landscaping",
             description: "Lawn care, garden design, tree services",
-            icon: "fas fa-seedling",
+            icon: "leaf",
             color: "hsl(150, 70%, 40%)",
           },
           {
             name: "Lawn Care",
             description: "Mowing, fertilizing, weed control",
-            icon: "fas fa-leaf",
+            icon: "leaf",
             color: "hsl(120, 75%, 45%)",
           },
           {
             name: "Tree Services",
             description: "Tree trimming, removal & stump grinding",
-            icon: "fas fa-tree",
+            icon: "tree",
             color: "hsl(90, 65%, 40%)",
           },
           {
             name: "Fence Installation",
             description: "Wood, vinyl & chain link fence installation",
-            icon: "fas fa-border-style",
+            icon: "fence",
             color: "hsl(45, 70%, 50%)",
           },
           {
             name: "Deck Building",
             description: "Deck construction, repair & staining",
-            icon: "fas fa-th",
+            icon: "layout",
             color: "hsl(20, 75%, 50%)",
           },
           // Appliances & Technology
           {
             name: "Appliance Repair",
             description: "Washer, dryer, refrigerator & appliance service",
-            icon: "fas fa-cog",
+            icon: "cog",
             color: "hsl(220, 60%, 50%)",
           },
           {
@@ -827,6 +827,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error initializing data:", error);
       res.status(500).json({ message: "Failed to initialize data" });
     }
+  });
+
+  // Add search suggestions endpoint
+  app.get('/api/search/suggestions', async (req, res) => {
+  try {
+    const { q } = req.query;
+    
+    if (!q || typeof q !== 'string' || q.trim().length < 2) {
+      return res.json([]);
+    }
+    
+    const query = q.toLowerCase().trim();
+    const suggestions = [];
+    
+    // Get categories
+    const categories = await storage.getServiceCategories();
+    
+    // Add matching categories (limit to 4)
+    const matchingCategories = categories.filter(cat => 
+      cat.name.toLowerCase().includes(query)
+    ).slice(0, 4);
+    
+    matchingCategories.forEach(category => {
+      suggestions.push({
+        type: 'category',
+        text: category.name,
+        description: category.description,
+        icon: category.icon,
+        color: category.color,
+        id: category.id
+      });
+    });
+    
+    res.json(suggestions);
+  } catch (error) {
+    console.error('Search suggestions error:', error);
+    res.status(500).json({ error: 'Failed to get suggestions' });
+  }
   });
 
   const httpServer = createServer(app);

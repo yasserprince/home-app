@@ -107,7 +107,7 @@ export class DatabaseStorage implements IStorage {
           ilike(serviceProviders.businessName, `%${search}%`),
           ilike(serviceProviders.description, `%${search}%`),
           ilike(serviceCategories.name, `%${search}%`)
-        )
+        )!
       );
     }
 

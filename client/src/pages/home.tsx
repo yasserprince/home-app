@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,7 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
-import { Search } from "lucide-react";
+import { ServiceIcon } from "@/components/service-icon";
+import { Search, X, ArrowRight } from "lucide-react";
 
 export default function Home() {
   const { user, isLoading: userLoading } = useAuth();
@@ -17,6 +18,10 @@ export default function Home() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   // Initialize sample data
   const initDataMutation = useMutation({
@@ -43,6 +48,102 @@ export default function Home() {
     queryKey: ["/api/categories"],
     enabled: !!user,
   });
+
+  // Generate search suggestions
+  const searchSuggestions = useMemo(() => {
+    if (!searchQuery.trim() || !categories) return [];
+    
+    const query = searchQuery.toLowerCase();
+    const suggestions: any[] = [];
+    
+    // Add matching categories
+    (categories as any[]).forEach((category: any) => {
+      if (category.name.toLowerCase().includes(query)) {
+        suggestions.push({
+          type: 'category',
+          text: category.name,
+          description: category.description,
+          icon: category.icon,
+          color: category.color,
+          id: category.id
+        });
+      }
+    });
+    
+    // Add common service keywords
+    const serviceKeywords = [
+      'plumbing repair', 'electrical installation', 'house cleaning', 'lawn mowing',
+      'painting interior', 'handyman services', 'appliance repair', 'furniture assembly',
+      'carpet cleaning', 'pest control', 'tree trimming', 'deck repair'
+    ];
+    
+    serviceKeywords.forEach(keyword => {
+      if (keyword.toLowerCase().includes(query)) {
+        suggestions.push({
+          type: 'service',
+          text: keyword,
+          description: `Find providers for ${keyword}`,
+          icon: 'search',
+          color: '#6B7280'
+        });
+      }
+    });
+    
+    return suggestions.slice(0, 6);
+  }, [searchQuery, categories]);
+
+  const handleSearchSelect = (suggestion: any) => {
+    if (suggestion.type === 'category') {
+      setLocation(`/providers?category=${suggestion.id}`);
+    } else {
+      setLocation(`/providers?search=${encodeURIComponent(suggestion.text)}`);
+    }
+    setSearchQuery("");
+    setShowSuggestions(false);
+    setSelectedSuggestion(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showSuggestions || searchSuggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestion(prev => 
+        prev < searchSuggestions.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestion(prev => 
+        prev > 0 ? prev - 1 : searchSuggestions.length - 1
+      );
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedSuggestion >= 0) {
+        handleSearchSelect(searchSuggestions[selectedSuggestion]);
+      } else if (searchQuery.trim()) {
+        setLocation(`/providers?search=${encodeURIComponent(searchQuery.trim())}`);
+        setSearchQuery("");
+        setShowSuggestions(false);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+      setSelectedSuggestion(-1);
+    }
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) &&
+          searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+        setSelectedSuggestion(-1);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Fetch recent bookings
   const { data: bookings, isLoading: bookingsLoading } = useQuery({
@@ -103,18 +204,70 @@ export default function Home() {
         {/* Search Bar */}
         <div className="relative">
           <Input
+            ref={searchInputRef}
             type="text"
             placeholder="Search for services..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter' && searchQuery.trim()) {
-                setLocation(`/providers?search=${encodeURIComponent(searchQuery.trim())}`);
-              }
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSuggestions(e.target.value.trim().length > 0);
+              setSelectedSuggestion(-1);
             }}
-            className="w-full py-3 px-4 pl-12 rounded-xl text-gray-900 bg-white border-0"
+            onKeyDown={handleKeyDown}
+            onFocus={() => {
+              if (searchQuery.trim()) setShowSuggestions(true);
+            }}
+            className="w-full py-3 px-4 pl-12 pr-10 rounded-xl text-gray-900 bg-white border-0"
           />
           <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setShowSuggestions(false);
+                setSelectedSuggestion(-1);
+              }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+          
+          {/* Search Suggestions */}
+          {showSuggestions && searchSuggestions.length > 0 && (
+            <div
+              ref={suggestionsRef}
+              className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-80 overflow-y-auto"
+            >
+              {searchSuggestions.map((suggestion, index) => (
+                <button
+                  key={`${suggestion.type}-${suggestion.text}`}
+                  onClick={() => handleSearchSelect(suggestion)}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors ${
+                    selectedSuggestion === index ? 'bg-blue-50 border-l-2 border-blue-500' : ''
+                  }`}
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${suggestion.color}20` }}
+                  >
+                    <ServiceIcon 
+                      iconName={suggestion.icon} 
+                      className="w-4 h-4" 
+                      style={{ color: suggestion.color }} 
+                    />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-medium text-gray-900 text-sm">{suggestion.text}</div>
+                    <div className="text-xs text-gray-600 truncate">{suggestion.description}</div>
+                  </div>
+                  <div className="text-gray-400">
+                    <ArrowRight className="w-3 h-3" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -129,7 +282,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-3 mb-6">
-            {categories?.slice(0, 6).map((category: any) => (
+            {(categories as any[])?.slice(0, 6).map((category: any) => (
               <Link key={category.id} href={`/providers?category=${category.id}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-3">
@@ -137,7 +290,11 @@ export default function Home() {
                       className="w-10 h-10 rounded-lg flex items-center justify-center mb-2 mx-auto"
                       style={{ backgroundColor: `${category.color}20` }}
                     >
-                      <i className={`${category.icon} text-lg`} style={{ color: category.color }}></i>
+                      <ServiceIcon 
+                        iconName={category.icon} 
+                        className="w-5 h-5" 
+                        style={{ color: category.color }} 
+                      />
                     </div>
                     <h3 className="font-medium text-gray-900 text-xs text-center leading-tight">{category.name}</h3>
                   </CardContent>
@@ -148,7 +305,7 @@ export default function Home() {
         )}
         
         {/* Show More Services */}
-        {categories && categories.length > 6 && (
+        {categories && (categories as any[]).length > 6 && (
           <div className="mb-6">
             <Link href="/categories">
               <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed border-2 border-gray-300">
@@ -157,7 +314,7 @@ export default function Home() {
                     <i className="fas fa-plus text-gray-400 text-xl"></i>
                   </div>
                   <h3 className="font-medium text-gray-900 text-sm">View All Services</h3>
-                  <p className="text-xs text-gray-600">+{categories.length - 6} more categories</p>
+                  <p className="text-xs text-gray-600">+{(categories as any[]).length - 6} more categories</p>
                 </CardContent>
               </Card>
             </Link>
@@ -175,10 +332,10 @@ export default function Home() {
 
           {bookingsLoading ? (
             <Skeleton className="h-20" />
-          ) : bookings && bookings.length > 0 ? (
+          ) : bookings && (bookings as any[]).length > 0 ? (
             <Card>
               <CardContent className="p-4">
-                {bookings.slice(0, 1).map((booking: any) => (
+                {(bookings as any[]).slice(0, 1).map((booking: any) => (
                   <div key={booking.id} className="flex items-center space-x-3">
                     {booking.provider.user.profileImageUrl ? (
                       <img
