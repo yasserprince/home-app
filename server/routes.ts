@@ -1034,6 +1034,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   });
 
+  // Social authentication routes
+  app.get('/api/auth/google', (req, res) => {
+    res.redirect('/api/login');
+  });
+
+  app.get('/api/auth/facebook', (req, res) => {
+    res.redirect('/api/login');
+  });
+
+  app.get('/api/auth/apple', (req, res) => {
+    res.redirect('/api/login');
+  });
+
+  // Signup route
+  app.post('/api/signup', async (req, res) => {
+    try {
+      const signupData = req.body;
+      
+      // TODO: Implement user creation logic
+      // For now, just return success
+      res.json({ 
+        success: true, 
+        message: 'Account created successfully',
+        user: {
+          id: Date.now().toString(),
+          email: signupData.email,
+          firstName: signupData.firstName,
+          lastName: signupData.lastName
+        }
+      });
+    } catch (error) {
+      console.error('Signup error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to create account' 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

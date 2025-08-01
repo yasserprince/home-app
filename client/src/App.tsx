@@ -21,7 +21,7 @@ import Verification from "@/pages/verification";
 import Notifications from "@/pages/notifications";
 import HelpSupport from "@/pages/help-support";
 import AdminPanel from "@/pages/admin";
-import SignupChoice from "@/pages/signup-choice";
+import Signup from "@/pages/signup";
 import Settings from "@/pages/settings";
 import { AdminNav } from "@/components/admin-nav";
 
@@ -30,7 +30,7 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/signup" component={SignupChoice} />
+      <Route path="/signup" component={Signup} />
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

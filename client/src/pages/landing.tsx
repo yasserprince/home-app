@@ -59,7 +59,15 @@ export default function Landing() {
                 className="w-full py-6 text-lg font-semibold"
                 onClick={() => window.location.href = '/signup'}
               >
-                Get Started
+                {t('createAccount')}
+              </Button>
+              
+              <Button 
+                variant="outline"
+                className="w-full py-6 text-lg font-semibold"
+                onClick={() => window.location.href = '/api/login'}
+              >
+                {t('signIn')}
               </Button>
               
               <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
