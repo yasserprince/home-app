@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { calculateDistance, formatDistance, getStoredLocation, getCurrentLocationAndStore, sortProvidersByDistance } from "@/lib/location";
 import LocationPermission from "@/components/location-permission";
 import { MapPin, Navigation } from "lucide-react";
+import { ServiceProvider, ServiceCategory, User } from "@shared/schema";
 
 export default function Providers() {
   const [location] = useLocation();
@@ -23,16 +24,22 @@ export default function Providers() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const { data: providers, isLoading } = useQuery({
+  type ProviderWithDetails = ServiceProvider & { 
+    user: User; 
+    category: ServiceCategory;
+    distance?: number;
+  };
+
+  const { data: providers, isLoading } = useQuery<ProviderWithDetails[]>({
     queryKey: ["/api/providers", categoryId, userLocation],
     enabled: true,
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories } = useQuery<ServiceCategory[]>({
     queryKey: ["/api/categories"],
   });
 
-  const currentCategory = categories?.find((cat: any) => cat.id === categoryId);
+  const currentCategory = categories?.find((cat) => cat.id === categoryId);
 
   // Initialize user location
   useEffect(() => {
@@ -87,7 +94,7 @@ export default function Providers() {
 
   // Process providers based on location and filter
   const processedProviders = providers ? (() => {
-    let filtered = [...providers];
+    let filtered: ProviderWithDetails[] = [...providers];
     
     // Add distance information if user location is available
     if (userLocation) {
@@ -98,7 +105,7 @@ export default function Providers() {
     switch (activeFilter) {
       case 'nearby':
         // Only show providers with location and within reasonable distance
-        filtered = filtered.filter(p => p.distance !== null && p.distance <= 50);
+        filtered = filtered.filter(p => p.distance !== null && p.distance !== undefined && p.distance <= 50);
         break;
       case 'toprated':
         filtered = filtered.sort((a, b) => parseFloat(b.rating || '0') - parseFloat(a.rating || '0'));
@@ -202,7 +209,7 @@ export default function Providers() {
         )}
         
         {processedProviders && processedProviders.length > 0 ? (
-          processedProviders.map((provider: any) => (
+          processedProviders.map((provider) => (
             <Link key={provider.id} href={`/provider/${provider.id}`}>
               <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="p-4">
@@ -241,7 +248,7 @@ export default function Providers() {
                               <i
                                 key={i}
                                 className={`fas fa-star text-xs ${
-                                  i < Math.floor(parseFloat(provider.rating) || 0)
+                                  i < Math.floor(parseFloat(provider.rating || '0'))
                                     ? "text-yellow-400"
                                     : "text-gray-300"
                                 }`}
@@ -254,7 +261,7 @@ export default function Providers() {
                         </div>
                         <span className="text-sm text-gray-600 flex items-center">
                           <MapPin className="w-3 h-3 mr-1" />
-                          {provider.distance !== null ? (
+                          {provider.distance !== null && provider.distance !== undefined ? (
                             `${formatDistance(provider.distance)} away`
                           ) : (
                             provider.location || "Distance unavailable"
