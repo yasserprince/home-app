@@ -100,7 +100,7 @@ export default function Settings() {
       {/* Header */}
       <div className="bg-primary text-white p-6 pt-12">
         <div className="flex items-center gap-4 mb-4">
-          <Link href="/">
+          <Link href="/profile">
             <Button 
               variant="ghost" 
               size="sm" 
