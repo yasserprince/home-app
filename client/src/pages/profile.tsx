@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNavigation from "@/components/bottom-navigation";
-import { Shield, ShieldCheck } from "lucide-react";
+import { Shield, ShieldCheck, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
@@ -48,6 +49,20 @@ export default function Profile() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <div className="bg-primary text-white p-6 pt-12">
+        <div className="flex items-center justify-between mb-4">
+          <Link href="/">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white hover:bg-blue-600 border border-white/20 hover:border-white/40 px-3 py-2"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+          </Link>
+          <h1 className="text-xl font-semibold">Profile</h1>
+          <div></div> {/* Spacer for center alignment */}
+        </div>
         <div className="flex items-center space-x-4">
           {user?.profileImageUrl ? (
             <img
