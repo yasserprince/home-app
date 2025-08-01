@@ -9,8 +9,8 @@ export default function Landing() {
     <div className="min-h-screen bg-gradient-to-b from-primary to-primary/80 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Language Selector at the top */}
-        <div className="flex justify-end mb-4">
-          <LanguageSelector variant="compact" />
+        <div className="flex justify-center mb-6">
+          <LanguageSelector variant="button" />
         </div>
         
         <Card className="shadow-xl border-0">

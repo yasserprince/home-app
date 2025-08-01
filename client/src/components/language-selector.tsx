@@ -10,13 +10,33 @@ import { Globe } from 'lucide-react';
 
 interface LanguageSelectorProps {
   className?: string;
-  variant?: 'default' | 'compact';
+  variant?: 'default' | 'compact' | 'button';
 }
 
 export function LanguageSelector({ className = '', variant = 'default' }: LanguageSelectorProps) {
   const { language, setLanguage } = useLanguage();
   
   const languages: Language[] = ['en', 'fr', 'ar'];
+  
+  if (variant === 'button') {
+    return (
+      <Select value={language} onValueChange={setLanguage}>
+        <SelectTrigger className={`w-auto px-4 py-3 h-12 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors ${className}`}>
+          <Globe className="w-4 h-4 mr-2" />
+          <SelectValue>
+            {getLanguageName(language)}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {languages.map((lang) => (
+            <SelectItem key={lang} value={lang}>
+              {getLanguageName(lang)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
   
   if (variant === 'compact') {
     return (
