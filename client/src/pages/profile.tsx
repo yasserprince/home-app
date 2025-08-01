@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNavigation from "@/components/bottom-navigation";
+import { Shield, ShieldCheck } from "lucide-react";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
@@ -204,7 +205,7 @@ export default function Profile() {
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-shield-check text-blue-600"></i>
+                <ShieldCheck className="w-5 h-5 text-blue-600" />
               </div>
               <span className="font-medium text-gray-900">Identity & Verification</span>
             </div>
