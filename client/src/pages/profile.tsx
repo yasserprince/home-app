@@ -83,9 +83,32 @@ export default function Profile() {
             <p className="text-sm text-gray-600">Total Spent</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">5.0</p>
-            <p className="text-sm text-gray-600">Avg Rating</p>
+            <div className="flex items-center justify-center space-x-1">
+              <p className="text-2xl font-bold text-gray-900">5.0</p>
+              <i className="fas fa-star text-yellow-400 text-sm"></i>
+            </div>
+            <p className="text-sm text-gray-600">Your Rating</p>
           </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Button
+            variant="outline"
+            className="p-4 h-auto flex flex-col items-center space-y-2"
+            onClick={() => window.location.href = '/bookings'}
+          >
+            <i className="fas fa-calendar-check text-primary text-lg"></i>
+            <span className="text-sm font-medium">My Bookings</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="p-4 h-auto flex flex-col items-center space-y-2"
+            onClick={() => window.location.href = '/providers?favorites=true'}
+          >
+            <i className="fas fa-heart text-red-500 text-lg"></i>
+            <span className="text-sm font-medium">Favorites</span>
+          </Button>
         </div>
 
         {/* Menu Items */}
@@ -142,6 +165,62 @@ export default function Profile() {
                 <i className="fas fa-map-pin text-orange-600"></i>
               </div>
               <span className="font-medium text-gray-900">Location Settings</span>
+            </div>
+            <i className="fas fa-chevron-right text-gray-400"></i>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-between p-4 h-auto"
+            onClick={() => window.location.href = '/profile/earnings'}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <i className="fas fa-chart-line text-green-600"></i>
+              </div>
+              <span className="font-medium text-gray-900">Earnings & Analytics</span>
+            </div>
+            <i className="fas fa-chevron-right text-gray-400"></i>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-between p-4 h-auto"
+            onClick={() => window.location.href = '/profile/reviews'}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <i className="fas fa-star text-yellow-600"></i>
+              </div>
+              <span className="font-medium text-gray-900">Reviews & Ratings</span>
+            </div>
+            <i className="fas fa-chevron-right text-gray-400"></i>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-between p-4 h-auto"
+            onClick={() => window.location.href = '/profile/verification'}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i className="fas fa-shield-check text-blue-600"></i>
+              </div>
+              <span className="font-medium text-gray-900">Identity & Verification</span>
+            </div>
+            <i className="fas fa-chevron-right text-gray-400"></i>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-between p-4 h-auto"
+            onClick={() => window.location.href = '/profile/preferences'}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <i className="fas fa-sliders-h text-indigo-600"></i>
+              </div>
+              <span className="font-medium text-gray-900">Preferences & Privacy</span>
             </div>
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
