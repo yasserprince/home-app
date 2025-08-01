@@ -14,6 +14,13 @@ export function getSession() {
     ttl: sessionTtl,
     tableName: "sessions",
   });
+  
+  console.log("Session configuration:", {
+    isProduction: process.env.NODE_ENV === 'production',
+    hasSecret: !!process.env.SESSION_SECRET,
+    hasDatabaseUrl: !!process.env.DATABASE_URL
+  });
+  
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
@@ -23,6 +30,7 @@ export function getSession() {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: sessionTtl,
+      sameSite: 'lax'
     },
   });
 }
@@ -37,9 +45,7 @@ export async function setupGoogleAuth(app: Express) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: process.env.NODE_ENV === 'production' 
-      ? `https://${process.env.REPLIT_DOMAIN || 'home-serve-katiflam1.replit.app'}/api/auth/google/callback`
-      : "http://localhost:5000/api/auth/google/callback"
+    callbackURL: "https://home-serve-katiflam1.replit.app/api/auth/google/callback"
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       console.log("Google OAuth profile received:", JSON.stringify(profile, null, 2));
@@ -95,9 +101,10 @@ export async function setupGoogleAuth(app: Express) {
   });
 
   // Auth routes
-  app.get("/api/auth/google", 
-    passport.authenticate("google", { scope: ["profile", "email"] })
-  );
+  app.get("/api/auth/google", (req, res, next) => {
+    console.log("Starting Google OAuth flow");
+    passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+  });
 
   app.get("/api/auth/google/callback", (req, res, next) => {
     console.log("OAuth callback reached");
