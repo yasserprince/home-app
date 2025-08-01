@@ -279,6 +279,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // One-time admin setup endpoint (use only once in production)
+  app.post('/api/setup-admin', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const userEmail = req.user?.claims?.email;
+      
+      if (!userId || userEmail !== 'katiflam1@gmail.com') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Update user to admin role
+      await storage.updateUserRole(userId, 'admin');
+      
+      res.json({ message: "Admin role assigned successfully" });
+    } catch (error) {
+      console.error("Error setting up admin:", error);
+      res.status(500).json({ message: "Failed to setup admin" });
+    }
+  });
+
   // Support routes (limited permissions - view only)
   app.get('/api/support/users', isAuthenticated, isSupport, async (req, res) => {
     try {
