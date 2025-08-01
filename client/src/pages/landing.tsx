@@ -1,10 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/language-selector";
 
 export default function Landing() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary to-primary/80 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
+        {/* Language Selector at the top */}
+        <div className="flex justify-end mb-4">
+          <LanguageSelector variant="compact" />
+        </div>
+        
         <Card className="shadow-xl border-0">
           <CardContent className="pt-12 pb-8 px-8 text-center">
             <div className="mb-8">

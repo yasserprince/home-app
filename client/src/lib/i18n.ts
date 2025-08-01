@@ -227,8 +227,8 @@ export const translations = {
     lastName: 'Nom',
     email: 'Email',
     phone: 'Téléphone',
-
-
+    address: 'Adresse',
+    city: 'Ville',
     state: 'État',
     zipCode: 'Code Postal',
     
@@ -395,11 +395,12 @@ export const translations = {
     
     // Auth & Profile
     getStarted: 'ابدأ الآن',
-
+    firstName: 'الاسم الأول',
+    lastName: 'اسم العائلة',
     email: 'البريد الإلكتروني',
     phone: 'الهاتف',
-
-
+    address: 'العنوان',
+    city: 'المدينة',
     state: 'الولاية',
     zipCode: 'الرمز البريدي',
     
