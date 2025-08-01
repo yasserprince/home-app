@@ -199,7 +199,7 @@ export default function Home() {
             <p className="text-blue-200 text-sm">{t('whatServiceToday')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <LanguageSelector variant="compact" className="mr-2" />
+            <LanguageSelector variant="button" className="mr-2" />
             {user?.role === 'admin' && (
               <Link href="/admin">
                 <div className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium hover:bg-red-600 transition-colors">
