@@ -141,8 +141,10 @@ export default function Signup() {
   };
 
   const onSubmit = async (data: SignupFormData) => {
+    console.log('Form submitted with data:', data);
     setIsLoading(true);
     try {
+      console.log('Sending signup request...');
       const response = await fetch('/api/signup', {
         method: 'POST',
         headers: {
@@ -151,16 +153,21 @@ export default function Signup() {
         body: JSON.stringify(data),
       });
 
+      console.log('Response status:', response.status);
       const result = await response.json();
+      console.log('Response result:', result);
 
       if (result.success) {
+        console.log('Signup successful, redirecting...');
         // Redirect to login or dashboard
         window.location.href = '/api/login';
       } else {
         console.error('Signup failed:', result.message);
+        alert(`Signup failed: ${result.message}`);
       }
     } catch (error) {
       console.error('Signup error:', error);
+      alert(`Signup error: ${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -250,7 +257,10 @@ export default function Signup() {
             </div>
 
             {/* Multi-step Form */}
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              console.log('Form validation errors:', errors);
+              alert('Please check the form for errors: ' + Object.keys(errors).join(', '));
+            })} className="space-y-6">
               {/* Progress Indicator */}
               <div className="flex justify-center mb-6">
                 <div className="flex space-x-2">
