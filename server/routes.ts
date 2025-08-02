@@ -54,10 +54,9 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupGoogleAuth(app);
+  // Auth middleware - consolidated session management
   await setupEmailAuth(app);
-  await setupAuth(app); // Replit Auth
+  await setupAuth(app); // Replit Auth (includes session management)
   
   // Test endpoints for debugging
   setupTestAuth(app);
@@ -182,22 +181,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Unified auth middleware - checks all auth types
   const isAnyAuthenticated: RequestHandler = async (req, res, next) => {
-    // Check if already authenticated (from any auth method)
-    if (req.user && req.isAuthenticated()) {
-      return next();
+    // Check if user is authenticated
+    if (!req.isAuthenticated() || !req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
     
-    // Try Replit Auth first (more modern approach)
-    try {
-      return await isReplitAuthenticated(req, res, next);
-    } catch (replitError) {
-      // If Replit Auth fails, try Google Auth
-      try {
-        return await isAuthenticated(req, res, next);
-      } catch (googleError) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-    }
+    return next();
   };
 
   // Auth routes
@@ -208,9 +197,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Replit Auth user
         const userId = req.user.claims.sub;
         const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
         return res.json(user);
       } else if (req.user?.id) {
-        // Google Auth user
+        // Google Auth or Email Auth user
         return res.json(req.user);
       } else {
         return res.status(401).json({ message: "Unauthorized" });

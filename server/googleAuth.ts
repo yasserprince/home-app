@@ -36,10 +36,7 @@ export function getSession() {
 }
 
 export async function setupGoogleAuth(app: Express) {
-  app.set("trust proxy", 1);
-  app.use(getSession());
-  app.use(passport.initialize());
-  app.use(passport.session());
+  // Session and passport already initialized by Replit Auth
   
   // Use production URL for all environments since Google Cloud Console is configured for it
   const callbackURL = "https://home-serve-katiflam1.replit.app/api/auth/google/callback";
