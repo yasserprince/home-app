@@ -30,6 +30,10 @@ import type { User } from "@shared/schema";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useTranslation, getLanguageDirection, translations } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import { ProfileImageUploader } from "@/components/ProfileImageUploader";
+import { PortfolioManager } from "@/components/PortfolioManager";
+import type { UploadResult } from "@uppy/core";
 
 export default function Settings() {
   const { user, isLoading: userLoading } = useAuth();
@@ -48,7 +52,8 @@ export default function Settings() {
     notifications: user?.notifications || false,
     role: user?.role || 'service_seeker',
     accountType: user?.accountType || 'individual',
-    companyName: user?.companyName || ''
+    companyName: user?.companyName || '',
+    bio: user?.bio || ''
   });
 
   const updateProfileMutation = useMutation({
@@ -147,17 +152,10 @@ export default function Settings() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4 mb-6">
-              {user?.profileImageUrl ? (
-                <img
-                  src={user.profileImageUrl}
-                  alt="Profile"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-                />
-              ) : (
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                  {((user?.firstName?.[0] || '') + (user?.lastName?.[0] || user?.email?.[0] || '')).toUpperCase().slice(0, 2) || 'U'}
-                </div>
-              )}
+              <ProfileImageUploader 
+                currentImageUrl={user?.profileImageUrl} 
+                userName={`${user?.firstName || ''} ${user?.lastName || ''}`.trim()}
+              />
               <div>
                 <h3 className="font-medium text-lg">
                   {user?.firstName && user?.lastName 
@@ -210,6 +208,26 @@ export default function Settings() {
                   disabled
                   className="bg-gray-50"
                 />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="bio">Bio (Max 300 characters)</Label>
+                <Textarea
+                  id="bio"
+                  value={isEditing ? formData.bio : user?.bio || ''}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 300) {
+                      handleInputChange('bio', e.target.value);
+                    }
+                  }}
+                  disabled={!isEditing}
+                  placeholder="Tell us about yourself... (Max 300 characters)"
+                  maxLength={300}
+                  className="resize-none"
+                  rows={3}
+                />
+                <div className="text-right text-xs text-muted-foreground mt-1">
+                  {(isEditing ? formData.bio : user?.bio || '').length}/300
+                </div>
               </div>
             </div>
 
@@ -506,6 +524,14 @@ export default function Settings() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Portfolio Management for Service Providers */}
+        {user?.role === 'service_provider' && user?.id && (
+          <PortfolioManager 
+            userId={user.id} 
+            isProvider={true} 
+          />
+        )}
       </div>
 
       <BottomNavigation activeTab="profile" />

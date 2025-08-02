@@ -347,13 +347,6 @@ export default function Home() {
       {/* Service Categories */}
       <div className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('popularServices')}</h2>
-        {/* Test icons */}
-        <div className="flex gap-2 mb-4 p-2 bg-yellow-100 rounded">
-          <ServiceIcon iconName="wrench" className="w-8 h-8" style={{ color: 'blue' }} />
-          <ServiceIcon iconName="zap" className="w-8 h-8" style={{ color: 'orange' }} />
-          <ServiceIcon iconName="thermometer" className="w-8 h-8" style={{ color: 'red' }} />
-          <ServiceIcon iconName="hammer" className="w-8 h-8" style={{ color: 'brown' }} />
-        </div>
         {categoriesLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             {[...Array(6)].map((_, i) => (

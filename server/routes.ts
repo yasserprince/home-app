@@ -11,6 +11,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import express from "express";
 import { insertBookingSchema, insertReviewSchema } from "@shared/schema";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { z } from "zod";
 
 // Configure multer for file uploads
@@ -1169,6 +1170,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false, 
         message: 'Failed to create account' 
       });
+    }
+  });
+
+  // Object storage endpoints
+  app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
+    const userId = req.user?.claims?.sub;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+        requestedPermission: "read" as any,
+      });
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    res.json({ uploadURL });
+  });
+
+  // Profile image upload endpoint
+  app.put("/api/profile/image", isAuthenticated, async (req: any, res) => {
+    if (!req.body.imageURL) {
+      return res.status(400).json({ error: "imageURL is required" });
+    }
+
+    const userId = req.user?.claims?.sub;
+
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        req.body.imageURL,
+        {
+          owner: userId,
+          visibility: "public",
+        },
+      );
+
+      // Update user profile with new image URL
+      const updatedUser = await storage.updateUser(userId, { profileImageUrl: objectPath });
+
+      res.status(200).json({
+        objectPath: objectPath,
+        user: updatedUser,
+      });
+    } catch (error) {
+      console.error("Error setting profile image:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Portfolio images upload endpoint for service providers
+  app.put("/api/profile/portfolio", isAuthenticated, async (req: any, res) => {
+    if (!req.body.imageURLs || !Array.isArray(req.body.imageURLs)) {
+      return res.status(400).json({ error: "imageURLs array is required" });
+    }
+
+    const userId = req.user?.claims?.sub;
+
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectPaths = [];
+
+      // Process each image URL
+      for (const imageURL of req.body.imageURLs) {
+        const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+          imageURL,
+          {
+            owner: userId,
+            visibility: "public",
+          },
+        );
+        objectPaths.push(objectPath);
+      }
+
+      // Update service provider portfolio with new image URLs
+      const serviceProvider = await storage.getServiceProviderByUserId(userId);
+      if (serviceProvider) {
+        const existingImages = serviceProvider.portfolioImages || [];
+        const updatedImages = [...existingImages, ...objectPaths];
+        
+        await storage.updateServiceProvider(serviceProvider.id, { 
+          portfolioImages: updatedImages 
+        });
+      }
+
+      res.status(200).json({
+        objectPaths: objectPaths,
+      });
+    } catch (error) {
+      console.error("Error adding portfolio images:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get service provider by user ID endpoint
+  app.get("/api/service-providers/user/:userId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { userId } = req.params;
+      const serviceProvider = await storage.getServiceProviderByUserId(userId);
+      res.json(serviceProvider);
+    } catch (error) {
+      console.error("Error fetching service provider:", error);
+      res.status(500).json({ error: "Failed to fetch service provider" });
+    }
+  });
+
+  // Update service provider endpoint
+  app.put("/api/service-providers/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const updatedProvider = await storage.updateServiceProvider(id, updateData);
+      res.json(updatedProvider);
+    } catch (error) {
+      console.error("Error updating service provider:", error);
+      res.status(500).json({ error: "Failed to update service provider" });
     }
   });
 

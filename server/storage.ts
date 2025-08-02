@@ -39,7 +39,9 @@ export interface IStorage {
   // Service Provider operations
   getServiceProviders(categoryId?: string, search?: string, userLat?: number, userLng?: number, radius?: number): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]>;
   getServiceProviderById(id: string): Promise<(ServiceProvider & { user: User; category: ServiceCategory }) | undefined>;
+  getServiceProviderByUserId(userId: string): Promise<ServiceProvider | undefined>;
   createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider>;
+  updateServiceProvider(id: string, providerData: Partial<ServiceProvider>): Promise<ServiceProvider>;
   updateServiceProviderRating(providerId: string): Promise<void>;
   
   // Booking operations
@@ -231,12 +233,32 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
+  async getServiceProviderByUserId(userId: string): Promise<ServiceProvider | undefined> {
+    const [provider] = await db
+      .select()
+      .from(serviceProviders)
+      .where(eq(serviceProviders.userId, userId));
+    return provider;
+  }
+
   async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
     const [newProvider] = await db
       .insert(serviceProviders)
       .values(provider)
       .returning();
     return newProvider;
+  }
+
+  async updateServiceProvider(id: string, providerData: Partial<ServiceProvider>): Promise<ServiceProvider> {
+    const [updatedProvider] = await db
+      .update(serviceProviders)
+      .set({
+        ...providerData,
+        updatedAt: new Date(),
+      })
+      .where(eq(serviceProviders.id, id))
+      .returning();
+    return updatedProvider;
   }
 
   async updateServiceProviderRating(providerId: string): Promise<void> {

@@ -35,6 +35,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  bio: text("bio"), // User bio description, max 300 characters
   role: varchar("role").notNull().default("service_seeker"), // admin, support, service_seeker, service_provider, company
   accountType: varchar("account_type").default("individual"), // individual, company
   companyName: varchar("company_name"),
@@ -92,6 +93,10 @@ export const serviceProviders = pgTable("service_providers", {
   location: varchar("location"),
   services: text("services").array(),
   profileImageUrl: varchar("profile_image_url"),
+  portfolioImages: text("portfolio_images").array(), // Array of image URLs
+  achievements: text("achievements"), // Professional achievements and qualifications
+  workExperience: jsonb("work_experience"), // Detailed work experience as JSON
+  certifications: text("certifications").array(), // Professional certifications
   latitude: decimal("latitude", { precision: 10, scale: 8 }),
   longitude: decimal("longitude", { precision: 11, scale: 8 }),
   serviceRadius: integer("service_radius").default(25), // in kilometers
