@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupGoogleAuth, isAuthenticated } from "./googleAuth";
 import { setupEmailAuth } from "./emailAuth";
 import { setupTestAuth } from "./testAuth";
+import { setupAuthTest } from "./authTest";
 import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
@@ -55,6 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Test endpoints for debugging
   setupTestAuth(app);
+  setupAuthTest(app);
   
   // Serve uploaded files
   app.use('/uploads', express.static(uploadDir));

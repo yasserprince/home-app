@@ -73,7 +73,7 @@ export async function setupGoogleAuth(app: Express) {
         return done(new Error("No email found in Google profile"), undefined);
       }
 
-      // Upsert user in database - use google_ prefix for Google OAuth users
+      // Upsert user in database - use google_ prefix for Google OAuth users  
       const userId = `google_${profile.id}`;
       console.log("Creating/updating user:", { id: userId, email, firstName, lastName });
       
@@ -83,6 +83,7 @@ export async function setupGoogleAuth(app: Express) {
         firstName,
         lastName,
         profileImageUrl,
+        authProvider: "google"
       });
       
       console.log("User created/updated successfully:", user);
@@ -90,7 +91,7 @@ export async function setupGoogleAuth(app: Express) {
     } catch (error) {
       console.error("Error in Google OAuth strategy:", error);
       console.error("Error details:", error.message, error.stack);
-      return done(error, undefined);
+      return done(error as Error, undefined);
     }
   }));
 
@@ -121,17 +122,34 @@ export async function setupGoogleAuth(app: Express) {
   });
 
   app.get("/api/auth/google/callback", (req, res, next) => {
-    console.log("OAuth callback reached with query:", req.query);
+    console.log("OAuth callback received with query:", req.query);
+    console.log("OAuth callback received with headers:", req.headers);
     
-    // Check for OAuth errors in the callback
     if (req.query.error) {
       console.error("OAuth error from Google:", req.query.error);
       return res.redirect("/?error=oauth_denied");
     }
     
-    passport.authenticate("google", {
-      successRedirect: "/",
-      failureRedirect: "/?error=auth_failed"
+    passport.authenticate("google", (err: any, user: any, info: any) => {
+      if (err) {
+        console.error("OAuth authentication error:", err);
+        return res.redirect("/?error=auth_failed");
+      }
+      
+      if (!user) {
+        console.error("No user returned from OAuth:", info);
+        return res.redirect("/?error=no_user");
+      }
+      
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Login error after OAuth:", loginErr);
+          return res.redirect("/?error=login_failed");
+        }
+        
+        console.log("OAuth login successful for user:", user.email);
+        res.redirect("/");
+      });
     })(req, res, next);
   });
 
