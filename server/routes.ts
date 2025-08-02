@@ -1388,7 +1388,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const adminEmail = "katiflam1@gmail.com";
     const adminPassword = "SuperAdmin2025!Secure#Platform";
     
-    console.log("🔐 Admin login attempt:", { email, hasPassword: !!password });
+    console.log("🔐 Admin login attempt:", { 
+      email, 
+      hasPassword: !!password,
+      sessionId: req.sessionID,
+      sessionData: req.session
+    });
     
     if (email === adminEmail && password === adminPassword) {
       // Create a simple admin session
@@ -1398,7 +1403,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         loginTime: new Date().toISOString()
       };
       
-      console.log("✅ Admin login successful");
+      console.log("✅ Admin login successful, session data:", {
+        sessionId: req.sessionID,
+        adminAuth: req.session.adminAuth
+      });
       res.json({ success: true, message: "Admin login successful" });
     } else {
       console.log("❌ Admin login failed");
@@ -1433,7 +1441,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all users for admin panel
   app.get('/api/admin/users', async (req, res) => {
     try {
-      console.log("🔍 Admin users request - Session:", req.session.adminAuth);
+      console.log("🔍 Admin users request:", {
+        sessionId: req.sessionID,
+        adminAuth: req.session.adminAuth,
+        hasSession: !!req.session,
+        cookies: req.headers.cookie
+      });
       
       // Check admin session first
       if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {

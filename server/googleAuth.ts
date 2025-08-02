@@ -28,9 +28,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true, // Always secure for HTTPS
+      secure: process.env.NODE_ENV === 'production', // Only secure in production
       maxAge: sessionTtl,
-      sameSite: 'none' // Required for OAuth redirects
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Lax for development
     },
   });
 }
