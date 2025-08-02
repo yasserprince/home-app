@@ -263,68 +263,33 @@ export default function AdminSpecial() {
     }
   };
 
-  // Check authorization
-  if (userLoading) {
+  // No longer need user loading check since we use session auth
+
+  // Check admin session by attempting to access admin API
+  const { data: adminCheck, isLoading: adminCheckLoading } = useQuery({
+    queryKey: ["/api/admin/check-session"],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/users');
+      if (response.status === 401) {
+        // No valid admin session, redirect to login
+        window.location.href = '/admin-login';
+        throw new Error('Unauthorized');
+      }
+      return { authorized: true };
+    },
+    retry: false,
+  });
+
+  // Show loading while checking admin session
+  if (adminCheckLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Checking admin access...</div>
       </div>
     );
   }
 
-  if (!currentUser || currentUser.email !== "katiflam1@gmail.com") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-red-900 flex items-center justify-center">
-        <Card className="bg-white/10 backdrop-blur-md border-red-500/30 text-white max-w-md">
-          <CardContent className="p-8 text-center">
-            <Shield className="w-16 h-16 mx-auto mb-4 text-red-400" />
-            <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-            <p className="text-red-200">You are not authorized to access this admin panel.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Show password dialog if not verified
-  if (!isPasswordVerified) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white max-w-md">
-          <CardContent className="p-8">
-            <div className="text-center mb-6">
-              <Lock className="w-16 h-16 mx-auto mb-4 text-blue-400" />
-              <h1 className="text-2xl font-bold mb-2">Secure Access Required</h1>
-              <p className="text-gray-300">Enter the admin password to continue</p>
-            </div>
-            <div className="space-y-4">
-              <Input
-                type="password"
-                placeholder="Enter admin password..."
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-              />
-              <Button
-                onClick={handlePasswordSubmit}
-                disabled={!passwordInput.trim() || verifyPasswordMutation.isPending}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500"
-              >
-                {verifyPasswordMutation.isPending ? "Verifying..." : "Access Admin Panel"}
-              </Button>
-              <p className="text-xs text-gray-400 text-center">
-                Password: SuperAdmin2025!Secure#Platform
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // No longer need password verification since we use session-based login
 
   // Filter users with enhanced search
   const filteredUsers = users.filter((user: User) => {

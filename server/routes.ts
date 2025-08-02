@@ -1406,6 +1406,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin logout
+  app.post('/api/admin/logout', async (req, res) => {
+    req.session.adminAuth = null;
+    console.log("🔓 Admin logged out");
+    res.json({ success: true, message: "Admin logged out" });
+  });
+
   // Password check for admin panel (legacy support)
   app.post('/api/admin/verify-password', async (req, res) => {
     const { password } = req.body;
