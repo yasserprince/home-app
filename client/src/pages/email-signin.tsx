@@ -23,11 +23,8 @@ export default function EmailSignin() {
 
   const signinMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      return await apiRequest("/api/auth/signin", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      });
+      const response = await apiRequest("POST", "/api/auth/signin", data);
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -39,7 +36,7 @@ export default function EmailSignin() {
     onError: (error: any) => {
       toast({
         title: t('signInFailed'),
-        description: error.message || t('checkCredentials'),
+        description: error.message || "Please check your credentials",
         variant: "destructive",
       });
     },
