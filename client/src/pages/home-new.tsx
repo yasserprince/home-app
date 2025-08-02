@@ -346,7 +346,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Popular Services Section */}
+      {/* Popular Services Section - Redesigned */}
       <div className="px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">{t('popularServices')}</h2>
@@ -366,31 +366,41 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {(categories as any[])?.slice(0, 6).map((category: any) => (
-              <Link key={category.id} href={`/providers?category=${category.id}`}>
-                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full hover:scale-[1.02] border-0 shadow-md">
-                  <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[140px]">
-                    <div
-                      className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300"
-                      style={{ 
-                        backgroundColor: `${category.color}15`, 
-                        border: `2px solid ${category.color}25`,
-                        boxShadow: `0 4px 12px ${category.color}20`
-                      }}
-                    >
-                      <ServiceIcon 
-                        iconName={category.icon || 'search'} 
-                        className="w-10 h-10" 
-                        style={{ color: category.color || '#6B7280' }}
-                      />
-                    </div>
-                    <h3 className="font-bold text-gray-900 text-center leading-tight text-base group-hover:text-blue-600 transition-colors">
-                      {translateCategoryName(category.name, language)}
-                    </h3>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+            {(categories as any[])?.slice(0, 6).map((category: any) => {
+              // Hardcoded icon mapping to avoid conflicts
+              const getStaticIcon = (categoryName: string) => {
+                const iconMap: { [key: string]: any } = {
+                  'Plumbing': Wrench,
+                  'Electrical': Zap,
+                  'HVAC': Settings,
+                  'House Cleaning': Sparkles,
+                  'Handyman': Settings,
+                  'Roofing': Settings,
+                  'Landscaping': TreePine,
+                  'Painting': Sparkles,
+                  'Carpentry': Settings,
+                  'Security Systems': Shield
+                };
+                return iconMap[categoryName] || Settings;
+              };
+
+              const IconComponent = getStaticIcon(category.name);
+              
+              return (
+                <Link key={category.id} href={`/providers?category=${category.id}`}>
+                  <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full hover:scale-[1.02] border-0 shadow-md">
+                    <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[140px]">
+                      <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 border border-blue-100">
+                        <IconComponent className="w-10 h-10 text-blue-600" strokeWidth={1.5} />
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-center leading-tight text-base group-hover:text-blue-600 transition-colors">
+                        {translateCategoryName(category.name, language)}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         )}
 
