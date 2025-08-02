@@ -39,11 +39,8 @@ export default function EmailSignup() {
   const signupMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       const { confirmPassword, ...signupData } = data;
-      return await apiRequest("/api/auth/signup", {
-        method: "POST",
-        body: JSON.stringify(signupData),
-        headers: { "Content-Type": "application/json" }
-      });
+      const response = await apiRequest("POST", "/api/auth/signup", signupData);
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -55,7 +52,7 @@ export default function EmailSignup() {
     onError: (error: any) => {
       toast({
         title: t('signupFailed'),
-        description: error.message || t('tryAgain'),
+        description: error.message || "Please try again",
         variant: "destructive",
       });
     },
@@ -116,7 +113,7 @@ export default function EmailSignup() {
             {t('createAccount')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {t('signupAs')} {t(`role${formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}`)}
+            {t('signupAs')} {formData.role === 'seeker' ? t('roleSeeker') : formData.role === 'provider' ? t('roleProvider') : t('roleCompany')}
           </p>
         </div>
 

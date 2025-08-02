@@ -82,7 +82,9 @@ export async function setupEmailAuth(app: Express) {
         wilaya,
         commune,
         postalCode,
-        role: role || "seeker"
+        role: role || "service_seeker", // Use consistent role naming
+        isActive: true,
+        isVerified: false
       });
 
       console.log("Email signup successful for:", email);
@@ -105,7 +107,7 @@ export async function setupEmailAuth(app: Express) {
   app.post("/api/auth/signin", (req, res, next) => {
     console.log("Email signin attempt for:", req.body.email);
     
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) {
         console.error("Email signin error:", err);
         return res.status(500).json({ message: 'Internal server error' });
