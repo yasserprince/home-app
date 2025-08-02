@@ -4,6 +4,14 @@
 
 This is a full-stack home service booking platform that connects customers with local service providers. The application allows users to browse service categories, find providers, book appointments, and manage their service requests through an intuitive mobile-first interface.
 
+## Recent Changes (August 2, 2025)
+
+### Dual Authentication System Completed
+- **Google OAuth**: Fixed critical session cookie configuration and user creation flow
+- **Email/Password**: Complete signup system with comprehensive user information collection
+- **Algeria Integration**: All 58 wilayas included in location selection
+- **Enhanced Security**: bcrypt password hashing and secure session management
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -33,10 +41,11 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Authentication System
-- **Provider**: Replit Auth integration
-- **Strategy**: OpenID Connect with Passport.js
-- **Session Storage**: PostgreSQL-backed sessions
-- **User Management**: Automatic user creation and profile management
+- **Dual Provider**: Google OAuth + Email/Password authentication
+- **Google OAuth**: Passport.js with Google Strategy, fixed session cookie configuration
+- **Email/Password**: bcrypt hashing, comprehensive signup forms with Algeria wilayas
+- **Session Storage**: PostgreSQL-backed sessions with secure cookie settings
+- **User Management**: Automatic user creation, role-based signup flow (seeker/provider/company)
 
 ### Service Management
 - **Categories**: Predefined service categories (Plumbing, Electrical, AC Repair, Cleaning, etc.)
