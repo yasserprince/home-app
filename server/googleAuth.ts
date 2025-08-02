@@ -41,8 +41,7 @@ export async function setupGoogleAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
   
-  // For now, use production URL for both dev and prod since Google Cloud Console is configured for it
-  // TODO: Add localhost URL to Google Cloud Console authorized redirect URIs
+  // Use production URL for all environments since Google Cloud Console is configured for it
   const callbackURL = "https://home-serve-katiflam1.replit.app/api/auth/google/callback";
     
   console.log("Setting up Google OAuth with:", {
@@ -114,8 +113,11 @@ export async function setupGoogleAuth(app: Express) {
 
   // Auth routes
   app.get("/api/auth/google", (req, res, next) => {
-    console.log("Starting Google OAuth flow");
-    passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+    console.log("Starting Google OAuth flow with query:", req.query);
+    passport.authenticate("google", { 
+      scope: ["profile", "email"],
+      state: req.query.state as string || undefined
+    })(req, res, next);
   });
 
   app.get("/api/auth/google/callback", (req, res, next) => {
@@ -127,30 +129,10 @@ export async function setupGoogleAuth(app: Express) {
       return res.redirect("/?error=oauth_denied");
     }
     
-    passport.authenticate("google", { 
-      failureRedirect: "/?error=auth_failed",
-    })(req, res, (err) => {
-      if (err) {
-        console.error("OAuth callback error:", err);
-        console.error("Error details:", err.message, err.stack);
-        return res.redirect("/?error=auth_failed");
-      }
-      if (!req.user) {
-        console.error("No user found after authentication");
-        return res.redirect("/?error=no_user");
-      }
-      console.log("OAuth callback successful, user authenticated:", req.user);
-      
-      // Check if user selected a role during signup
-      const signupRole = req.query.state as string;
-      if (signupRole && ['seeker', 'provider', 'company'].includes(signupRole)) {
-        console.log("Updating user role to:", signupRole);
-        // Update user role based on signup selection
-        // This would be handled by the storage layer
-      }
-      
-      res.redirect("/");
-    });
+    passport.authenticate("google", {
+      successRedirect: "/",
+      failureRedirect: "/?error=auth_failed"
+    })(req, res, next);
   });
 
   app.post("/api/logout", (req, res) => {

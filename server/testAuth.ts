@@ -19,6 +19,24 @@ export function setupTestAuth(app: Express) {
       headers: Object.keys(req.headers),
       cookies: req.cookies,
       session: req.session,
+      isAuthenticated: req.isAuthenticated(),
+      user: req.user
     });
+  });
+  
+  // Simple test for direct Google OAuth (bypassing our signup flow)
+  app.get("/api/test-direct-auth", (req, res) => {
+    res.send(`
+      <html>
+        <body>
+          <h2>Direct Google OAuth Test</h2>
+          <a href="/api/auth/google">Login with Google (Direct)</a>
+          <br><br>
+          <a href="/api/debug-session">Check Session</a>
+          <br><br>
+          <a href="/">Back to Home</a>
+        </body>
+      </html>
+    `);
   });
 }
