@@ -188,9 +188,21 @@ export async function setupGoogleAuth(app: Express) {
     })(req, res, next);
   });
 
+  // Handle both GET and POST logout for convenience
+  app.get("/api/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.redirect("/?error=logout_failed");
+      }
+      res.redirect("/");
+    });
+  });
+
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
       if (err) {
+        console.error("Logout error:", err);
         return res.status(500).json({ message: "Logout failed" });
       }
       res.json({ message: "Logged out successfully" });

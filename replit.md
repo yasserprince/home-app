@@ -11,6 +11,7 @@ This is a full-stack home service booking platform that connects customers with 
 - **Email/Password**: Complete signup system with comprehensive user information collection
 - **Algeria Integration**: All 58 wilayas included in location selection
 - **Enhanced Security**: bcrypt password hashing and secure session management
+- **Logout System**: Fixed logout functionality with both GET and POST endpoints
 
 ## User Preferences
 

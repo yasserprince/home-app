@@ -372,10 +372,20 @@ export default function Settings() {
                   {t('signOutDescription')}
                 </p>
               </div>
-              <Button variant="outline" asChild>
-                <a href="/api/logout" className="text-red-600 hover:text-red-700">
-                  {t('logout')}
-                </a>
+              <Button 
+                variant="outline" 
+                className="text-red-600 hover:text-red-700"
+                onClick={async () => {
+                  try {
+                    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+                    window.location.href = '/';
+                  } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/api/logout'; // Fallback to GET
+                  }
+                }}
+              >
+                {t('logout')}
               </Button>
             </div>
           </CardContent>
