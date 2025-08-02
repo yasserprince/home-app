@@ -186,6 +186,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Profile update route
+  app.put('/api/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const updates = req.body;
+      
+      // Validate role change if provided
+      if (updates.role && !['service_seeker', 'service_provider', 'company'].includes(updates.role)) {
+        return res.status(400).json({ message: 'Invalid role specified' });
+      }
+      
+      // If changing to company, require company name
+      if (updates.role === 'company' && !updates.companyName?.trim()) {
+        return res.status(400).json({ message: 'Company name is required for company accounts' });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json({ message: 'Profile updated successfully', user: updatedUser });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
   // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {
     try {

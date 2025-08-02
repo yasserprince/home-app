@@ -122,6 +122,9 @@ export const translations = {
     signOutDescription: 'Sign out of your account on this device',
     language: 'Language',
     selectLanguage: 'Select Language',
+    accountType: 'Account Type',
+    changeAccountType: 'Change Account Type',
+    companyName: 'Company Name',
     
     // Profile Menu Items
     editProfile: 'Edit Profile',

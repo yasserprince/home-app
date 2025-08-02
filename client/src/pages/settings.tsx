@@ -17,8 +17,12 @@ import {
   Shield, 
   MapPin,
   Save,
-  ArrowLeft
+  ArrowLeft,
+  Users,
+  UserCheck,
+  Briefcase
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -42,6 +46,9 @@ export default function Settings() {
     state: user?.state || '',
     zipCode: user?.zipCode || '',
     notifications: user?.notifications || false,
+    role: user?.role || 'service_seeker',
+    accountType: user?.accountType || 'individual',
+    companyName: user?.companyName || ''
   });
 
   const updateProfileMutation = useMutation({
@@ -216,6 +223,95 @@ export default function Settings() {
                   <Save className="h-4 w-4" />
                   {updateProfileMutation.isPending ? `${t('save')}...` : `${t('save')} Changes`}
                 </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Account Type Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              <CardTitle>{t('accountType')}</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="flex items-center gap-3">
+                {user?.role === 'service_seeker' && <Users className="h-6 w-6 text-blue-600" />}
+                {user?.role === 'service_provider' && <UserCheck className="h-6 w-6 text-green-600" />}
+                {user?.role === 'company' && <Briefcase className="h-6 w-6 text-purple-600" />}
+                <div>
+                  <p className="font-medium">
+                    {user?.role === 'service_seeker' && t('roleSeeker')}
+                    {user?.role === 'service_provider' && t('roleProvider')}
+                    {user?.role === 'company' && t('roleCompany')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {user?.role === 'service_seeker' && "Find and book services"}
+                    {user?.role === 'service_provider' && "Provide individual services"}
+                    {user?.role === 'company' && "Manage business services"}
+                  </p>
+                </div>
+              </div>
+              <Badge variant={user?.role === 'service_seeker' ? 'default' : 'secondary'}>
+                Current
+              </Badge>
+            </div>
+
+            {isEditing && (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="role">{t('changeAccountType')}</Label>
+                  <Select
+                    value={formData.role}
+                    onValueChange={(value) => handleInputChange('role', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="service_seeker">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          {t('roleSeeker')} - Find services
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="service_provider">
+                        <div className="flex items-center gap-2">
+                          <UserCheck className="h-4 w-4" />
+                          {t('roleProvider')} - Provide services
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="company">
+                        <div className="flex items-center gap-2">
+                          <Briefcase className="h-4 w-4" />
+                          {t('roleCompany')} - Business account
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.role === 'company' && (
+                  <div>
+                    <Label htmlFor="companyName">{t('companyName')} *</Label>
+                    <Input
+                      id="companyName"
+                      value={formData.companyName}
+                      onChange={(e) => handleInputChange('companyName', e.target.value)}
+                      placeholder="Enter company name"
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-950 rounded-lg">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    <strong>Important:</strong> Changing your account type will affect your available features and how others can find you on the platform.
+                  </p>
+                </div>
               </div>
             )}
           </CardContent>
