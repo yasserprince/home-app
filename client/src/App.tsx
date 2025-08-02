@@ -22,6 +22,7 @@ import Notifications from "@/pages/notifications";
 import HelpSupport from "@/pages/help-support";
 import AdminPanel from "@/pages/admin";
 import Signup from "@/pages/signup";
+import Signin from "@/pages/signin";
 import Settings from "@/pages/settings";
 import { AdminNav } from "@/components/admin-nav";
 
@@ -31,6 +32,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/signup" component={Signup} />
+      <Route path="/signin" component={Signin} />
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

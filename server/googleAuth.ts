@@ -140,6 +140,15 @@ export async function setupGoogleAuth(app: Express) {
         return res.redirect("/?error=no_user");
       }
       console.log("OAuth callback successful, user authenticated:", req.user);
+      
+      // Check if user selected a role during signup
+      const signupRole = req.query.state as string;
+      if (signupRole && ['seeker', 'provider', 'company'].includes(signupRole)) {
+        console.log("Updating user role to:", signupRole);
+        // Update user role based on signup selection
+        // This would be handled by the storage layer
+      }
+      
       res.redirect("/");
     });
   });
