@@ -16,8 +16,8 @@ export default function LocationSettings() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const mapRef = useRef<HTMLDivElement>(null);
-  const googleMapRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  const googleMapRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
   
   const [locationEnabled, setLocationEnabled] = useState(user?.locationEnabled || false);
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
@@ -124,19 +124,32 @@ export default function LocationSettings() {
         return;
       }
 
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=geometry`;
-      script.async = true;
-      script.onload = () => setMapLoaded(true);
-      script.onerror = () => {
-        console.error('Failed to load Google Maps');
-        toast({
-          title: "Maps Error",
-          description: "Failed to load Google Maps. Map features may not be available.",
-          variant: "destructive",
+      // Get API key from server
+      fetch('/api/maps/config')
+        .then(res => res.json())
+        .then(config => {
+          if (!config.hasApiKey) {
+            console.error('Google Maps API key not configured');
+            return;
+          }
+          
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${config.apiKey}&libraries=geometry`;
+          script.async = true;
+          script.onload = () => setMapLoaded(true);
+          script.onerror = () => {
+            console.error('Failed to load Google Maps');
+            toast({
+              title: "Maps Error",
+              description: "Failed to load Google Maps. Map features may not be available.",
+              variant: "destructive",
+            });
+          };
+          document.head.appendChild(script);
+        })
+        .catch(error => {
+          console.error('Failed to get Maps config:', error);
         });
-      };
-      document.head.appendChild(script);
     };
 
     loadGoogleMaps();
@@ -151,7 +164,7 @@ export default function LocationSettings() {
       };
       setCurrentLocation(location);
       setLocationStatus('success');
-      setLocationEnabled(user.locationEnabled);
+      setLocationEnabled(user.locationEnabled || false);
     }
   }, [user]);
 
@@ -188,7 +201,7 @@ export default function LocationSettings() {
 
   // Update map when location changes
   useEffect(() => {
-    if (googleMapRef.current && markerRef.current && currentLocation) {
+    if (googleMapRef.current && markerRef.current && currentLocation && window.google) {
       const newPosition = new window.google.maps.LatLng(currentLocation.lat, currentLocation.lng);
       googleMapRef.current.setCenter(newPosition);
       markerRef.current.setPosition(newPosition);
@@ -299,9 +312,9 @@ export default function LocationSettings() {
                         </div>
                       </div>
                     )}
-                    {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY && (
+                    {!mapLoaded && locationStatus === 'success' && (
                       <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-                        <p className="text-sm text-gray-600">Google Maps API key not configured</p>
+                        <p className="text-sm text-gray-600">Loading Google Maps...</p>
                       </div>
                     )}
                   </div>
