@@ -22,11 +22,7 @@ export default function LocationSettings() {
 
   const updateLocationMutation = useMutation({
     mutationFn: async (data: { locationEnabled: boolean, latitude?: number, longitude?: number }) => {
-      return await apiRequest("/api/location", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      return await apiRequest("PUT", "/api/location", data);
     },
     onSuccess: () => {
       toast({

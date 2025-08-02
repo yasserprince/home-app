@@ -215,6 +215,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Location update route
+  app.put('/api/location', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { locationEnabled, latitude, longitude } = req.body;
+      
+      const updates: any = { locationEnabled };
+      
+      if (locationEnabled && latitude !== undefined && longitude !== undefined) {
+        updates.latitude = latitude.toString();
+        updates.longitude = longitude.toString();
+      } else if (!locationEnabled) {
+        updates.latitude = null;
+        updates.longitude = null;
+      }
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json({ message: 'Location updated successfully', user: updatedUser });
+    } catch (error) {
+      console.error("Error updating location:", error);
+      res.status(500).json({ message: "Failed to update location" });
+    }
+  });
+
   // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {
     try {
