@@ -340,8 +340,11 @@ export default function Home() {
                     >
                       <ServiceIcon 
                         iconName={category.icon || 'search'} 
-                        className="w-10 h-10" 
-                        style={{ color: category.color || '#6B7280' }}
+                        className="w-10 h-10 text-current" 
+                        style={{ 
+                          color: category.color || '#6B7280',
+                          display: 'block !important'
+                        }}
                       />
                     </div>
                     <h3 className="font-bold text-gray-900 text-center leading-tight text-base group-hover:text-blue-600 transition-colors">

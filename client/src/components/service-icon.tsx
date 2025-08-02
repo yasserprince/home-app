@@ -185,17 +185,26 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
   
   // Debug logging for troubleshooting
   if (typeof window !== 'undefined') {
-    console.log(`ServiceIcon: iconName="${iconName}" -> IconComponent="${IconComponent?.name || 'unknown'}"`);
+    console.log(`🔧 ServiceIcon Debug:`, {
+      iconName,
+      IconComponentName: IconComponent?.name || 'unknown',
+      iconMapHasKey: !!iconMap[iconName as keyof typeof iconMap],
+      availableKeys: Object.keys(iconMap).slice(0, 10)
+    });
   }
 
-  // Mobile Safari SVG fix: Simple JSX rendering
+  // Mobile Safari SVG fix: Force explicit rendering with important styles
   return (
     <IconComponent 
       className={`${className} flex-shrink-0`}
       style={{
         ...style,
-        display: 'inline-block',
+        display: 'inline-block !important',
         verticalAlign: 'middle',
+        width: 'auto',
+        height: 'auto',
+        minWidth: '20px',
+        minHeight: '20px'
       }}
       strokeWidth={2}
       fill="none"
