@@ -1355,6 +1355,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Special Admin-only endpoints - Restricted to katiflam1@gmail.com
+  const isSuperAdmin: RequestHandler = async (req, res, next) => {
+    // Check if user is authenticated
+    if (!req.isAuthenticated() || !req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Get user email from different auth types
+    let userEmail = null;
+    if (req.user?.claims?.email) {
+      // Replit Auth
+      userEmail = req.user.claims.email;
+    } else if (req.user?.email) {
+      // Google/Email Auth
+      userEmail = req.user.email;
+    }
+    
+    // Only allow katiflam1@gmail.com
+    if (userEmail !== "katiflam1@gmail.com") {
+      return res.status(403).json({ message: "Access denied - Super admin only" });
+    }
+    
+    return next();
+  };
+
+  // Get all users for admin panel
+  app.get('/api/admin/users', isSuperAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Get admin statistics
+  app.get('/api/admin/stats', isSuperAdmin, async (req, res) => {
+    try {
+      const [users, providers, bookings, categories] = await Promise.all([
+        storage.getAllUsers(),
+        storage.getServiceProviders(),
+        storage.getAllBookings(),
+        storage.getServiceCategories()
+      ]);
+
+      const stats = {
+        totalUsers: users.length,
+        totalProviders: providers.length,
+        totalBookings: bookings.length,
+        totalCategories: categories.length,
+        activeUsers: users.filter(u => u.isActive).length,
+        verifiedProviders: providers.filter(p => {
+          const user = users.find(u => u.id === p.userId);
+          return user?.isVerified;
+        }).length,
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching admin stats:", error);
+      res.status(500).json({ message: "Failed to fetch statistics" });
+    }
+  });
+
+  // Update any user (super admin only)
+  app.put('/api/admin/users/:userId', isSuperAdmin, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updates = req.body;
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  // Delete any user (super admin only)
+  app.delete('/api/admin/users/:userId', isSuperAdmin, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Prevent super admin from deleting themselves
+      let currentUserEmail = null;
+      if (req.user?.claims?.email) {
+        currentUserEmail = req.user.claims.email;
+      } else if (req.user?.email) {
+        currentUserEmail = req.user.email;
+      }
+      
+      const userToDelete = await storage.getUser(userId);
+      if (userToDelete?.email === currentUserEmail) {
+        return res.status(400).json({ message: 'Cannot delete your own account' });
+      }
+      
+      const deleted = await storage.deleteUser(userId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Add new admin (super admin only)
+  app.post('/api/admin/add-admin', isSuperAdmin, async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found with this email' });
+      }
+      
+      // Update user role to admin
+      const updatedUser = await storage.updateUser(user.id, { 
+        role: 'admin',
+        accountType: 'admin'
+      });
+      
+      res.json({ 
+        message: 'Admin added successfully',
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Error adding admin:", error);
+      res.status(500).json({ message: "Failed to add admin" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

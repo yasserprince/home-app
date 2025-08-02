@@ -21,6 +21,7 @@ import Verification from "@/pages/verification";
 import Notifications from "@/pages/notifications";
 import HelpSupport from "@/pages/help-support";
 import AdminPanel from "@/pages/admin";
+import AdminSpecial from "@/pages/admin-special";
 import Signup from "@/pages/signup";
 import Signin from "@/pages/signin";
 import EmailSignup from "@/pages/email-signup";
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/signin" component={Signin} />
       <Route path="/email-signup" component={EmailSignup} />
       <Route path="/email-signin" component={EmailSignin} />
+      <Route path="/adminspecial" component={AdminSpecial} />
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

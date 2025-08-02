@@ -30,7 +30,8 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
   updateUserRole(userId: string, role: string): Promise<User>;
   updateUserStatus(userId: string, isActive: boolean): Promise<User>;
-  deleteUser(userId: string): Promise<void>;
+  deleteUser(userId: string): Promise<boolean>;
+  getAllBookings(): Promise<Booking[]>;
   
   // Service Category operations
   getServiceCategories(): Promise<ServiceCategory[]>;
@@ -125,8 +126,13 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async deleteUser(userId: string): Promise<void> {
-    await db.delete(users).where(eq(users.id, userId));
+  async deleteUser(userId: string): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, userId));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  async getAllBookings(): Promise<Booking[]> {
+    return await db.select().from(bookings).orderBy(desc(bookings.createdAt));
   }
 
   // Service Category operations
