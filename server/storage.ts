@@ -36,6 +36,8 @@ export interface IStorage {
   // Service Category operations
   getServiceCategories(): Promise<ServiceCategory[]>;
   createServiceCategory(category: InsertServiceCategory): Promise<ServiceCategory>;
+  updateServiceCategory(id: string, categoryData: Partial<ServiceCategory>): Promise<ServiceCategory | undefined>;
+  deleteServiceCategory(id: string): Promise<boolean>;
   
   // Service Provider operations
   getServiceProviders(categoryId?: string, search?: string, userLat?: number, userLng?: number, radius?: number): Promise<(ServiceProvider & { user: User; category: ServiceCategory })[]>;
@@ -146,6 +148,20 @@ export class DatabaseStorage implements IStorage {
       .values(category)
       .returning();
     return newCategory;
+  }
+
+  async updateServiceCategory(id: string, categoryData: Partial<ServiceCategory>): Promise<ServiceCategory | undefined> {
+    const [updatedCategory] = await db
+      .update(serviceCategories)
+      .set(categoryData)
+      .where(eq(serviceCategories.id, id))
+      .returning();
+    return updatedCategory;
+  }
+
+  async deleteServiceCategory(id: string): Promise<boolean> {
+    const result = await db.delete(serviceCategories).where(eq(serviceCategories.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Service Provider operations

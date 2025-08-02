@@ -30,7 +30,14 @@ import {
   Star,
   Briefcase,
   Database,
-  BarChart3
+  BarChart3,
+  Lock,
+  Unlock,
+  Search,
+  Grid,
+  Upload,
+  Image,
+  Palette
 } from "lucide-react";
 
 interface User {
@@ -67,6 +74,16 @@ export default function AdminSpecial() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [editUserData, setEditUserData] = useState<Partial<User>>({});
+  const [isPasswordVerified, setIsPasswordVerified] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [newCategoryData, setNewCategoryData] = useState({
+    name: "",
+    description: "",
+    icon: "",
+    color: ""
+  });
 
   // Check if current user is authorized
   const { data: currentUser, isLoading: userLoading } = useQuery({
@@ -74,16 +91,52 @@ export default function AdminSpecial() {
     retry: false,
   });
 
+  // Password verification
+  const verifyPasswordMutation = useMutation({
+    mutationFn: async (password: string) => {
+      return apiRequest("POST", "/api/admin/verify-password", { password });
+    },
+    onSuccess: () => {
+      setIsPasswordVerified(true);
+      setShowPasswordDialog(false);
+      setPasswordInput("");
+      toast({
+        title: "Access Granted",
+        description: "Password verified successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Access Denied",
+        description: "Invalid password",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Show password dialog on load if not verified
+  useEffect(() => {
+    if (currentUser && currentUser.email === "katiflam1@gmail.com" && !isPasswordVerified) {
+      setShowPasswordDialog(true);
+    }
+  }, [currentUser, isPasswordVerified]);
+
   // Get all users
   const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery({
     queryKey: ["/api/admin/users"],
-    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com",
+    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com" && isPasswordVerified,
   });
 
   // Get admin statistics
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/admin/stats"],
-    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com",
+    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com" && isPasswordVerified,
+  });
+
+  // Get categories
+  const { data: categories = [], isLoading: categoriesLoading, refetch: refetchCategories } = useQuery({
+    queryKey: ["/api/categories"],
+    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com" && isPasswordVerified,
   });
 
   // Update user mutation
@@ -153,6 +206,57 @@ export default function AdminSpecial() {
     },
   });
 
+  // Create category mutation
+  const createCategoryMutation = useMutation({
+    mutationFn: async (categoryData: any) => {
+      return apiRequest("POST", "/api/admin/categories", categoryData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Category created successfully",
+      });
+      refetchCategories();
+      setCategoryDialogOpen(false);
+      setNewCategoryData({ name: "", description: "", icon: "", color: "" });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to create category: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete category mutation
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (categoryId: string) => {
+      return apiRequest("DELETE", `/api/admin/categories/${categoryId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
+      refetchCategories();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to delete category: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Password verification functions
+  const handlePasswordSubmit = () => {
+    if (passwordInput.trim()) {
+      verifyPasswordMutation.mutate(passwordInput);
+    }
+  };
+
   // Check authorization
   if (userLoading) {
     return (
@@ -179,14 +283,58 @@ export default function AdminSpecial() {
     );
   }
 
-  // Filter users
+  // Show password dialog if not verified
+  if (!isPasswordVerified) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white max-w-md">
+          <CardContent className="p-8">
+            <div className="text-center mb-6">
+              <Lock className="w-16 h-16 mx-auto mb-4 text-blue-400" />
+              <h1 className="text-2xl font-bold mb-2">Secure Access Required</h1>
+              <p className="text-gray-300">Enter the admin password to continue</p>
+            </div>
+            <div className="space-y-4">
+              <Input
+                type="password"
+                placeholder="Enter admin password..."
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              />
+              <Button
+                onClick={handlePasswordSubmit}
+                disabled={!passwordInput.trim() || verifyPasswordMutation.isPending}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500"
+              >
+                {verifyPasswordMutation.isPending ? "Verifying..." : "Access Admin Panel"}
+              </Button>
+              <p className="text-xs text-gray-400 text-center">
+                Password: SuperAdmin2025!Secure#Platform
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Filter users with enhanced search
   const filteredUsers = users.filter((user: User) => {
-    const matchesSearch = 
+    const matchesSearch = searchQuery === "" || 
       user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.lastName?.toLowerCase().includes(searchQuery.toLowerCase());
+      user.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.wilaya?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.bio?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    const matchesRole = roleFilter === "all" || 
+      user.role === roleFilter || 
+      user.accountType === roleFilter;
     
     return matchesSearch && matchesRole;
   });
@@ -219,6 +367,18 @@ export default function AdminSpecial() {
   const handleDeleteUser = (userId: string) => {
     if (confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
       deleteUserMutation.mutate(userId);
+    }
+  };
+
+  const handleCreateCategory = () => {
+    if (newCategoryData.name && newCategoryData.icon && newCategoryData.color) {
+      createCategoryMutation.mutate(newCategoryData);
+    }
+  };
+
+  const handleDeleteCategory = (categoryId: string) => {
+    if (confirm("Are you sure you want to delete this category? This action cannot be undone.")) {
+      deleteCategoryMutation.mutate(categoryId);
     }
   };
 
@@ -302,6 +462,9 @@ export default function AdminSpecial() {
             <TabsTrigger value="users" className="data-[state=active]:bg-white/20 text-white">
               User Management
             </TabsTrigger>
+            <TabsTrigger value="categories" className="data-[state=active]:bg-white/20 text-white">
+              Categories
+            </TabsTrigger>
             <TabsTrigger value="admins" className="data-[state=active]:bg-white/20 text-white">
               Admin Management
             </TabsTrigger>
@@ -315,12 +478,13 @@ export default function AdminSpecial() {
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
-                      placeholder="Search users by name or email..."
+                      placeholder="Search users by name, email, phone, location..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 pl-10"
                     />
                   </div>
                   <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -399,20 +563,151 @@ export default function AdminSpecial() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleEditUser(user)}
-                              className="border-white/20 text-white hover:bg-white/10"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleEditUser(user);
+                              }}
+                              className="border-white/20 text-white hover:bg-white/10 cursor-pointer"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="border-red-500/50 text-red-400 hover:bg-red-500/20"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleDeleteUser(user.id);
+                              }}
+                              className="border-red-500/50 text-red-400 hover:bg-red-500/20 cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="categories" className="space-y-6">
+            {/* Category Management */}
+            <Card className="bg-white/10 backdrop-blur-md border-white/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-white flex items-center">
+                    <Grid className="w-6 h-6 mr-2" />
+                    Category Management
+                  </CardTitle>
+                  <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-gradient-to-r from-green-500 to-blue-500 text-white">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Category
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-gray-900 border-gray-700 text-white">
+                      <DialogHeader>
+                        <DialogTitle>Create New Category</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Category Name</Label>
+                          <Input
+                            value={newCategoryData.name}
+                            onChange={(e) => setNewCategoryData({...newCategoryData, name: e.target.value})}
+                            placeholder="e.g. Pool Cleaning"
+                            className="bg-gray-800 border-gray-600 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label>Description</Label>
+                          <Textarea
+                            value={newCategoryData.description}
+                            onChange={(e) => setNewCategoryData({...newCategoryData, description: e.target.value})}
+                            placeholder="Category description..."
+                            className="bg-gray-800 border-gray-600 text-white"
+                            rows={3}
+                          />
+                        </div>
+                        <div>
+                          <Label>Icon (Lucide icon name)</Label>
+                          <Input
+                            value={newCategoryData.icon}
+                            onChange={(e) => setNewCategoryData({...newCategoryData, icon: e.target.value})}
+                            placeholder="e.g. droplets, wrench, zap"
+                            className="bg-gray-800 border-gray-600 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label>Color (HSL format)</Label>
+                          <Input
+                            value={newCategoryData.color}
+                            onChange={(e) => setNewCategoryData({...newCategoryData, color: e.target.value})}
+                            placeholder="e.g. hsl(210, 80%, 55%)"
+                            className="bg-gray-800 border-gray-600 text-white"
+                          />
+                        </div>
+                        <Button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCreateCategory();
+                          }}
+                          disabled={!newCategoryData.name || !newCategoryData.icon || !newCategoryData.color || createCategoryMutation.isPending}
+                          className="w-full bg-gradient-to-r from-green-500 to-blue-500 cursor-pointer"
+                        >
+                          {createCategoryMutation.isPending ? "Creating..." : "Create Category"}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {categoriesLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {categories.map((category: any) => (
+                      <div
+                        key={category.id}
+                        className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-all"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-3">
+                            <div 
+                              className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                              style={{ backgroundColor: category.color }}
+                            >
+                              {category.icon}
+                            </div>
+                            <div>
+                              <h3 className="text-white font-semibold">{category.name}</h3>
+                              <p className="text-gray-400 text-sm">{category.description}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleDeleteCategory(category.id);
+                            }}
+                            className="border-red-500/50 text-red-400 hover:bg-red-500/20 cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Icon: {category.icon} | Color: {category.color}
                         </div>
                       </div>
                     ))}

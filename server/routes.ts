@@ -1372,6 +1372,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       userEmail = req.user.email;
     }
     
+    console.log("Super admin check - User email:", userEmail);
+    
     // Only allow katiflam1@gmail.com
     if (userEmail !== "katiflam1@gmail.com") {
       return res.status(403).json({ message: "Access denied - Super admin only" });
@@ -1379,6 +1381,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     return next();
   };
+
+  // Password check for admin panel
+  app.post('/api/admin/verify-password', isSuperAdmin, async (req, res) => {
+    const { password } = req.body;
+    const correctPassword = "SuperAdmin2025!Secure#Platform";
+    
+    if (password === correctPassword) {
+      res.json({ success: true });
+    } else {
+      res.status(401).json({ success: false, message: "Invalid password" });
+    }
+  });
 
   // Get all users for admin panel
   app.get('/api/admin/users', isSuperAdmin, async (req, res) => {
@@ -1499,6 +1513,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error adding admin:", error);
       res.status(500).json({ message: "Failed to add admin" });
+    }
+  });
+
+  // Create new service category (super admin only)
+  app.post('/api/admin/categories', isSuperAdmin, async (req, res) => {
+    try {
+      const categoryData = req.body;
+      
+      if (!categoryData.name || !categoryData.icon || !categoryData.color) {
+        return res.status(400).json({ message: 'Name, icon, and color are required' });
+      }
+      
+      const newCategory = await storage.createServiceCategory(categoryData);
+      
+      res.json({ 
+        message: 'Category created successfully',
+        category: newCategory
+      });
+    } catch (error) {
+      console.error("Error creating category:", error);
+      res.status(500).json({ message: "Failed to create category" });
+    }
+  });
+
+  // Update service category (super admin only)
+  app.put('/api/admin/categories/:categoryId', isSuperAdmin, async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const updateData = req.body;
+      
+      const updatedCategory = await storage.updateServiceCategory(categoryId, updateData);
+      
+      if (!updatedCategory) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+      
+      res.json(updatedCategory);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      res.status(500).json({ message: "Failed to update category" });
+    }
+  });
+
+  // Delete service category (super admin only)
+  app.delete('/api/admin/categories/:categoryId', isSuperAdmin, async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      
+      const deleted = await storage.deleteServiceCategory(categoryId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+      
+      res.json({ message: 'Category deleted successfully' });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      res.status(500).json({ message: "Failed to delete category" });
     }
   });
 
