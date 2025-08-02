@@ -12,6 +12,7 @@ import { promises as fs } from "fs";
 import express from "express";
 import { insertBookingSchema, insertReviewSchema } from "@shared/schema";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import sharp from "sharp";
 import { z } from "zod";
 
 // Configure multer for file uploads

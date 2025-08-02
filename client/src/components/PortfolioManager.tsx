@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ObjectUploader } from "./ObjectUploader";
+import { CategorySelector } from "./CategorySelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +18,8 @@ import {
   Image as ImageIcon,
   Award,
   Briefcase,
-  Star 
+  Star,
+  Settings
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -34,6 +36,8 @@ export function PortfolioManager({ userId, isProvider }: PortfolioManagerProps) 
   const [uploading, setUploading] = useState(false);
   const [editingAchievements, setEditingAchievements] = useState(false);
   const [achievements, setAchievements] = useState("");
+  const [editingCategory, setEditingCategory] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   // Fetch service provider data if user is a provider
   const { data: serviceProvider } = useQuery<any>({
@@ -90,6 +94,31 @@ export function PortfolioManager({ userId, isProvider }: PortfolioManagerProps) 
     },
   });
 
+  const updateCategoryMutation = useMutation({
+    mutationFn: async (categoryId: string) => {
+      const response = await apiRequest("PUT", `/api/service-providers/${serviceProvider?.id}`, { 
+        categoryId: categoryId 
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/service-providers/user/${userId}`] });
+      toast({
+        title: "Success",
+        description: "Service category updated successfully",
+      });
+      setEditingCategory(false);
+    },
+    onError: (error: any) => {
+      console.error("Error updating category:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update category",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleGetUploadParameters = async () => {
     const response = await apiRequest("POST", "/api/objects/upload");
     return {
@@ -119,12 +148,90 @@ export function PortfolioManager({ userId, isProvider }: PortfolioManagerProps) 
     setEditingAchievements(true);
   };
 
+  const startEditingCategory = () => {
+    setSelectedCategory(serviceProvider?.categoryId || "");
+    setEditingCategory(true);
+  };
+
+  const handleSaveCategory = () => {
+    if (selectedCategory) {
+      updateCategoryMutation.mutate(selectedCategory);
+    }
+  };
+
   if (!isProvider) {
     return null;
   }
 
   return (
     <div className="space-y-6">
+      {/* Service Category Selection */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              <CardTitle>Service Category</CardTitle>
+            </div>
+            {!editingCategory && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={startEditingCategory}
+                className="flex items-center gap-2"
+              >
+                <Edit className="w-4 h-4" />
+                Change
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {editingCategory ? (
+            <div className="space-y-4">
+              <CategorySelector
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+                label="Select your service category"
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSaveCategory}
+                  disabled={updateCategoryMutation.isPending || !selectedCategory}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {updateCategoryMutation.isPending ? "Saving..." : "Save"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setEditingCategory(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {serviceProvider?.category ? (
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-sm">
+                    {serviceProvider.category.name}
+                  </Badge>
+                  <span className="text-muted-foreground text-sm">
+                    Current service category
+                  </span>
+                </div>
+              ) : (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Settings className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No service category selected. Choose your category to get started!</p>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
       {/* Portfolio Images */}
       <Card>
         <CardHeader>
@@ -134,18 +241,32 @@ export function PortfolioManager({ userId, isProvider }: PortfolioManagerProps) 
               <CardTitle>Portfolio Images</CardTitle>
             </div>
             <ObjectUploader
-              maxNumberOfFiles={5}
-              maxFileSize={10485760} // 10MB
+              maxNumberOfFiles={Math.min(5, 10 - (serviceProvider?.portfolioImages?.length || 0))}
+              maxFileSize={2097152} // 2MB limit
               onGetUploadParameters={handleGetUploadParameters}
               onComplete={handleUploadComplete}
               buttonClassName="flex items-center gap-2"
+              compressionOptions={{
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1200,
+                useWebWorker: true,
+              }}
             >
               <Plus className="w-4 h-4" />
-              Add Images
+              Add Images ({(serviceProvider?.portfolioImages?.length || 0)}/10)
             </ObjectUploader>
           </div>
         </CardHeader>
         <CardContent>
+          {serviceProvider?.portfolioImages && serviceProvider.portfolioImages.length > 0 ? (
+            serviceProvider.portfolioImages.length >= 10 && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-700">
+                  Maximum portfolio limit reached (10 images). Remove some images to add new ones.
+                </p>
+              </div>
+            ) || null
+          ) : null}
           {serviceProvider?.portfolioImages && serviceProvider.portfolioImages.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {serviceProvider.portfolioImages.map((imageUrl: string, index: number) => (

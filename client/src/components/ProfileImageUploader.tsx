@@ -7,6 +7,7 @@ import { Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { UploadResult } from "@uppy/core";
+import imageCompression from "browser-image-compression";
 
 interface ProfileImageUploaderProps {
   currentImageUrl?: string;
@@ -74,10 +75,15 @@ export function ProfileImageUploader({ currentImageUrl, userName, className }: P
       
       <ObjectUploader
         maxNumberOfFiles={1}
-        maxFileSize={5242880} // 5MB
+        maxFileSize={2097152} // 2MB limit
         onGetUploadParameters={handleGetUploadParameters}
         onComplete={handleUploadComplete}
         buttonClassName="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 bg-blue-600 hover:bg-blue-700"
+        compressionOptions={{
+          maxSizeMB: 1,
+          maxWidthOrHeight: 800,
+          useWebWorker: true,
+        }}
       >
         <Camera className="w-4 h-4 text-white" />
       </ObjectUploader>

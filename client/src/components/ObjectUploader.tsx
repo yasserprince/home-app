@@ -7,6 +7,7 @@ import "@uppy/dashboard/dist/style.min.css";
 import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
+import imageCompression from "browser-image-compression";
 
 interface ObjectUploaderProps {
   maxNumberOfFiles?: number;
@@ -20,6 +21,11 @@ interface ObjectUploaderProps {
   ) => void;
   buttonClassName?: string;
   children: ReactNode;
+  compressionOptions?: {
+    maxSizeMB: number;
+    maxWidthOrHeight: number;
+    useWebWorker: boolean;
+  };
 }
 
 /**
@@ -44,13 +50,15 @@ export function ObjectUploader({
   onComplete,
   buttonClassName,
   children,
+  compressionOptions,
 }: ObjectUploaderProps) {
   const [showModal, setShowModal] = useState(false);
-  const [uppy] = useState(() =>
-    new Uppy({
+  const [uppy] = useState(() => {
+    const uppyInstance = new Uppy({
       restrictions: {
         maxNumberOfFiles,
         maxFileSize,
+        allowedFileTypes: ['image/*'],
       },
       autoProceed: false,
     })
@@ -60,8 +68,31 @@ export function ObjectUploader({
       })
       .on("complete", (result) => {
         onComplete?.(result);
-      })
-  );
+      });
+
+    // Add image compression if options provided
+    if (compressionOptions) {
+      uppyInstance.addPreProcessor(async (fileIDs) => {
+        const promises = fileIDs.map(async (fileID) => {
+          const file = uppyInstance.getFile(fileID);
+          if (file && file.type?.startsWith('image/')) {
+            try {
+              const compressedFile = await imageCompression(file.data as File, compressionOptions);
+              uppyInstance.setFileState(fileID, {
+                data: compressedFile,
+                size: compressedFile.size,
+              });
+            } catch (error) {
+              console.error('Image compression failed:', error);
+            }
+          }
+        });
+        await Promise.all(promises);
+      });
+    }
+
+    return uppyInstance;
+  });
 
   return (
     <div>
