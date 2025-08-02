@@ -74,49 +74,8 @@ async function upsertUser(
 }
 
 export async function setupAuth(app: Express) {
-  app.set("trust proxy", 1);
-  app.use(getSession());
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  // Add Google OAuth Strategy
-  const callbackURL = "https://home-serve-katiflam1.replit.app/api/auth/google/callback";
-  passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID!,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: callbackURL
-  }, async (accessToken, refreshToken, profile, done) => {
-    try {
-      const email = profile.emails?.[0]?.value;
-      const firstName = profile.name?.givenName;
-      const lastName = profile.name?.familyName;
-      const profileImageUrl = profile.photos?.[0]?.value;
-
-      if (!email) {
-        return done(new Error("No email found in Google profile"));
-      }
-
-      const userData = {
-        id: `google_${profile.id}`,
-        email,
-        firstName,
-        lastName,
-        profileImageUrl,
-        authProvider: 'google',
-        role: 'service_seeker',
-        accountType: 'individual',
-        isActive: true,
-        lastLoginAt: new Date()
-      };
-
-      const user = await storage.upsertUser(userData);
-      return done(null, user);
-    } catch (error) {
-      console.error("Google auth error:", error);
-      return done(error);
-    }
-  }));
-
+  // Don't re-initialize session and passport - they're already set up by Google Auth
+  
   const config = await getOidcConfig();
 
   const verify: VerifyFunction = async (
@@ -129,39 +88,39 @@ export async function setupAuth(app: Express) {
     verified(null, user);
   };
 
-  // For now, we'll focus on Google and Email auth
-  // Replit Auth can be added later when needed
-  // for (const domain of process.env
-  //   .REPLIT_DOMAINS!.split(",")) {
-  //   const strategy = new Strategy(
-  //     {
-  //       name: `replitauth:${domain}`,
-  //       config,
-  //       scope: "openid email profile offline_access",
-  //       callbackURL: `https://${domain}/api/callback`,
-  //     },
-  //     verify,
-  //   );
-  //   passport.use(strategy);
-  // }
+  for (const domain of process.env
+    .REPLIT_DOMAINS!.split(",")) {
+    const strategy = new Strategy(
+      {
+        name: `replitauth:${domain}`,
+        config,
+        scope: "openid email profile offline_access",
+        callbackURL: `https://${domain}/api/callback`,
+      },
+      verify,
+    );
+    passport.use(strategy);
+  }
 
-  passport.serializeUser((user: Express.User, cb) => cb(null, user));
-  passport.deserializeUser((user: Express.User, cb) => cb(null, user));
+  // Only register if not already registered by Google Auth
+  if (!passport._serializers || passport._serializers.length === 0) {
+    passport.serializeUser((user: Express.User, cb) => cb(null, user));
+    passport.deserializeUser((user: Express.User, cb) => cb(null, user));
+  }
 
-  // Replit Auth routes disabled for now
-  // app.get("/api/login", (req, res, next) => {
-  //   passport.authenticate(`replitauth:${req.hostname}`, {
-  //     prompt: "login consent",
-  //     scope: ["openid", "email", "profile", "offline_access"],
-  //   })(req, res, next);
-  // });
+  app.get("/api/login", (req, res, next) => {
+    passport.authenticate(`replitauth:${req.hostname}`, {
+      prompt: "login consent",
+      scope: ["openid", "email", "profile", "offline_access"],
+    })(req, res, next);
+  });
 
-  // app.get("/api/callback", (req, res, next) => {
-  //   passport.authenticate(`replitauth:${req.hostname}`, {
-  //     successReturnToOrRedirect: "/",
-  //     failureRedirect: "/api/login",
-  //   })(req, res, next);
-  // });
+  app.get("/api/callback", (req, res, next) => {
+    passport.authenticate(`replitauth:${req.hostname}`, {
+      successReturnToOrRedirect: "/",
+      failureRedirect: "/api/login",
+    })(req, res, next);
+  });
 
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
@@ -174,17 +133,7 @@ export async function setupAuth(app: Express) {
     });
   });
 
-  // Google OAuth routes
-  app.get("/api/auth/google", passport.authenticate("google", {
-    scope: ["profile", "email"]
-  }));
-
-  app.get("/api/auth/google/callback", 
-    passport.authenticate("google", { failureRedirect: "/signin" }),
-    (req, res) => {
-      res.redirect("/");
-    }
-  );
+  // Google OAuth routes are handled by googleAuth.ts
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {

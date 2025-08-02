@@ -54,9 +54,10 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware - consolidated session management
+  // Auth middleware
+  await setupGoogleAuth(app);
   await setupEmailAuth(app);
-  await setupAuth(app); // Replit Auth (includes session management)
+  await setupAuth(app); // Replit Auth
   
   // Test endpoints for debugging
   setupTestAuth(app);
