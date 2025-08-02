@@ -90,16 +90,19 @@ interface ServiceIconProps {
 export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceIconProps) {
   // Handle empty or undefined iconName
   if (!iconName || typeof iconName !== 'string') {
+    console.log(`ServiceIcon: No iconName provided, using Search fallback`);
     return <Search className={className} style={style} />;
   }
   
+  console.log(`ServiceIcon: Looking for icon "${iconName}"`);
   const IconComponent = iconMap[iconName as keyof typeof iconMap];
   
   if (!IconComponent) {
     // Fallback to search icon for unknown icons
-    console.warn(`Icon "${iconName}" not found in iconMap, using fallback`);
+    console.warn(`Icon "${iconName}" not found in iconMap, using fallback. Available icons:`, Object.keys(iconMap).slice(0, 10));
     return <Search className={className} style={style} />;
   }
   
+  console.log(`ServiceIcon: Found and rendering icon "${iconName}"`);
   return <IconComponent className={className} style={style} />;
 }
