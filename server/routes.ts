@@ -2,6 +2,7 @@ import type { Express, RequestHandler } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupGoogleAuth, isAuthenticated } from "./googleAuth";
+import { setupEmailAuth } from "./emailAuth";
 import { setupTestAuth } from "./testAuth";
 import multer from "multer";
 import path from "path";
@@ -50,6 +51,7 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupGoogleAuth(app);
+  await setupEmailAuth(app);
   
   // Test endpoints for debugging
   setupTestAuth(app);

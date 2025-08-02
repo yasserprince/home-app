@@ -29,7 +29,9 @@ export const sessions = pgTable(
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
+  email: varchar("email").unique().notNull(),
+  password: varchar("password"), // For email/password auth (hashed)
+  authProvider: varchar("auth_provider").default("email"), // 'email' or 'google'
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -40,6 +42,7 @@ export const users = pgTable("users", {
   address: text("address"),
   city: varchar("city"),
   state: varchar("state"),
+  wilaya: varchar("wilaya"), // Algerian wilaya code for Algerian users
   zipCode: varchar("zip_code"),
   dateOfBirth: timestamp("date_of_birth"),
   emergencyContact: varchar("emergency_contact"),

@@ -152,10 +152,11 @@ export default function Signup() {
               </div>
             </div>
             
-            <Button variant="outline" className="w-full" disabled>
-              {t('continueWithEmail')}
-              <span className="ml-2 text-xs text-gray-500">({t('comingSoon')})</span>
-            </Button>
+            <Link href={`/email-signup?role=${selectedRole}`} className="w-full">
+              <Button variant="outline" className="w-full">
+                {t('continueWithEmail')}
+              </Button>
+            </Link>
             
             <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
               {t('signupTerms')}
