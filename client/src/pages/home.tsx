@@ -10,7 +10,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 import { ServiceIcon } from "@/components/service-icon";
-import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown } from "lucide-react";
+import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown, Star, Calendar } from "lucide-react";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -174,17 +174,23 @@ export default function Home() {
 
   if (userLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-primary text-white p-6 pt-12">
-          <Skeleton className="h-6 w-32 mb-2" />
-          <Skeleton className="h-4 w-48 mb-4" />
-          <Skeleton className="h-12 w-full" />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 -right-20 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
-        <div className="p-6">
-          <Skeleton className="h-6 w-32 mb-4" />
+        
+        <div className="relative z-10 bg-white/10 backdrop-blur-md text-white p-6 pt-12 border-b border-white/20">
+          <Skeleton className="h-6 w-32 mb-2 bg-white/20" />
+          <Skeleton className="h-4 w-48 mb-4 bg-white/20" />
+          <Skeleton className="h-12 w-full bg-white/20" />
+        </div>
+        <div className="relative z-10 p-6">
+          <Skeleton className="h-6 w-32 mb-4 bg-white/20" />
           <div className="grid grid-cols-2 gap-4">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-24" />
+              <Skeleton key={i} className="h-24 bg-white/20" />
             ))}
           </div>
         </div>
@@ -193,15 +199,21 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20" dir={getLanguageDirection(language)}>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 pb-20 relative overflow-hidden" dir={getLanguageDirection(language)}>
+      {/* Background Effects */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-20 -right-20 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+      
       {/* Header */}
-      <div className="bg-primary text-white p-6 pt-12">
+      <div className="relative z-10 bg-white/10 backdrop-blur-md text-white p-6 pt-12 border-b border-white/20">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-semibold">
               {t('hello')}, {user?.firstName || "User"}!
             </h1>
-            <p className="text-blue-200 text-sm">{t('whatServiceToday')}</p>
+            <p className="text-blue-100 text-sm">{t('whatServiceToday')}</p>
           </div>
           <div className="flex items-center gap-2">
             <LanguageSelector variant="button" className="mr-2" />
@@ -220,14 +232,14 @@ export default function Home() {
                     <img
                       src={user.profileImageUrl}
                       alt="Profile"
-                      className="w-10 h-10 rounded-full object-cover border-2 border-blue-300"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
                     />
                   ) : (
-                    <div className="w-10 h-10 bg-blue-300 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                    <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 text-white font-semibold text-sm">
                       {((user?.firstName?.[0] || '') + (user?.lastName?.[0] || user?.email?.[0] || '')).toUpperCase().slice(0, 2) || 'U'}
                     </div>
                   )}
-                  <ChevronDown className="h-3 w-3 text-blue-200" />
+                  <ChevronDown className="h-3 w-3 text-white/70" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -290,7 +302,7 @@ export default function Home() {
             onFocus={() => {
               if (searchQuery.trim()) setShowSuggestions(true);
             }}
-            className="w-full py-3 px-4 pl-12 pr-10 rounded-xl text-gray-900 bg-white border-0"
+            className="w-full py-3 px-4 pl-12 pr-10 rounded-xl text-gray-900 bg-white/90 backdrop-blur-md border border-white/20 shadow-lg"
           />
           <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
           {searchQuery && (
@@ -345,19 +357,19 @@ export default function Home() {
       </div>
 
       {/* Service Categories */}
-      <div className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('popularServices')}</h2>
+      <div className="relative z-10 p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">{t('popularServices')}</h2>
         {categoriesLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-20 sm:h-24" />
+              <Skeleton key={i} className="h-20 sm:h-24 bg-white/20" />
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
             {(categories as any[])?.slice(0, 6).map((category: any) => (
               <Link key={category.id} href={`/providers?category=${category.id}`}>
-                <Card className="hover:shadow-md transition-all duration-200 cursor-pointer h-full hover:scale-105">
+                <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer h-full hover:scale-105 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20">
                   <CardContent className="p-4 flex flex-col items-center justify-center h-full min-h-[100px] sm:min-h-[120px]">
                     <div
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center mb-3 mx-auto flex-shrink-0 shadow-sm"
@@ -370,7 +382,7 @@ export default function Home() {
                       />
 
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base text-center leading-tight line-clamp-2">
+                    <h3 className="font-semibold text-white text-sm sm:text-base text-center leading-tight line-clamp-2">
                       {translateCategoryName(category.name, language)}
                     </h3>
                   </CardContent>
@@ -384,13 +396,13 @@ export default function Home() {
         {categories && (categories as any[]).length > 6 && (
           <div className="mb-6">
             <Link href="/categories">
-              <Card className="hover:shadow-md transition-all duration-200 cursor-pointer border-dashed border-2 border-gray-300 hover:scale-105">
+              <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer border-dashed border-2 border-white/30 hover:scale-105 bg-white/10 backdrop-blur-md hover:bg-white/20">
                 <CardContent className="p-4 text-center min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
-                    <ServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm border border-white/30">
+                    <ServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{t('viewAllServices')}</h3>
-                  <p className="text-xs text-gray-600">+{(categories as any[]).length - 6} {t('moreCategories')}</p>
+                  <h3 className="font-semibold text-white text-sm sm:text-base">{t('viewAllServices')}</h3>
+                  <p className="text-xs text-white/70">+{(categories as any[]).length - 6} {t('moreCategories')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -400,16 +412,16 @@ export default function Home() {
         {/* Recent Bookings */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">{t('recentBookings')}</h2>
+            <h2 className="text-lg font-semibold text-white">{t('recentBookings')}</h2>
             <Link href="/bookings">
-              <button className="text-primary text-sm font-medium">{t('viewAll')}</button>
+              <button className="text-blue-300 text-sm font-medium hover:text-white transition-colors">{t('viewAll')}</button>
             </Link>
           </div>
 
           {bookingsLoading ? (
-            <Skeleton className="h-20" />
+            <Skeleton className="h-20 bg-white/20" />
           ) : bookings && (bookings as any[]).length > 0 ? (
-            <Card>
+            <Card className="bg-white/10 backdrop-blur-md border border-white/20">
               <CardContent className="p-4">
                 {(bookings as any[]).slice(0, 1).map((booking: any) => (
                   <div key={booking.id} className="flex items-center space-x-3">
@@ -421,14 +433,14 @@ export default function Home() {
                       />
                     ) : (
                       <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                        <i className="fas fa-user text-gray-500"></i>
+                        <UserIcon className="w-6 h-6 text-gray-500" />
                       </div>
                     )}
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">
+                      <h4 className="font-medium text-white">
                         {booking.provider.user.firstName} {booking.provider.user.lastName}
                       </h4>
-                      <p className="text-sm text-gray-600">{booking.serviceType}</p>
+                      <p className="text-sm text-white/70">{booking.serviceType}</p>
                       <p className={`text-sm font-medium ${
                         booking.status === 'completed' ? 'text-green-600' :
                         booking.status === 'confirmed' ? 'text-blue-600' :
@@ -438,12 +450,12 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-white/70">
                         {new Date(booking.scheduledDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </p>
                       <div className="flex items-center">
-                        <i className="fas fa-star text-yellow-400 text-xs"></i>
-                        <span className="text-sm text-gray-900 ml-1">
+                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                        <span className="text-sm text-white ml-1">
                           {booking.provider.rating || '4.8'}
                         </span>
                       </div>
@@ -453,13 +465,13 @@ export default function Home() {
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="bg-white/10 backdrop-blur-md border border-white/20">
               <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-calendar text-gray-400 text-2xl"></i>
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/30">
+                  <Calendar className="w-8 h-8 text-white/70" />
                 </div>
-                <h3 className="font-medium text-gray-900 mb-2">{t('noBookingsYet')}</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <h3 className="font-medium text-white mb-2">{t('noBookingsYet')}</h3>
+                <p className="text-sm text-white/70 mb-4">
                   {t('bookFirstService')}
                 </p>
               </CardContent>
