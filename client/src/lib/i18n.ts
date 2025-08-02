@@ -155,6 +155,7 @@ export const translations = {
     cannotDeleteOwn: 'Cannot delete your own account',
     
     // Service Categories
+    popularServices: 'Popular Services',
     plumbing: 'Plumbing',
     electrical: 'Electrical',
     hvac: 'HVAC',

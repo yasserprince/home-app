@@ -47,7 +47,6 @@ const iconMap = {
   heart: Heart,
   calendar: Calendar,
   'utensils-crossed': UtensilsCrossed,
-  music: Music,
   wine: Wine,
   car: Car,
   brush: Brush,
@@ -73,6 +72,33 @@ const iconMap = {
   'temperature-low': Wind,
   
   // Additional service mappings
+  'tool': Wrench,
+  'electrical': Zap,
+  'plumbing': Wrench,
+  'painting': Paintbrush,
+  'cleaning': Sparkles,
+  'hvac': Thermometer,
+  'handyman': Hammer,
+  'roofing': Home,
+  'flooring': Square,
+  'landscaping': TreePine,
+  'appliance': Square,
+  'pest': Bug,
+  'moving': Truck,
+  'security': Shield,
+  'pool': Waves,
+  'automotive': Car,
+  'wellness': Heart,
+  'pet': PawPrint,
+  'fitness': Dumbbell,
+  'education': GraduationCap,
+  'photography': Camera,
+  'events': Calendar,
+  'catering': Utensils,
+  'legal': Scale,
+  'technology': Monitor,
+  'design': Layout,
+  'finance': Calculator,
   saw: Hammer,
   tv: Monitor,
   spa: Sparkles,
@@ -95,16 +121,12 @@ interface ServiceIconProps {
 export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceIconProps) {
   // Handle empty or undefined iconName
   if (!iconName || typeof iconName !== 'string') {
-    console.log('ServiceIcon: Empty iconName, using fallback');
     return <Search className={className} style={style} />;
   }
-  
-  console.log(`ServiceIcon: Received iconName "${iconName}"`);
   
   // Try exact match first
   const ExactMatch = iconMap[iconName as keyof typeof iconMap];
   if (ExactMatch) {
-    console.log(`ServiceIcon: Found exact match for "${iconName}"`);
     return <ExactMatch className={className} style={style} />;
   }
   
@@ -112,7 +134,6 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
   const cleanIconName = iconName.toLowerCase().trim();
   const CleanMatch = iconMap[cleanIconName as keyof typeof iconMap];
   if (CleanMatch) {
-    console.log(`ServiceIcon: Found clean match for "${iconName}" -> "${cleanIconName}"`);
     return <CleanMatch className={className} style={style} />;
   }
   
@@ -121,18 +142,41 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     cleanIconName.replace(/\s+/g, '-'), // spaces to hyphens
     cleanIconName.replace(/[-_\s]/g, ''), // Remove all separators
     cleanIconName.replace(/\s+/g, '_'), // spaces to underscores
+    cleanIconName.replace(/ing$/, ''), // Remove 'ing' suffix
+    cleanIconName.replace(/s$/, ''), // Remove plural 's'
   ];
   
   // Try to find a matching icon
   for (const variation of variations) {
     const FoundIcon = iconMap[variation as keyof typeof iconMap];
     if (FoundIcon) {
-      console.log(`ServiceIcon: Found variation match for "${iconName}" -> "${variation}"`);
       return <FoundIcon className={className} style={style} />;
     }
   }
   
-  // If still not found, return fallback with warning
-  console.warn(`ServiceIcon: No match found for "${iconName}". Available icons:`, Object.keys(iconMap).slice(0, 10));
+  // Category-specific fallbacks
+  const categoryKeywords = {
+    'repair': Wrench,
+    'clean': Sparkles,
+    'electric': Zap,
+    'water': Droplets,
+    'home': Home,
+    'garden': Leaf,
+    'tech': Monitor,
+    'food': Utensils,
+    'health': Heart,
+    'transport': Car,
+    'build': Hammer,
+    'design': Layout,
+  };
+  
+  // Check for keyword matches
+  for (const [keyword, IconComponent] of Object.entries(categoryKeywords)) {
+    if (cleanIconName.includes(keyword)) {
+      return <IconComponent className={className} style={style} />;
+    }
+  }
+  
+  // Return fallback
   return <Search className={className} style={style} />;
 }
