@@ -339,15 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Admin routes (full permissions)
-  app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const users = await storage.getAllUsers();
-      res.json(users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      res.status(500).json({ message: "Failed to fetch users" });
-    }
-  });
+  // Removed: Replaced with session-based admin auth version below
 
   app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req, res) => {
     try {
@@ -1421,6 +1413,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, message: "Admin logged out" });
   });
 
+  // Test session endpoint
+  app.get('/api/admin/test-session', (req: any, res) => {
+    console.log("🧪 Session test:", {
+      sessionId: req.sessionID,
+      hasSession: !!req.session,
+      sessionData: req.session,
+      adminAuth: req.session?.adminAuth,
+      cookies: req.headers.cookie
+    });
+    res.json({
+      sessionId: req.sessionID,
+      hasSession: !!req.session,
+      adminAuth: req.session?.adminAuth || null
+    });
+  });
+
   // Password check for admin panel (legacy support)
   app.post('/api/admin/verify-password', async (req, res) => {
     const { password } = req.body;
@@ -1439,17 +1447,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all users for admin panel
-  app.get('/api/admin/users', async (req, res) => {
+  app.get('/api/admin/users', async (req: any, res) => {
+    console.log("🚨 ADMIN USERS ENDPOINT HIT!"); // Always log this
     try {
       console.log("🔍 Admin users request:", {
         sessionId: req.sessionID,
-        adminAuth: req.session.adminAuth,
+        adminAuth: req.session?.adminAuth,
         hasSession: !!req.session,
-        cookies: req.headers.cookie
+        cookies: req.headers.cookie,
+        sessionData: req.session
       });
       
       // Check admin session first
-      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+      if (req.session?.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
         console.log("✅ Admin access via session auth");
         const users = await storage.getAllUsers();
         console.log("📊 Fetched users count:", users.length);
