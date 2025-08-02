@@ -255,10 +255,30 @@ export default function Settings() {
                   </p>
                 </div>
               </div>
-              <Badge variant={user?.role === 'service_seeker' ? 'default' : 'secondary'}>
-                Current
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant={user?.role === 'service_seeker' ? 'default' : 'secondary'}>
+                  Current
+                </Badge>
+                {!isEditing && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditing(true)}
+                    className="text-xs"
+                  >
+                    Change
+                  </Button>
+                )}
+              </div>
             </div>
+
+            {!isEditing && (
+              <div className="text-center py-2">
+                <p className="text-sm text-muted-foreground">
+                  Click "Edit" above or "Change" button to modify your account type
+                </p>
+              </div>
+            )}
 
             {isEditing && (
               <div className="space-y-4">
