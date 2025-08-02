@@ -28,9 +28,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // Always secure for HTTPS
       maxAge: sessionTtl,
-      sameSite: 'lax'
+      sameSite: 'none' // Required for OAuth redirects
     },
   });
 }
@@ -77,14 +77,32 @@ export async function setupGoogleAuth(app: Express) {
       const userId = `google_${profile.id}`;
       console.log("Creating/updating user:", { id: userId, email, firstName, lastName });
       
-      const user = await storage.upsertUser({
-        id: userId,
-        email,
-        firstName,
-        lastName,
-        profileImageUrl,
-        authProvider: "google"
-      });
+      // Check if user exists by email first
+      let user = await storage.getUserByEmail(email);
+      
+      if (user) {
+        console.log("User exists, updating with Google profile:", user.id);
+        // Update existing user with Google data
+        const updatedUser = await storage.updateUser(user.id, {
+          firstName: firstName || user.firstName,
+          lastName: lastName || user.lastName,
+          profileImageUrl: profileImageUrl || user.profileImageUrl,
+          authProvider: "google"
+        });
+        user = updatedUser || user;
+      } else {
+        console.log("Creating new Google user");
+        // Create new user with google prefix to avoid ID conflicts
+        user = await storage.createUser({
+          id: `google_${profile.id}`, // Use google prefix
+          email,
+          firstName,
+          lastName,
+          profileImageUrl,
+          authProvider: "google",
+          role: "service_seeker" // Default role for Google users
+        });
+      }
       
       console.log("User created/updated successfully:", user);
       return done(null, user);
@@ -122,8 +140,13 @@ export async function setupGoogleAuth(app: Express) {
   });
 
   app.get("/api/auth/google/callback", (req, res, next) => {
+    console.log("=== OAUTH CALLBACK START ===");
     console.log("OAuth callback received with query:", req.query);
-    console.log("OAuth callback received with headers:", req.headers);
+    console.log("Request headers relevant:", {
+      'user-agent': req.headers['user-agent'],
+      'referer': req.headers['referer'],
+      'host': req.headers['host']
+    });
     
     if (req.query.error) {
       console.error("OAuth error from Google:", req.query.error);
@@ -131,23 +154,35 @@ export async function setupGoogleAuth(app: Express) {
     }
     
     passport.authenticate("google", (err: any, user: any, info: any) => {
+      console.log("=== OAUTH AUTHENTICATION RESULT ===");
+      console.log("Error:", err);
+      console.log("User:", user ? { id: user.id, email: user.email } : null);
+      console.log("Info:", info);
+      
       if (err) {
         console.error("OAuth authentication error:", err);
+        console.error("Full error:", JSON.stringify(err, null, 2));
         return res.redirect("/?error=auth_failed");
       }
       
       if (!user) {
-        console.error("No user returned from OAuth:", info);
+        console.error("No user returned from OAuth. Info:", info);
         return res.redirect("/?error=no_user");
       }
       
       req.logIn(user, (loginErr) => {
+        console.log("=== LOGIN ATTEMPT ===");
+        console.log("Login error:", loginErr);
+        
         if (loginErr) {
           console.error("Login error after OAuth:", loginErr);
+          console.error("Full login error:", JSON.stringify(loginErr, null, 2));
           return res.redirect("/?error=login_failed");
         }
         
         console.log("OAuth login successful for user:", user.email);
+        console.log("Session after login:", req.sessionID);
+        console.log("=== OAUTH CALLBACK END (SUCCESS) ===");
         res.redirect("/");
       });
     })(req, res, next);
