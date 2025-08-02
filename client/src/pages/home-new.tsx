@@ -55,9 +55,10 @@ export default function Home() {
   });
 
   // Fetch service categories
-  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useQuery({
+  const { data: categories, isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useQuery({
     queryKey: ["/api/categories"],
     enabled: true,
+    staleTime: 0, // Force fresh data
   });
 
   // Generate search suggestions
@@ -307,7 +308,18 @@ export default function Home() {
         
         {/* Direct Service Category Icon Test */}
         <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-          <h4 className="font-bold mb-2">Service Category Icon Test:</h4>
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="font-bold">Service Category Icon Test:</h4>
+            <button 
+              onClick={() => {
+                queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
+                refetchCategories();
+              }}
+              className="px-3 py-1 bg-blue-500 text-white rounded text-xs"
+            >
+              Refresh Data
+            </button>
+          </div>
           <div className="flex space-x-4">
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-2">
@@ -327,6 +339,9 @@ export default function Home() {
               </div>
               <p className="text-xs">thermometer</p>
             </div>
+          </div>
+          <div className="mt-2 text-xs text-gray-600">
+            Categories loaded: {(categories as any[])?.length || 0}
           </div>
         </div>
       </div>
