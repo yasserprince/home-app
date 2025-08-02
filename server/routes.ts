@@ -257,8 +257,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {
     try {
-      const userId = req.user?.id;
-      const userEmail = req.user?.email;
+      const userId = req.user?.claims?.sub;
+      const userEmail = req.user?.claims?.email;
       const user = await storage.getUser(userId);
       
       // Only allow admin access for katiflam1@gmail.com
@@ -275,7 +275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Support middleware - limited permissions
   const isSupport: RequestHandler = async (req: any, res, next) => {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.claims?.sub;
       const user = await storage.getUser(userId);
       
       if (!user || (user.role !== 'admin' && user.role !== 'support')) {
@@ -305,7 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { role } = req.body;
       
       // Prevent changing own role
-      const currentUserId = (req.user as any)?.id;
+      const currentUserId = (req.user as any)?.claims?.sub;
       if (id === currentUserId) {
         return res.status(400).json({ message: "Cannot change your own role" });
       }

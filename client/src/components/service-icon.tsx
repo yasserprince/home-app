@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 const iconMap = {
-  // Primary icons
+  // Primary Lucide icons
   wrench: Wrench,
   zap: Zap,
   thermometer: Thermometer,
@@ -41,15 +41,12 @@ const iconMap = {
   bug: Bug,
   road: Square,
   warehouse: Warehouse,
-  'paw-print': PawPrint,
   dumbbell: Dumbbell,
-  'graduation-cap': GraduationCap,
   camera: Camera,
   hand: Hand,
   heart: Heart,
   calendar: Calendar,
   'utensils-crossed': UtensilsCrossed,
-  'chef-hat': Utensils,
   music: Music,
   wine: Wine,
   car: Car,
@@ -65,8 +62,18 @@ const iconMap = {
   wind: Wind,
   search: Search,
   
-  // Aliases and variations (no duplicates)
-  saw: Hammer, // Better mapping for carpentry
+  // Database specific mappings (from service_categories table)
+  'chef-hat': Utensils,
+  'calendar-alt': Calendar,
+  'swimming-pool': Waves,
+  'paw-print': PawPrint,
+  'graduation-cap': GraduationCap,
+  'car-wash': Brush,
+  'solar-panel': Sun,
+  'temperature-low': Wind,
+  
+  // Additional service mappings
+  saw: Hammer,
   tv: Monitor,
   spa: Sparkles,
   cocktail: Wine,
@@ -77,44 +84,6 @@ const iconMap = {
   boxes: Package,
   couch: Sofa,
   cogs: Settings,
-  
-  // Database specific mappings (exact matches from service_categories table)
-  'chef-hat': Utensils,
-  'calendar-alt': Calendar,
-  'swimming-pool': Waves,
-  'paw-print': PawPrint,
-  'graduation-cap': GraduationCap,
-  'car-wash': Brush,
-  'solar-panel': Sun,
-  'temperature-low': Wind,
-  
-  // Common service category mappings
-  plumbing: Wrench,
-  electrical: Zap,
-  hvac: Thermometer,
-  carpentry: Hammer,
-  painting: Paintbrush,
-  cleaning: Sparkles,
-  landscaping: Leaf,
-  moving: Truck,
-  'pest-control': Bug,
-  fitness: Dumbbell,
-  tutoring: GraduationCap,
-  photography: Camera,
-  massage: Hand,
-  wellness: Heart,
-  catering: Utensils,
-  entertainment: Music,
-  automotive: Car,
-  legal: Scale,
-  'it-support': Monitor,
-  'home-security': Shield,
-  'furniture-assembly': Armchair,
-  delivery: Package,
-  'pool-cleaning': Waves,
-  'ac-repair': Snowflake,
-  'solar-installation': Sun,
-  'event-planning': Calendar,
 };
 
 interface ServiceIconProps {
@@ -126,12 +95,16 @@ interface ServiceIconProps {
 export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceIconProps) {
   // Handle empty or undefined iconName
   if (!iconName || typeof iconName !== 'string') {
+    console.log('ServiceIcon: Empty iconName, using fallback');
     return <Search className={className} style={style} />;
   }
+  
+  console.log(`ServiceIcon: Received iconName "${iconName}"`);
   
   // Try exact match first
   const ExactMatch = iconMap[iconName as keyof typeof iconMap];
   if (ExactMatch) {
+    console.log(`ServiceIcon: Found exact match for "${iconName}"`);
     return <ExactMatch className={className} style={style} />;
   }
   
@@ -139,6 +112,7 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
   const cleanIconName = iconName.toLowerCase().trim();
   const CleanMatch = iconMap[cleanIconName as keyof typeof iconMap];
   if (CleanMatch) {
+    console.log(`ServiceIcon: Found clean match for "${iconName}" -> "${cleanIconName}"`);
     return <CleanMatch className={className} style={style} />;
   }
   
@@ -153,11 +127,12 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
   for (const variation of variations) {
     const FoundIcon = iconMap[variation as keyof typeof iconMap];
     if (FoundIcon) {
+      console.log(`ServiceIcon: Found variation match for "${iconName}" -> "${variation}"`);
       return <FoundIcon className={className} style={style} />;
     }
   }
   
-  // If still not found, return fallback
-  console.warn(`Icon "${iconName}" not found in iconMap.`);
+  // If still not found, return fallback with warning
+  console.warn(`ServiceIcon: No match found for "${iconName}". Available icons:`, Object.keys(iconMap).slice(0, 10));
   return <Search className={className} style={style} />;
 }
