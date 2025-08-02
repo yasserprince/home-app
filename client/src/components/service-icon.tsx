@@ -150,8 +150,11 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     
     // Try to find a matching icon
     for (const variation of variations) {
-      IconComponent = iconMap[variation as keyof typeof iconMap];
-      if (IconComponent) break;
+      const mappedIcon = iconMap[variation as keyof typeof iconMap];
+      if (mappedIcon) {
+        IconComponent = mappedIcon;
+        break;
+      }
     }
   }
   
@@ -193,12 +196,14 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     });
   }
 
-  // Mobile Safari SVG fix: Clean rendering like the working test icons
+  // Render exactly like the working test icons
   return (
     <IconComponent 
       className={className}
       style={style}
       strokeWidth={2}
+      fill="none"
+      stroke="currentColor"
     />
   );
 }

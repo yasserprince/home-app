@@ -304,6 +304,31 @@ export default function Home() {
       {/* Icon Test Section - Remove after confirming mobile fix */}
       <div className="px-6 py-4">
         <ServiceIconTest />
+        
+        {/* Direct Service Category Icon Test */}
+        <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
+          <h4 className="font-bold mb-2">Service Category Icon Test:</h4>
+          <div className="flex space-x-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-2">
+                <ServiceIcon iconName="wrench" className="w-8 h-8" style={{ color: '#2563eb' }} />
+              </div>
+              <p className="text-xs">wrench</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-xl flex items-center justify-center mb-2">
+                <ServiceIcon iconName="zap" className="w-8 h-8" style={{ color: '#ea580c' }} />
+              </div>
+              <p className="text-xs">zap</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-2">
+                <ServiceIcon iconName="thermometer" className="w-8 h-8" style={{ color: '#2563eb' }} />
+              </div>
+              <p className="text-xs">thermometer</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Popular Services Section */}
