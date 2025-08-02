@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 const iconMap = {
+  // Primary icons
   wrench: Wrench,
   zap: Zap,
   thermometer: Thermometer,
@@ -17,7 +18,7 @@ const iconMap = {
   paintbrush: Paintbrush,
   home: Home,
   'layout-grid': LayoutGrid,
-  'grid': LayoutGrid,
+  grid: LayoutGrid,
   utensils: Utensils,
   bath: Bath,
   sparkles: Sparkles,
@@ -63,22 +64,57 @@ const iconMap = {
   sun: Sun,
   wind: Wind,
   search: Search,
-  'saw': Settings,
-  'tv': Monitor,
-  'spa': Sparkles,
-  'cocktail': Wine,
-  'car-wash': Brush,
-  'gavel': Scale,
+  
+  // Aliases and variations (no duplicates)
+  saw: Hammer, // Better mapping for carpentry
+  tv: Monitor,
+  spa: Sparkles,
+  cocktail: Wine,
+  gavel: Scale,
+  'border-style': Fence,
+  th: Layout,
+  chair: Armchair,
+  boxes: Package,
+  couch: Sofa,
+  cogs: Settings,
+  
+  // Database specific mappings (exact matches from service_categories table)
+  'chef-hat': Utensils,
   'calendar-alt': Calendar,
   'swimming-pool': Waves,
-  'border-style': Fence,
-  'th': Layout,
-  'chair': Armchair,
-  'boxes': Package,
-  'couch': Sofa,
-  'cogs': Settings,
+  'paw-print': PawPrint,
+  'graduation-cap': GraduationCap,
+  'car-wash': Brush,
   'solar-panel': Sun,
   'temperature-low': Wind,
+  
+  // Common service category mappings
+  plumbing: Wrench,
+  electrical: Zap,
+  hvac: Thermometer,
+  carpentry: Hammer,
+  painting: Paintbrush,
+  cleaning: Sparkles,
+  landscaping: Leaf,
+  moving: Truck,
+  'pest-control': Bug,
+  fitness: Dumbbell,
+  tutoring: GraduationCap,
+  photography: Camera,
+  massage: Hand,
+  wellness: Heart,
+  catering: Utensils,
+  entertainment: Music,
+  automotive: Car,
+  legal: Scale,
+  'it-support': Monitor,
+  'home-security': Shield,
+  'furniture-assembly': Armchair,
+  delivery: Package,
+  'pool-cleaning': Waves,
+  'ac-repair': Snowflake,
+  'solar-installation': Sun,
+  'event-planning': Calendar,
 };
 
 interface ServiceIconProps {
@@ -90,19 +126,38 @@ interface ServiceIconProps {
 export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceIconProps) {
   // Handle empty or undefined iconName
   if (!iconName || typeof iconName !== 'string') {
-    console.log(`ServiceIcon: No iconName provided, using Search fallback`);
     return <Search className={className} style={style} />;
   }
   
-  console.log(`ServiceIcon: Looking for icon "${iconName}"`);
-  const IconComponent = iconMap[iconName as keyof typeof iconMap];
-  
-  if (!IconComponent) {
-    // Fallback to search icon for unknown icons
-    console.warn(`Icon "${iconName}" not found in iconMap, using fallback. Available icons:`, Object.keys(iconMap).slice(0, 10));
-    return <Search className={className} style={style} />;
+  // Try exact match first
+  const ExactMatch = iconMap[iconName as keyof typeof iconMap];
+  if (ExactMatch) {
+    return <ExactMatch className={className} style={style} />;
   }
   
-  console.log(`ServiceIcon: Found and rendering icon "${iconName}"`);
-  return <IconComponent className={className} style={style} />;
+  // Clean and normalize icon name
+  const cleanIconName = iconName.toLowerCase().trim();
+  const CleanMatch = iconMap[cleanIconName as keyof typeof iconMap];
+  if (CleanMatch) {
+    return <CleanMatch className={className} style={style} />;
+  }
+  
+  // Try common variations and mappings
+  const variations = [
+    cleanIconName.replace(/\s+/g, '-'), // spaces to hyphens
+    cleanIconName.replace(/[-_\s]/g, ''), // Remove all separators
+    cleanIconName.replace(/\s+/g, '_'), // spaces to underscores
+  ];
+  
+  // Try to find a matching icon
+  for (const variation of variations) {
+    const FoundIcon = iconMap[variation as keyof typeof iconMap];
+    if (FoundIcon) {
+      return <FoundIcon className={className} style={style} />;
+    }
+  }
+  
+  // If still not found, return fallback
+  console.warn(`Icon "${iconName}" not found in iconMap.`);
+  return <Search className={className} style={style} />;
 }
