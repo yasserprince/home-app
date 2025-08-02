@@ -11,7 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 import { ServiceIcon } from "@/components/service-icon";
 import { ServiceIconTest } from "@/components/service-icon-test";
-import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, Calendar, MapPin, Star, Clock, Briefcase } from "lucide-react";
+import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, Calendar, MapPin, Star, Clock, Briefcase, Wrench, Zap, Sparkles, TreePine } from "lucide-react";
 import { 
   DropdownMenu,
   DropdownMenuContent,

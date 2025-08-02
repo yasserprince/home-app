@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupGoogleAuth, isAuthenticated } from "./googleAuth";
 import { setupEmailAuth } from "./emailAuth";
+import { setupAuth, isAuthenticated as isReplitAuthenticated } from "./replitAuth";
 import { setupTestAuth } from "./testAuth";
 import { setupAuthTest } from "./authTest";
 import { setupDebugAuth } from "./debugAuth";
@@ -56,6 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupGoogleAuth(app);
   await setupEmailAuth(app);
+  await setupAuth(app); // Replit Auth
   
   // Test endpoints for debugging
   setupTestAuth(app);
@@ -178,10 +180,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Unified auth middleware - checks all auth types
+  const isAnyAuthenticated: RequestHandler = async (req, res, next) => {
+    // Check if already authenticated (from any auth method)
+    if (req.user && req.isAuthenticated()) {
+      return next();
+    }
+    
+    // Try Replit Auth first (more modern approach)
     try {
-      res.json(req.user);
+      return await isReplitAuthenticated(req, res, next);
+    } catch (replitError) {
+      // If Replit Auth fails, try Google Auth
+      try {
+        return await isAuthenticated(req, res, next);
+      } catch (googleError) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+    }
+  };
+
+  // Auth routes
+  app.get('/api/auth/user', isAnyAuthenticated, async (req: any, res) => {
+    try {
+      // Handle different auth types
+      if (req.user?.claims?.sub) {
+        // Replit Auth user
+        const userId = req.user.claims.sub;
+        const user = await storage.getUser(userId);
+        return res.json(user);
+      } else if (req.user?.id) {
+        // Google Auth user
+        return res.json(req.user);
+      } else {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -189,7 +222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Profile update route
-  app.put('/api/profile', isAuthenticated, async (req: any, res) => {
+  app.put('/api/profile', isAnyAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const updates = req.body;
@@ -218,7 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Location update route
-  app.put('/api/location', isAuthenticated, async (req: any, res) => {
+  app.put('/api/location', isAnyAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const { locationEnabled, latitude, longitude } = req.body;
