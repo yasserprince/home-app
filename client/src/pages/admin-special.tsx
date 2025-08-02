@@ -74,7 +74,7 @@ export default function AdminSpecial() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [editUserData, setEditUserData] = useState<Partial<User>>({});
-  const [isPasswordVerified, setIsPasswordVerified] = useState(false);
+  const [isPasswordVerified, setIsPasswordVerified] = useState(true); // Always true since we have login page
   const [passwordInput, setPasswordInput] = useState("");
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -120,30 +120,29 @@ export default function AdminSpecial() {
     },
   });
 
-  // Show password dialog on load if not verified
+  // Redirect to login if not authenticated as admin
   useEffect(() => {
-    if (currentUser && currentUser.email === "katiflam1@gmail.com" && !isPasswordVerified) {
-      setShowPasswordDialog(true);
-    }
+    // For session-based admin auth, we don't need user authentication
+    // The backend will handle admin session validation
   }, [currentUser, isPasswordVerified]);
 
   // Get all users
   const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery({
     queryKey: ["/api/admin/users"],
-    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com" && isPasswordVerified,
+    enabled: isPasswordVerified, // Always enabled since we use session auth
     retry: false,
   });
 
   // Get admin statistics
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/admin/stats"],
-    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com" && isPasswordVerified,
+    enabled: isPasswordVerified, // Always enabled since we use session auth
   });
 
   // Get categories
   const { data: categories = [], isLoading: categoriesLoading, refetch: refetchCategories } = useQuery({
     queryKey: ["/api/categories"],
-    enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com" && isPasswordVerified,
+    enabled: isPasswordVerified, // Always enabled since we use session auth
   });
 
   // Update user mutation

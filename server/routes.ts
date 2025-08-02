@@ -1382,12 +1382,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return next();
   };
 
-  // Password check for admin panel
-  app.post('/api/admin/verify-password', isSuperAdmin, async (req, res) => {
+  // Admin login with email and password
+  app.post('/api/admin/login', async (req, res) => {
+    const { email, password } = req.body;
+    const adminEmail = "katiflam1@gmail.com";
+    const adminPassword = "SuperAdmin2025!Secure#Platform";
+    
+    console.log("🔐 Admin login attempt:", { email, hasPassword: !!password });
+    
+    if (email === adminEmail && password === adminPassword) {
+      // Create a simple admin session
+      req.session.adminAuth = {
+        email: adminEmail,
+        isAdmin: true,
+        loginTime: new Date().toISOString()
+      };
+      
+      console.log("✅ Admin login successful");
+      res.json({ success: true, message: "Admin login successful" });
+    } else {
+      console.log("❌ Admin login failed");
+      res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+  });
+
+  // Password check for admin panel (legacy support)
+  app.post('/api/admin/verify-password', async (req, res) => {
     const { password } = req.body;
     const correctPassword = "SuperAdmin2025!Secure#Platform";
     
     if (password === correctPassword) {
+      req.session.adminAuth = {
+        email: "katiflam1@gmail.com",
+        isAdmin: true,
+        loginTime: new Date().toISOString()
+      };
       res.json({ success: true });
     } else {
       res.status(401).json({ success: false, message: "Invalid password" });
@@ -1397,23 +1426,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all users for admin panel
   app.get('/api/admin/users', async (req, res) => {
     try {
-      // Check if user is authenticated
+      console.log("🔍 Admin users request - Session:", req.session.adminAuth);
+      
+      // Check admin session first
+      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+        console.log("✅ Admin access via session auth");
+        const users = await storage.getAllUsers();
+        console.log("📊 Fetched users count:", users.length);
+        return res.json(users);
+      }
+      
+      // Fallback to regular authentication
       if (!req.isAuthenticated() || !req.user) {
+        console.log("❌ No admin session and not authenticated");
         return res.status(401).json({ message: "Unauthorized" });
       }
       
       // Get user email from different auth types
       let userEmail = null;
       if (req.user?.claims?.email) {
-        // Replit Auth
         userEmail = req.user.claims.email;
       } else if (req.user?.email) {
-        // Google/Email Auth
         userEmail = req.user.email;
       }
       
       console.log("🔍 Admin users request - User email:", userEmail);
-      console.log("🔍 Authentication status:", req.isAuthenticated());
       
       // Only allow katiflam1@gmail.com
       if (userEmail !== "katiflam1@gmail.com") {
@@ -1424,10 +1461,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("✅ Admin access granted, fetching users...");
       const users = await storage.getAllUsers();
       console.log("📊 Fetched users count:", users.length);
-      console.log("📊 First user sample:", users[0] ? { id: users[0].id, email: users[0].email } : "No users");
       res.json(users);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("❌ Error fetching users:", error);
       res.status(500).json({ message: "Failed to fetch users" });
     }
   });
@@ -1435,22 +1471,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get admin statistics
   app.get('/api/admin/stats', async (req, res) => {
     try {
-      // Check if user is authenticated
-      if (!req.isAuthenticated() || !req.user) {
+      // Check admin session first
+      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+        // Admin session is valid, proceed
+      } else if (!req.isAuthenticated() || !req.user) {
         return res.status(401).json({ message: "Unauthorized" });
-      }
-      
-      // Get user email from different auth types
-      let userEmail = null;
-      if (req.user?.claims?.email) {
-        userEmail = req.user.claims.email;
-      } else if (req.user?.email) {
-        userEmail = req.user.email;
-      }
-      
-      // Only allow katiflam1@gmail.com
-      if (userEmail !== "katiflam1@gmail.com") {
-        return res.status(403).json({ message: "Access denied - Super admin only" });
+      } else {
+        // Check regular authentication
+        let userEmail = null;
+        if (req.user?.claims?.email) {
+          userEmail = req.user.claims.email;
+        } else if (req.user?.email) {
+          userEmail = req.user.email;
+        }
+        
+        // Only allow katiflam1@gmail.com
+        if (userEmail !== "katiflam1@gmail.com") {
+          return res.status(403).json({ message: "Access denied - Super admin only" });
+        }
       }
       
       const [users, providers, bookings, categories] = await Promise.all([
@@ -1482,22 +1520,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update any user (super admin only)
   app.put('/api/admin/users/:userId', async (req, res) => {
     try {
-      // Check if user is authenticated
-      if (!req.isAuthenticated() || !req.user) {
+      // Check admin session first
+      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+        // Admin session is valid, proceed
+      } else if (!req.isAuthenticated() || !req.user) {
         return res.status(401).json({ message: "Unauthorized" });
-      }
-      
-      // Get user email from different auth types
-      let userEmail = null;
-      if (req.user?.claims?.email) {
-        userEmail = req.user.claims.email;
-      } else if (req.user?.email) {
-        userEmail = req.user.email;
-      }
-      
-      // Only allow katiflam1@gmail.com
-      if (userEmail !== "katiflam1@gmail.com") {
-        return res.status(403).json({ message: "Access denied - Super admin only" });
+      } else {
+        // Check regular authentication
+        let userEmail = null;
+        if (req.user?.claims?.email) {
+          userEmail = req.user.claims.email;
+        } else if (req.user?.email) {
+          userEmail = req.user.email;
+        }
+        
+        // Only allow katiflam1@gmail.com
+        if (userEmail !== "katiflam1@gmail.com") {
+          return res.status(403).json({ message: "Access denied - Super admin only" });
+        }
       }
       
       const { userId } = req.params;
@@ -1521,22 +1561,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete any user (super admin only)
   app.delete('/api/admin/users/:userId', async (req, res) => {
     try {
-      // Check if user is authenticated
-      if (!req.isAuthenticated() || !req.user) {
+      let currentUserEmail = "katiflam1@gmail.com"; // Default for session auth
+      
+      // Check admin session first
+      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+        // Admin session is valid, proceed
+      } else if (!req.isAuthenticated() || !req.user) {
         return res.status(401).json({ message: "Unauthorized" });
-      }
-      
-      // Get user email from different auth types
-      let currentUserEmail = null;
-      if (req.user?.claims?.email) {
-        currentUserEmail = req.user.claims.email;
-      } else if (req.user?.email) {
-        currentUserEmail = req.user.email;
-      }
-      
-      // Only allow katiflam1@gmail.com
-      if (currentUserEmail !== "katiflam1@gmail.com") {
-        return res.status(403).json({ message: "Access denied - Super admin only" });
+      } else {
+        // Check regular authentication
+        if (req.user?.claims?.email) {
+          currentUserEmail = req.user.claims.email;
+        } else if (req.user?.email) {
+          currentUserEmail = req.user.email;
+        }
+        
+        // Only allow katiflam1@gmail.com
+        if (currentUserEmail !== "katiflam1@gmail.com") {
+          return res.status(403).json({ message: "Access denied - Super admin only" });
+        }
       }
       
       const { userId } = req.params;
