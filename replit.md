@@ -6,6 +6,19 @@ This is a full-stack home service booking platform that connects customers with 
 
 ## Recent Changes (August 2, 2025)
 
+### Google Maps Integration Completed
+- **Interactive Maps**: Added Google Maps JavaScript API integration to location settings
+- **Real-time Location**: Users can see their exact location with custom red pin markers
+- **Secure API Handling**: Created `/api/maps/config` endpoint for secure key distribution
+- **Professional UI**: Clean map integration with loading states and error handling
+- **Location Updates**: Maps automatically center and update when user location changes
+
+### Account Management & Location Services Fixed
+- **Account Type Switching**: Fixed profile settings with intuitive "Change" button for role switching
+- **Location API**: Added `/api/location` PUT endpoint for location preference updates
+- **API Syntax Fixes**: Corrected `apiRequest` function calls throughout the application
+- **Enhanced UX**: Improved user interface for account type selection and location management
+
 ### Dual Authentication System Completed
 - **Google OAuth**: Fixed critical session cookie configuration and user creation flow
 - **Email/Password**: Complete signup system with comprehensive user information collection
