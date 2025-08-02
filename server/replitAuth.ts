@@ -102,11 +102,7 @@ export async function setupAuth(app: Express) {
     passport.use(strategy);
   }
 
-  // Only register if not already registered by Google Auth
-  if (!passport._serializers || passport._serializers.length === 0) {
-    passport.serializeUser((user: Express.User, cb) => cb(null, user));
-    passport.deserializeUser((user: Express.User, cb) => cb(null, user));
-  }
+  // Serialization is handled by Google Auth setup
 
   app.get("/api/login", (req, res, next) => {
     passport.authenticate(`replitauth:${req.hostname}`, {

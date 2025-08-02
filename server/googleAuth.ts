@@ -113,17 +113,33 @@ export async function setupGoogleAuth(app: Express) {
     }
   }));
 
+  // Unified serialization for all auth types
   passport.serializeUser((user: any, done) => {
-    done(null, user.id);
+    console.log("Serializing user:", user);
+    if (user.claims) {
+      // Replit Auth user format
+      done(null, { type: 'replit', data: user });
+    } else {
+      // Google/Email Auth user format
+      done(null, { type: 'database', id: user.id });
+    }
   });
 
-  passport.deserializeUser(async (id: string, done) => {
+  passport.deserializeUser(async (sessionData: any, done) => {
     try {
-      const user = await storage.getUser(id);
-      if (!user) {
-        return done(null, false);
+      console.log("Deserializing user:", sessionData);
+      
+      if (sessionData.type === 'replit') {
+        // Return Replit user session data directly
+        return done(null, sessionData.data);
+      } else {
+        // Fetch database user
+        const user = await storage.getUser(sessionData.id);
+        if (!user) {
+          return done(null, false);
+        }
+        done(null, user);
       }
-      done(null, user);
     } catch (error) {
       console.error("Error deserializing user:", error);
       done(null, false);
