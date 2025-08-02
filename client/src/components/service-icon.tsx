@@ -183,8 +183,11 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     }
   }
   
+  // Debug logging for troubleshooting
+  console.log(`ServiceIcon: iconName="${iconName}" -> IconComponent="${IconComponent?.name || 'unknown'}"`);
+
   // Mobile Safari SVG fix: Force proper rendering
-  return React.createElement(IconComponent, {
+  const iconProps = {
     className: `${className} flex-shrink-0`,
     style: {
       ...style,
@@ -201,5 +204,7 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     viewBox: '0 0 24 24',
     // Ensure proper SVG namespace
     xmlns: 'http://www.w3.org/2000/svg',
-  });
+  };
+
+  return React.createElement(IconComponent, iconProps);
 }

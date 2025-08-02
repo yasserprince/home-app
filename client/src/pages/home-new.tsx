@@ -301,7 +301,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Icon Test Section - for debugging mobile icons */}
+      {/* Icon Test Section - Remove after confirming mobile fix */}
       <div className="px-6 py-4">
         <ServiceIconTest />
       </div>
@@ -338,11 +338,13 @@ export default function Home() {
                         boxShadow: `0 4px 12px ${category.color}20`
                       }}
                     >
-                      <ServiceIcon 
-                        iconName={category.icon || 'search'} 
-                        className="w-10 h-10 flex-shrink-0" 
-                        style={{ color: category.color || '#6B7280' }} 
-                      />
+                      <div className="w-20 h-20 flex items-center justify-center">
+                        <ServiceIcon 
+                          iconName={category.icon || 'search'} 
+                          className="w-10 h-10" 
+                          style={{ color: category.color || '#6B7280' }}
+                        />
+                      </div>
                     </div>
                     <h3 className="font-bold text-gray-900 text-center leading-tight text-base group-hover:text-blue-600 transition-colors">
                       {translateCategoryName(category.name, language)}

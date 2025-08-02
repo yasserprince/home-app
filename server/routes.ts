@@ -655,26 +655,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             name: "Plumbing",
             description: "Pipe repair, drain cleaning, water heater service",
             icon: "wrench",
-            color: "hsl(207, 90%, 54%)",
+            color: "#3B82F6",
           },
           {
             name: "Electrical",
             description: "Wiring, panel upgrades, lighting installation",
             icon: "zap",
-            color: "hsl(39, 96%, 49%)",
+            color: "#F59E0B",
           },
           {
             name: "HVAC",
             description: "Heating, cooling & air conditioning repair",
             icon: "thermometer",
-            color: "hsl(200, 70%, 45%)",
+            color: "#0EA5E9",
           },
           // Home Improvement & Construction
           {
             name: "Handyman",
             description: "General repairs, furniture assembly, minor fixes",
             icon: "hammer",
-            color: "hsl(25, 85%, 55%)",
+            color: "#EA580C",
           },
           {
             name: "Painting",
