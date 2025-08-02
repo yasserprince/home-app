@@ -193,23 +193,12 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     });
   }
 
-  // Mobile Safari SVG fix: Force explicit rendering with important styles
+  // Mobile Safari SVG fix: Clean rendering like the working test icons
   return (
     <IconComponent 
-      className={`${className} flex-shrink-0`}
-      style={{
-        ...style,
-        display: 'inline-block !important',
-        verticalAlign: 'middle',
-        width: 'auto',
-        height: 'auto',
-        minWidth: '20px',
-        minHeight: '20px'
-      }}
+      className={className}
+      style={style}
       strokeWidth={2}
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
     />
   );
 }
