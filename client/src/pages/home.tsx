@@ -349,22 +349,22 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
             {(categories as any[])?.slice(0, 6).map((category: any) => (
               <Link key={category.id} href={`/providers?category=${category.id}`}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                  <CardContent className="p-3 flex flex-col items-center justify-center h-full min-h-[80px] sm:min-h-[96px]">
+                <Card className="hover:shadow-md transition-all duration-200 cursor-pointer h-full hover:scale-105">
+                  <CardContent className="p-4 flex flex-col items-center justify-center h-full min-h-[100px] sm:min-h-[120px]">
                     <div
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center mb-2 mx-auto flex-shrink-0"
-                      style={{ backgroundColor: `${category.color}20` }}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center mb-3 mx-auto flex-shrink-0 shadow-sm"
+                      style={{ backgroundColor: `${category.color}15`, border: `2px solid ${category.color}30` }}
                     >
                       <ServiceIcon 
                         iconName={category.icon || 'search'} 
-                        className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" 
+                        className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0" 
                         style={{ color: category.color || '#6B7280' }} 
                       />
                     </div>
-                    <h3 className="font-medium text-gray-900 text-xs text-center leading-tight line-clamp-2">
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base text-center leading-tight line-clamp-2">
                       {translateCategoryName(category.name, language)}
                     </h3>
                   </CardContent>
@@ -378,12 +378,12 @@ export default function Home() {
         {categories && (categories as any[]).length > 6 && (
           <div className="mb-6">
             <Link href="/categories">
-              <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed border-2 border-gray-300">
-                <CardContent className="p-4 text-center">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <ServiceIcon iconName="search" className="w-6 h-6 text-gray-400" />
+              <Card className="hover:shadow-md transition-all duration-200 cursor-pointer border-dashed border-2 border-gray-300 hover:scale-105">
+                <CardContent className="p-4 text-center min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+                    <ServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
                   </div>
-                  <h3 className="font-medium text-gray-900 text-sm">{t('viewAllServices')}</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{t('viewAllServices')}</h3>
                   <p className="text-xs text-gray-600">+{(categories as any[]).length - 6} {t('moreCategories')}</p>
                 </CardContent>
               </Card>
