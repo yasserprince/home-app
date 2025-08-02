@@ -1412,15 +1412,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userEmail = req.user.email;
       }
       
-      console.log("Admin users check - User email:", userEmail);
+      console.log("🔍 Admin users request - User email:", userEmail);
+      console.log("🔍 Authentication status:", req.isAuthenticated());
       
       // Only allow katiflam1@gmail.com
       if (userEmail !== "katiflam1@gmail.com") {
+        console.log("❌ Access denied - wrong email:", userEmail);
         return res.status(403).json({ message: "Access denied - Super admin only" });
       }
       
+      console.log("✅ Admin access granted, fetching users...");
       const users = await storage.getAllUsers();
-      console.log("Fetched users count:", users.length);
+      console.log("📊 Fetched users count:", users.length);
+      console.log("📊 First user sample:", users[0] ? { id: users[0].id, email: users[0].email } : "No users");
       res.json(users);
     } catch (error) {
       console.error("Error fetching users:", error);

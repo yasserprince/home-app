@@ -100,6 +100,12 @@ export default function AdminSpecial() {
       setIsPasswordVerified(true);
       setShowPasswordDialog(false);
       setPasswordInput("");
+      
+      // Force refetch users after password verification
+      setTimeout(() => {
+        refetchUsers();
+      }, 100);
+      
       toast({
         title: "Access Granted",
         description: "Password verified successfully",
@@ -125,6 +131,7 @@ export default function AdminSpecial() {
   const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery({
     queryKey: ["/api/admin/users"],
     enabled: !!currentUser && currentUser.email === "katiflam1@gmail.com" && isPasswordVerified,
+    retry: false,
   });
 
   // Get admin statistics
@@ -142,7 +149,7 @@ export default function AdminSpecial() {
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: async (userData: { id: string; updates: Partial<User> }) => {
-      return apiRequest("PUT", `/api/admin/users/${userData.id}`, userData.updates);
+      return apiRequest("PUT", `/api/admin/users/${userData.id}`, { updates: userData.updates });
     },
     onSuccess: () => {
       toast({
