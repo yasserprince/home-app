@@ -338,13 +338,11 @@ export default function Home() {
                         boxShadow: `0 4px 12px ${category.color}20`
                       }}
                     >
-                      <div className="w-20 h-20 flex items-center justify-center">
-                        <ServiceIcon 
-                          iconName={category.icon || 'search'} 
-                          className="w-10 h-10" 
-                          style={{ color: category.color || '#6B7280' }}
-                        />
-                      </div>
+                      <ServiceIcon 
+                        iconName={category.icon || 'search'} 
+                        className="w-10 h-10" 
+                        style={{ color: category.color || '#6B7280' }}
+                      />
                     </div>
                     <h3 className="font-bold text-gray-900 text-center leading-tight text-base group-hover:text-blue-600 transition-colors">
                       {translateCategoryName(category.name, language)}
