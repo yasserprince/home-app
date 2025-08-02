@@ -244,6 +244,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Google Maps API key endpoint for frontend
+  app.get('/api/maps/config', (req, res) => {
+    res.json({
+      apiKey: process.env.GOOGLE_MAPS_API_KEY || null,
+      hasApiKey: !!process.env.GOOGLE_MAPS_API_KEY
+    });
+  });
+
   // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {
     try {

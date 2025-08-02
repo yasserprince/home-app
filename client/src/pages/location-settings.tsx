@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,10 +15,14 @@ export default function LocationSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  const mapRef = useRef<HTMLDivElement>(null);
+  const googleMapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
   
   const [locationEnabled, setLocationEnabled] = useState(user?.locationEnabled || false);
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [locationStatus, setLocationStatus] = useState<'idle' | 'requesting' | 'success' | 'error'>('idle');
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   const updateLocationMutation = useMutation({
     mutationFn: async (data: { locationEnabled: boolean, latitude?: number, longitude?: number }) => {
@@ -112,15 +116,84 @@ export default function LocationSettings() {
     }
   };
 
+  // Load Google Maps script
+  useEffect(() => {
+    const loadGoogleMaps = () => {
+      if (window.google && window.google.maps) {
+        setMapLoaded(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=geometry`;
+      script.async = true;
+      script.onload = () => setMapLoaded(true);
+      script.onerror = () => {
+        console.error('Failed to load Google Maps');
+        toast({
+          title: "Maps Error",
+          description: "Failed to load Google Maps. Map features may not be available.",
+          variant: "destructive",
+        });
+      };
+      document.head.appendChild(script);
+    };
+
+    loadGoogleMaps();
+  }, [toast]);
+
+  // Initialize user location and map
   useEffect(() => {
     if (user?.latitude && user?.longitude) {
-      setCurrentLocation({
+      const location = {
         lat: parseFloat(user.latitude),
         lng: parseFloat(user.longitude),
-      });
+      };
+      setCurrentLocation(location);
       setLocationStatus('success');
+      setLocationEnabled(user.locationEnabled);
     }
   }, [user]);
+
+  // Initialize map when loaded and location available
+  useEffect(() => {
+    if (mapLoaded && currentLocation && mapRef.current && !googleMapRef.current) {
+      const map = new window.google.maps.Map(mapRef.current, {
+        center: currentLocation,
+        zoom: 15,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+      });
+
+      const marker = new window.google.maps.Marker({
+        position: currentLocation,
+        map: map,
+        title: "Your Location",
+        icon: {
+          url: 'data:image/svg+xml,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          `),
+          scaledSize: new window.google.maps.Size(24, 24),
+        }
+      });
+
+      googleMapRef.current = map;
+      markerRef.current = marker;
+    }
+  }, [mapLoaded, currentLocation]);
+
+  // Update map when location changes
+  useEffect(() => {
+    if (googleMapRef.current && markerRef.current && currentLocation) {
+      const newPosition = new window.google.maps.LatLng(currentLocation.lat, currentLocation.lng);
+      googleMapRef.current.setCenter(newPosition);
+      markerRef.current.setPosition(newPosition);
+    }
+  }, [currentLocation]);
 
   if (isLoading) {
     return (
@@ -190,14 +263,47 @@ export default function LocationSettings() {
             )}
 
             {locationStatus === 'success' && currentLocation && (
-              <div className="p-4 bg-green-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <MapPin className="w-6 h-6 text-green-600" />
-                  <div>
-                    <p className="font-medium text-green-900">Location Found</p>
-                    <p className="text-sm text-green-700">
-                      Lat: {currentLocation.lat.toFixed(6)}, Lng: {currentLocation.lng.toFixed(6)}
-                    </p>
+              <div className="space-y-4">
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="w-6 h-6 text-green-600" />
+                    <div>
+                      <p className="font-medium text-green-900">Location Found</p>
+                      <p className="text-sm text-green-700">
+                        Lat: {currentLocation.lat.toFixed(6)}, Lng: {currentLocation.lng.toFixed(6)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Google Maps Integration */}
+                <div className="bg-white border rounded-lg overflow-hidden">
+                  <div className="p-3 border-b bg-gray-50">
+                    <h4 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>Your Location on Map</span>
+                    </h4>
+                  </div>
+                  <div className="relative">
+                    {mapLoaded ? (
+                      <div 
+                        ref={mapRef}
+                        className="w-full h-64"
+                        style={{ minHeight: '256px' }}
+                      />
+                    ) : (
+                      <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                          <p className="text-sm text-gray-600">Loading map...</p>
+                        </div>
+                      </div>
+                    )}
+                    {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY && (
+                      <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                        <p className="text-sm text-gray-600">Google Maps API key not configured</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
