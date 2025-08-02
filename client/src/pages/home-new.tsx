@@ -10,6 +10,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 import { ServiceIcon } from "@/components/service-icon";
+import { ServiceIconTest } from "@/components/service-icon-test";
 import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, Calendar, MapPin, Star, Clock, Briefcase } from "lucide-react";
 import { 
   DropdownMenu,
@@ -298,6 +299,11 @@ export default function Home() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Icon Test Section - for debugging mobile icons */}
+      <div className="px-6 py-4">
+        <ServiceIconTest />
       </div>
 
       {/* Popular Services Section */}

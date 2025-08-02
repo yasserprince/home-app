@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Wrench, Zap, Thermometer, Hammer, Paintbrush, Home, LayoutGrid,
   Utensils, Bath, Sparkles, Square, Droplets, Truck,
@@ -6,7 +7,8 @@ import {
   PawPrint, Dumbbell, GraduationCap, Camera, Hand, Heart,
   Calendar, UtensilsCrossed, Music, Wine, Car, Brush,
   Calculator, Scale, Code, Snowflake, Star, Sofa, Cog,
-  Sun, Wind, Search, CircleDot
+  Sun, Wind, Search, CircleDot, Wrench as WrenchIcon,
+  type LucideIcon
 } from "lucide-react";
 
 const iconMap = {
@@ -121,62 +123,83 @@ interface ServiceIconProps {
 export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceIconProps) {
   // Handle empty or undefined iconName
   if (!iconName || typeof iconName !== 'string') {
-    return <Search className={className} style={style} />;
+    return <Search className={`${className} text-gray-500`} style={style} strokeWidth={2} />;
   }
+  
+  // Get the icon component
+  let IconComponent: LucideIcon | null = null;
   
   // Try exact match first
-  const ExactMatch = iconMap[iconName as keyof typeof iconMap];
-  if (ExactMatch) {
-    return <ExactMatch className={className} style={style} />;
+  IconComponent = iconMap[iconName as keyof typeof iconMap];
+  
+  if (!IconComponent) {
+    // Clean and normalize icon name
+    const cleanIconName = iconName.toLowerCase().trim();
+    IconComponent = iconMap[cleanIconName as keyof typeof iconMap];
   }
   
-  // Clean and normalize icon name
-  const cleanIconName = iconName.toLowerCase().trim();
-  const CleanMatch = iconMap[cleanIconName as keyof typeof iconMap];
-  if (CleanMatch) {
-    return <CleanMatch className={className} style={style} />;
-  }
-  
-  // Try common variations and mappings
-  const variations = [
-    cleanIconName.replace(/\s+/g, '-'), // spaces to hyphens
-    cleanIconName.replace(/[-_\s]/g, ''), // Remove all separators
-    cleanIconName.replace(/\s+/g, '_'), // spaces to underscores
-    cleanIconName.replace(/ing$/, ''), // Remove 'ing' suffix
-    cleanIconName.replace(/s$/, ''), // Remove plural 's'
-  ];
-  
-  // Try to find a matching icon
-  for (const variation of variations) {
-    const FoundIcon = iconMap[variation as keyof typeof iconMap];
-    if (FoundIcon) {
-      return <FoundIcon className={className} style={style} />;
+  if (!IconComponent) {
+    // Try common variations and mappings
+    const variations = [
+      iconName.toLowerCase().replace(/\s+/g, '-'), // spaces to hyphens
+      iconName.toLowerCase().replace(/[-_\s]/g, ''), // Remove all separators
+      iconName.toLowerCase().replace(/\s+/g, '_'), // spaces to underscores
+      iconName.toLowerCase().replace(/ing$/, ''), // Remove 'ing' suffix
+      iconName.toLowerCase().replace(/s$/, ''), // Remove plural 's'
+    ];
+    
+    // Try to find a matching icon
+    for (const variation of variations) {
+      IconComponent = iconMap[variation as keyof typeof iconMap];
+      if (IconComponent) break;
     }
   }
   
-  // Category-specific fallbacks
-  const categoryKeywords = {
-    'repair': Wrench,
-    'clean': Sparkles,
-    'electric': Zap,
-    'water': Droplets,
-    'home': Home,
-    'garden': Leaf,
-    'tech': Monitor,
-    'food': Utensils,
-    'health': Heart,
-    'transport': Car,
-    'build': Hammer,
-    'design': Layout,
-  };
-  
-  // Check for keyword matches
-  for (const [keyword, IconComponent] of Object.entries(categoryKeywords)) {
-    if (cleanIconName.includes(keyword)) {
-      return <IconComponent className={className} style={style} />;
+  if (!IconComponent) {
+    // Category-specific fallbacks
+    const cleanIconName = iconName.toLowerCase();
+    if (cleanIconName.includes('plumb') || cleanIconName.includes('pipe') || cleanIconName.includes('water')) {
+      IconComponent = Wrench;
+    } else if (cleanIconName.includes('electric') || cleanIconName.includes('wiring') || cleanIconName.includes('light')) {
+      IconComponent = Zap;
+    } else if (cleanIconName.includes('hvac') || cleanIconName.includes('air') || cleanIconName.includes('heat') || cleanIconName.includes('cool')) {
+      IconComponent = Thermometer;
+    } else if (cleanIconName.includes('handyman') || cleanIconName.includes('repair') || cleanIconName.includes('fix')) {
+      IconComponent = Hammer;
+    } else if (cleanIconName.includes('paint') || cleanIconName.includes('color')) {
+      IconComponent = Paintbrush;
+    } else if (cleanIconName.includes('clean') || cleanIconName.includes('wash')) {
+      IconComponent = Sparkles;
+    } else if (cleanIconName.includes('roof') || cleanIconName.includes('home') || cleanIconName.includes('house')) {
+      IconComponent = Home;
+    } else if (cleanIconName.includes('landscape') || cleanIconName.includes('garden') || cleanIconName.includes('tree')) {
+      IconComponent = TreePine;
+    } else if (cleanIconName.includes('security') || cleanIconName.includes('protect')) {
+      IconComponent = Shield;
+    } else if (cleanIconName.includes('move') || cleanIconName.includes('transport')) {
+      IconComponent = Truck;
+    } else {
+      IconComponent = Search; // Ultimate fallback
     }
   }
   
-  // Return fallback
-  return <Search className={className} style={style} />;
+  // Mobile Safari SVG fix: Force proper rendering
+  return React.createElement(IconComponent, {
+    className: `${className} flex-shrink-0`,
+    style: {
+      ...style,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+    },
+    strokeWidth: 2,
+    fill: 'none',
+    stroke: 'currentColor',
+    'aria-hidden': 'true',
+    // Force explicit dimensions for mobile Safari
+    width: className.includes('w-') ? undefined : '20',
+    height: className.includes('h-') ? undefined : '20',
+    viewBox: '0 0 24 24',
+    // Ensure proper SVG namespace
+    xmlns: 'http://www.w3.org/2000/svg',
+  });
 }
