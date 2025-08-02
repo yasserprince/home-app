@@ -35,14 +35,18 @@ export default function AdminLogin() {
   const loginMutation = useMutation({
     mutationFn: async (data: LoginForm) => {
       setIsLoading(true);
-      return apiRequest("POST", "/api/admin/login", data);
+      const response = await apiRequest("POST", "/api/admin/login", data);
+      return response.json();
     },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Admin login successful",
-      });
-      setLocation("/adminspecial");
+    onSuccess: (data) => {
+      if (data.success) {
+        toast({
+          title: "Success", 
+          description: "Admin login successful",
+        });
+        // Force page reload to ensure session is recognized
+        window.location.href = '/adminspecial';
+      }
     },
     onError: (error) => {
       toast({

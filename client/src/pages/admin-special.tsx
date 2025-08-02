@@ -266,19 +266,30 @@ export default function AdminSpecial() {
   // No longer need user loading check since we use session auth
 
   // Check admin session by attempting to access admin API
-  const { data: adminCheck, isLoading: adminCheckLoading } = useQuery({
+  const { data: adminCheck, isLoading: adminCheckLoading, error: adminCheckError } = useQuery({
     queryKey: ["/api/admin/check-session"],
     queryFn: async () => {
-      const response = await fetch('/api/admin/users');
+      const response = await fetch('/api/admin/users', {
+        credentials: 'include'
+      });
       if (response.status === 401) {
-        // No valid admin session, redirect to login
-        window.location.href = '/admin-login';
         throw new Error('Unauthorized');
       }
       return { authorized: true };
     },
     retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    staleTime: 0, // Always check fresh
   });
+
+  // Handle redirect to login page
+  useEffect(() => {
+    if (adminCheckError && !adminCheckLoading) {
+      console.log("❌ Admin access denied, redirecting to login");
+      window.location.href = '/admin-login';
+    }
+  }, [adminCheckError, adminCheckLoading]);
 
   // Show loading while checking admin session
   if (adminCheckLoading) {
