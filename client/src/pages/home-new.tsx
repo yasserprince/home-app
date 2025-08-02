@@ -116,7 +116,15 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      window.location.href = "/api/auth/logout";
+      await apiRequest("POST", "/api/auth/logout");
+      toast({
+        title: "Success",
+        description: "Logged out successfully",
+      });
+      // Redirect to home after logout
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
     } catch (error) {
       console.error("Logout error:", error);
       toast({
@@ -164,26 +172,34 @@ export default function Home() {
 
   return (
     <div 
-      className={`min-h-screen bg-gray-50 pb-20 ${getLanguageDirection(language) === 'rtl' ? 'rtl' : 'ltr'}`}
+      className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden pb-20 ${getLanguageDirection(language) === 'rtl' ? 'rtl' : 'ltr'}`}
     >
-      {/* Modern Header Section */}
-      <div className="bg-white border-b border-gray-100 shadow-sm">
+      {/* Beautiful Background Wallpapers */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 via-teal-500/20 to-purple-600/20"></div>
+        <div className="absolute top-20 -right-20 w-80 h-80 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full blur-3xl opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full blur-3xl opacity-15 animate-pulse delay-500"></div>
+      </div>
+      
+      {/* Modern Header Section with Glass Effect */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-xl relative z-10">
         <div className="px-6 pt-12 pb-6">
           {/* User Greeting & Profile */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 flex items-center justify-center shadow-xl ring-4 ring-white/50">
                   <span className="text-white text-xl font-bold">
                     {user?.firstName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                   </span>
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   {t('hello')}, {user?.firstName || user?.email?.split('@')[0] || 'User'}!
                 </h1>
                 <p className="text-gray-600 text-sm">{t('whatServiceToday')}</p>
@@ -247,7 +263,7 @@ export default function Home() {
                 onFocus={() => {
                   if (searchQuery.trim()) setShowSuggestions(true);
                 }}
-                className="w-full pl-14 pr-12 py-5 rounded-2xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-blue-50 transition-all duration-200 text-lg"
+                className="w-full pl-14 pr-12 py-5 rounded-2xl border border-white/30 bg-white/70 backdrop-blur-md text-gray-900 placeholder-gray-500 focus:bg-white/90 focus:border-blue-300 focus:ring-4 focus:ring-blue-50 transition-all duration-200 text-lg shadow-lg"
               />
               {searchQuery && (
                 <button
@@ -267,7 +283,7 @@ export default function Home() {
             {showSuggestions && searchSuggestions.length > 0 && (
               <div 
                 ref={suggestionsRef}
-                className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+                className="absolute top-full left-0 right-0 mt-3 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 z-50 overflow-hidden"
               >
                 {searchSuggestions.map((suggestion, index) => (
                   <button
@@ -388,10 +404,10 @@ export default function Home() {
               
               return (
                 <Link key={category.id} href={`/providers?category=${category.id}`}>
-                  <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full hover:scale-[1.02] border-0 shadow-md">
+                  <Card className="group hover:shadow-2xl transition-all duration-300 cursor-pointer h-full hover:scale-[1.02] border-0 shadow-xl bg-white/80 backdrop-blur-md hover:bg-white/90">
                     <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[140px]">
-                      <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 border border-blue-100">
-                        <IconComponent className="w-10 h-10 text-blue-600" strokeWidth={1.5} />
+                      <div className="w-20 h-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 border border-blue-200 group-hover:shadow-lg">
+                        <IconComponent className="w-10 h-10 text-blue-600 group-hover:text-indigo-600 transition-colors" strokeWidth={1.5} />
                       </div>
                       <h3 className="font-bold text-gray-900 text-center leading-tight text-base group-hover:text-blue-600 transition-colors">
                         {translateCategoryName(category.name, language)}
@@ -409,28 +425,28 @@ export default function Home() {
           <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             <Link href="/bookings">
-              <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer border border-blue-100 bg-blue-50">
+              <Card className="hover:shadow-2xl transition-all duration-300 cursor-pointer border-0 bg-gradient-to-br from-blue-50/80 to-indigo-100/80 backdrop-blur-md hover:bg-blue-50/90 hover:scale-[1.02]">
                 <CardContent className="p-6 flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Calendar className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">{t('bookings')}</h4>
-                    <p className="text-sm text-gray-600">View & manage</p>
+                    <p className="text-sm text-blue-600 font-medium">View & manage</p>
                   </div>
                 </CardContent>
               </Card>
             </Link>
             
             <Link href="/profile">
-              <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer border border-green-100 bg-green-50">
+              <Card className="hover:shadow-2xl transition-all duration-300 cursor-pointer border-0 bg-gradient-to-br from-green-50/80 to-emerald-100/80 backdrop-blur-md hover:bg-green-50/90 hover:scale-[1.02]">
                 <CardContent className="p-6 flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                    <UserIcon className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <UserIcon className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">{t('profile')}</h4>
-                    <p className="text-sm text-gray-600">Edit details</p>
+                    <p className="text-sm text-green-600 font-medium">Edit details</p>
                   </div>
                 </CardContent>
               </Card>
@@ -442,25 +458,25 @@ export default function Home() {
         <div className="mb-8">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Why Choose Us</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-blue-600" />
+            <div className="bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-white/30 text-center shadow-xl hover:shadow-2xl hover:bg-white/80 transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Shield className="w-8 h-8 text-white" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Verified Providers</h4>
               <p className="text-sm text-gray-600">All professionals are background checked and verified</p>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-green-600" />
+            <div className="bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-white/30 text-center shadow-xl hover:shadow-2xl hover:bg-white/80 transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Star className="w-8 h-8 text-white" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Top Rated</h4>
               <p className="text-sm text-gray-600">Highly rated professionals with excellent reviews</p>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-purple-600" />
+            <div className="bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-white/30 text-center shadow-xl hover:shadow-2xl hover:bg-white/80 transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Clock className="w-8 h-8 text-white" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Same Day Service</h4>
               <p className="text-sm text-gray-600">Fast booking and quick service availability</p>
@@ -471,15 +487,17 @@ export default function Home() {
         {/* Service Provider CTA */}
         {user?.role !== 'service_provider' && (
           <div className="mb-8">
-            <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0">
-              <CardContent className="p-8 text-center">
-                <div className="flex justify-center mb-4">
-                  <Briefcase className="w-16 h-16 text-white opacity-90" />
+            <Card className="bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02]">
+              <CardContent className="p-8 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                <div className="flex justify-center mb-4 relative z-10">
+                  <Briefcase className="w-16 h-16 text-white drop-shadow-lg" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Become a Service Provider</h3>
-                <p className="text-indigo-100 mb-6">Join thousands of professionals and grow your business with us</p>
+                <h3 className="text-2xl font-bold mb-2 relative z-10">Become a Service Provider</h3>
+                <p className="text-white/90 mb-6 relative z-10">Join thousands of professionals and grow your business with us</p>
                 <Link href="/profile">
-                  <button className="bg-white text-indigo-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors">
+                  <button className="bg-white/95 backdrop-blur-md text-indigo-600 px-8 py-3 rounded-xl font-semibold hover:bg-white hover:scale-105 transition-all duration-200 shadow-lg relative z-10">
                     Get Started Today
                   </button>
                 </Link>

@@ -195,12 +195,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Handle different auth types
       if (req.user?.claims?.sub) {
-        // Replit Auth user
-        const userId = req.user.claims.sub;
-        const user = await storage.getUser(userId);
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
+        // Replit Auth user - return user data from claims
+        const user = {
+          id: req.user.claims.sub,
+          email: req.user.claims.email,
+          firstName: req.user.claims.first_name,
+          lastName: req.user.claims.last_name,
+          profileImageUrl: req.user.claims.profile_image_url || null,
+          authProvider: 'replit',
+          role: 'service_seeker',
+          accountType: 'individual',
+          isActive: true
+        };
         return res.json(user);
       } else if (req.user?.id) {
         // Google Auth or Email Auth user
@@ -212,6 +218,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
+  });
+
+  // Enhanced logout endpoint that works for all auth types
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Session destroy error:", err);
+          // Continue with logout even if session destroy fails
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: "Logged out successfully" });
+      });
+    });
   });
 
   // Profile update route
