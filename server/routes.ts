@@ -1395,9 +1395,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all users for admin panel
-  app.get('/api/admin/users', isSuperAdmin, async (req, res) => {
+  app.get('/api/admin/users', async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get user email from different auth types
+      let userEmail = null;
+      if (req.user?.claims?.email) {
+        // Replit Auth
+        userEmail = req.user.claims.email;
+      } else if (req.user?.email) {
+        // Google/Email Auth
+        userEmail = req.user.email;
+      }
+      
+      console.log("Admin users check - User email:", userEmail);
+      
+      // Only allow katiflam1@gmail.com
+      if (userEmail !== "katiflam1@gmail.com") {
+        return res.status(403).json({ message: "Access denied - Super admin only" });
+      }
+      
       const users = await storage.getAllUsers();
+      console.log("Fetched users count:", users.length);
       res.json(users);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -1406,8 +1429,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get admin statistics
-  app.get('/api/admin/stats', isSuperAdmin, async (req, res) => {
+  app.get('/api/admin/stats', async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get user email from different auth types
+      let userEmail = null;
+      if (req.user?.claims?.email) {
+        userEmail = req.user.claims.email;
+      } else if (req.user?.email) {
+        userEmail = req.user.email;
+      }
+      
+      // Only allow katiflam1@gmail.com
+      if (userEmail !== "katiflam1@gmail.com") {
+        return res.status(403).json({ message: "Access denied - Super admin only" });
+      }
+      
       const [users, providers, bookings, categories] = await Promise.all([
         storage.getAllUsers(),
         storage.getServiceProviders(),
@@ -1435,10 +1476,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update any user (super admin only)
-  app.put('/api/admin/users/:userId', isSuperAdmin, async (req, res) => {
+  app.put('/api/admin/users/:userId', async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get user email from different auth types
+      let userEmail = null;
+      if (req.user?.claims?.email) {
+        userEmail = req.user.claims.email;
+      } else if (req.user?.email) {
+        userEmail = req.user.email;
+      }
+      
+      // Only allow katiflam1@gmail.com
+      if (userEmail !== "katiflam1@gmail.com") {
+        return res.status(403).json({ message: "Access denied - Super admin only" });
+      }
+      
       const { userId } = req.params;
-      const updates = req.body;
+      const updates = req.body.updates || req.body;
+      
+      console.log("Updating user:", userId, "with:", updates);
       
       const updatedUser = await storage.updateUser(userId, updates);
       
@@ -1454,11 +1515,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete any user (super admin only)
-  app.delete('/api/admin/users/:userId', isSuperAdmin, async (req, res) => {
+  app.delete('/api/admin/users/:userId', async (req, res) => {
     try {
-      const { userId } = req.params;
+      // Check if user is authenticated
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
-      // Prevent super admin from deleting themselves
+      // Get user email from different auth types
       let currentUserEmail = null;
       if (req.user?.claims?.email) {
         currentUserEmail = req.user.claims.email;
@@ -1466,10 +1530,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentUserEmail = req.user.email;
       }
       
+      // Only allow katiflam1@gmail.com
+      if (currentUserEmail !== "katiflam1@gmail.com") {
+        return res.status(403).json({ message: "Access denied - Super admin only" });
+      }
+      
+      const { userId } = req.params;
+      
+      // Prevent super admin from deleting themselves
       const userToDelete = await storage.getUser(userId);
       if (userToDelete?.email === currentUserEmail) {
         return res.status(400).json({ message: 'Cannot delete your own account' });
       }
+      
+      console.log("Deleting user:", userId);
       
       const deleted = await storage.deleteUser(userId);
       
