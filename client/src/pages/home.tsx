@@ -10,6 +10,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 import { ServiceIcon } from "@/components/service-icon";
+import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
 import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown, Star, Calendar } from "lucide-react";
 import { 
   DropdownMenu,
@@ -336,10 +337,11 @@ export default function Home() {
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${suggestion.color}20` }}
                   >
-                    <ServiceIcon 
+                    <InlineSvgServiceIcon 
                       iconName={suggestion.icon} 
                       className="w-4 h-4" 
                       style={{ color: suggestion.color }} 
+                      size={16}
                     />
                   </div>
                   <div className="flex-1 text-left">
@@ -375,10 +377,11 @@ export default function Home() {
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center mb-3 mx-auto flex-shrink-0 shadow-sm"
                       style={{ backgroundColor: `${category.color}15`, border: `2px solid ${category.color}30` }}
                     >
-                      <ServiceIcon 
+                      <InlineSvgServiceIcon 
                         iconName={category.icon || 'search'} 
                         className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0" 
                         style={{ color: category.color || '#6B7280' }} 
+                        size={32}
                       />
 
                     </div>
@@ -399,7 +402,7 @@ export default function Home() {
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer border-dashed border-2 border-white/30 hover:scale-105 bg-white/10 backdrop-blur-md hover:bg-white/20">
                 <CardContent className="p-4 text-center min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm border border-white/30">
-                    <ServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" />
+                    <InlineSvgServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" size={32} />
                   </div>
                   <h3 className="font-semibold text-white text-sm sm:text-base">{t('viewAllServices')}</h3>
                   <p className="text-xs text-white/70">+{(categories as any[]).length - 6} {t('moreCategories')}</p>
