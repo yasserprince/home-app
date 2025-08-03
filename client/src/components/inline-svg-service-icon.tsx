@@ -132,13 +132,20 @@ export function InlineSvgServiceIcon({
         ...style,
         display: 'inline-block',
         verticalAlign: 'middle',
-        flexShrink: 0
+        flexShrink: 0,
+        // Mobile-specific rendering fixes
+        WebkitTransform: 'translateZ(0)',
+        transform: 'translateZ(0)',
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden'
       }}
       width={size}
       height={size}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      // Critical for mobile icon rendering
+      preserveAspectRatio="xMidYMid meet"
       dangerouslySetInnerHTML={{ __html: svgPath }}
     />
   );

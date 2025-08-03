@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 import { ServiceIcon } from "@/components/service-icon";
 import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
+import { MobileIconTest } from "@/components/mobile-icon-test";
 import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown, Star, Calendar } from "lucide-react";
 import { 
   DropdownMenu,
@@ -481,6 +482,11 @@ export default function Home() {
             </Card>
           )}
         </div>
+      </div>
+
+      {/* Temporary Mobile Icon Test - Remove after testing */}
+      <div className="mb-8">
+        <MobileIconTest />
       </div>
 
       <div className="pb-20">

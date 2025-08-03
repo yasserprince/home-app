@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ServiceIcon } from "@/components/service-icon";
 import { IconifyServiceIcon } from "@/components/iconify-service-icon";
+import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
 import { Link } from "wouter";
 import { CheckCircle, Star, Shield, Clock } from "lucide-react";
 
@@ -114,7 +115,7 @@ export default function Login() {
             ].map((service) => (
               <Card key={service.name} className="backdrop-blur-md bg-white/5 border-white/10 p-4 text-center hover:bg-white/10 transition-all duration-200">
                 <div className={`${service.color} w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2`}>
-                  <IconifyServiceIcon iconName={service.icon} size={24} color="white" />
+                  <InlineSvgServiceIcon iconName={service.icon} size={24} style={{ color: 'white' }} />
                 </div>
                 <p className="text-white text-sm font-medium">{service.name}</p>
               </Card>

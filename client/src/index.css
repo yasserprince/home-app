@@ -74,16 +74,61 @@
   }
 }
 
-/* SVG fix for mobile icon rendering */
+/* Mobile-first SVG icon rendering fixes */
 svg {
   display: inline-block;
   vertical-align: middle;
+  flex-shrink: 0;
+  /* Ensure SVG icons render properly on all mobile browsers */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Critical iOS Safari fixes */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
 }
 
+/* Specific fixes for mobile WebKit engines (Safari, Chrome on iOS) */
 @media (max-width: 768px) {
   svg {
+    /* Force hardware acceleration for better mobile rendering */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Prevent SVG scaling issues on mobile */
+    max-width: none;
     width: auto;
     height: auto;
-    max-width: 100%;
+    /* Ensure proper color inheritance */
+    color: inherit;
+  }
+  
+  /* Service category card icons specific fixes */
+  .service-card svg,
+  .popular-services svg,
+  [class*="service"] svg,
+  [data-testid*="icon"] svg {
+    /* Force proper dimensions on mobile */
+    min-width: 16px;
+    min-height: 16px;
+    /* Prevent browser from applying default icon styles */
+    border: none !important;
+    outline: none !important;
+    background: none !important;
+    /* Critical mobile WebKit fixes */
+    -webkit-appearance: none;
+    appearance: none;
+    /* Force proper rendering */
+    shape-rendering: geometricPrecision;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  
+  /* Target specific service category containers */
+  .min-h-\\[100px\\] svg,
+  .min-h-\\[120px\\] svg,
+  .h-16 svg,
+  .h-20 svg {
+    /* Ensure mobile icons display correctly in service cards */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 }

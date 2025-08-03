@@ -220,10 +220,11 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
                 className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: `${category.color}20` }}
               >
-                <ServiceIcon 
+                <InlineSvgServiceIcon 
                   iconName={category.icon || 'search'} 
                   className="w-5 h-5 flex-shrink-0" 
                   style={{ color: category.color || '#6B7280' }} 
+                  size={20}
                 />
               </div>
               <div className="flex-1 min-w-0">
