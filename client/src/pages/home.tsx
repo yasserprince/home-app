@@ -339,7 +339,7 @@ export default function Home() {
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${suggestion.color}20` }}
                   >
-                    <InlineSvgServiceIcon 
+                    <SimpleServiceIcon 
                       iconName={suggestion.icon} 
                       className="w-4 h-4" 
                       style={{ color: suggestion.color }} 
