@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, Grid, List, ChevronRight } from "lucide-react";
-import { ServiceIcon } from "@/components/service-icon";
 import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
 import { ServiceCategory } from "@shared/schema";
 

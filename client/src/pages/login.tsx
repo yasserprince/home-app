@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ServiceIcon } from "@/components/service-icon";
-import { IconifyServiceIcon } from "@/components/iconify-service-icon";
 import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
 import { Link } from "wouter";
 import { CheckCircle, Star, Shield, Clock } from "lucide-react";

@@ -76,15 +76,27 @@
 
 /* Mobile-first SVG icon rendering fixes */
 svg {
-  display: inline-block;
+  display: inline-block !important;
   vertical-align: middle;
   flex-shrink: 0;
   /* Ensure SVG icons render properly on all mobile browsers */
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   /* Critical iOS Safari fixes */
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
-  mask-image: radial-gradient(white, black);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Force proper SVG rendering on iOS */
+@supports (-webkit-touch-callout: none) {
+  svg {
+    -webkit-appearance: none;
+    appearance: none;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 /* Specific fixes for mobile WebKit engines (Safari, Chrome on iOS) */
