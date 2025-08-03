@@ -28,6 +28,7 @@ import Signin from "@/pages/signin";
 import EmailSignup from "@/pages/email-signup";
 import EmailSignin from "@/pages/email-signin";
 import Settings from "@/pages/settings";
+import IconTest from "@/pages/icon-test";
 import { AdminNav } from "@/components/admin-nav";
 
 function Router() {
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/email-signin" component={EmailSignin} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/adminspecial" component={AdminSpecial} />
+      <Route path="/icon-test" component={IconTest} />
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Login} />
       ) : (
