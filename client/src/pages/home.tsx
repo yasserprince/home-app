@@ -10,7 +10,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 
-import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
+import { SimpleServiceIcon } from "@/components/simple-service-icon";
 import { IconDebug } from "@/components/icon-debug";
 import { ForceIconRefresh } from "@/components/force-icon-refresh";
 import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown, Star, Calendar } from "lucide-react";
@@ -379,7 +379,7 @@ export default function Home() {
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center mb-3 mx-auto flex-shrink-0 shadow-sm"
                       style={{ backgroundColor: `${category.color}15`, border: `2px solid ${category.color}30` }}
                     >
-                      <InlineSvgServiceIcon 
+                      <SimpleServiceIcon 
                         iconName={category.icon || 'search'} 
                         className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0" 
                         style={{ color: category.color || '#6B7280' }} 
@@ -404,7 +404,7 @@ export default function Home() {
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer border-dashed border-2 border-white/30 hover:scale-105 bg-white/10 backdrop-blur-md hover:bg-white/20">
                 <CardContent className="p-4 text-center min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm border border-white/30">
-                    <InlineSvgServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" size={32} />
+                    <SimpleServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" size={32} />
                   </div>
                   <h3 className="font-semibold text-white text-sm sm:text-base">{t('viewAllServices')}</h3>
                   <p className="text-xs text-white/70">+{Array.isArray(categories) ? categories.length - 6 : 0} {t('moreCategories')}</p>

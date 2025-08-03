@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, Grid, List, ChevronRight } from "lucide-react";
-import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
+import { SimpleServiceIcon } from "@/components/simple-service-icon";
 import { ServiceCategory } from "@shared/schema";
 
 export default function Categories() {
@@ -197,7 +197,7 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-2 sm:mb-3 mx-auto flex-shrink-0"
                 style={{ backgroundColor: `${category.color}20` }}
               >
-                <InlineSvgServiceIcon 
+                <SimpleServiceIcon 
                   iconName={category.icon || 'search'} 
                   className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" 
                   style={{ color: category.color || '#6B7280' }} 
@@ -219,7 +219,7 @@ function CategoryCard({ category, viewMode }: CategoryCardProps) {
                 className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: `${category.color}20` }}
               >
-                <InlineSvgServiceIcon 
+                <SimpleServiceIcon 
                   iconName={category.icon || 'search'} 
                   className="w-5 h-5 flex-shrink-0" 
                   style={{ color: category.color || '#6B7280' }} 

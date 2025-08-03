@@ -1,4 +1,4 @@
-import { InlineSvgServiceIcon } from "./inline-svg-service-icon";
+import { SimpleServiceIcon } from "./simple-service-icon";
 
 export function MobileIconTest() {
   const testIcons = [
@@ -28,7 +28,7 @@ export function MobileIconTest() {
               className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-sm"
               style={{ backgroundColor: `${icon.color}15`, border: `2px solid ${icon.color}30` }}
             >
-              <InlineSvgServiceIcon 
+              <SimpleServiceIcon 
                 iconName={icon.name} 
                 className="w-8 h-8 flex-shrink-0" 
                 style={{ color: icon.color }} 
@@ -47,7 +47,7 @@ export function MobileIconTest() {
           {[16, 24, 32, 48].map((size) => (
             <div key={size} className="text-center">
               <div className="bg-blue-500/20 rounded-lg p-2 mb-2 flex items-center justify-center">
-                <InlineSvgServiceIcon 
+                <SimpleServiceIcon 
                   iconName="wrench" 
                   size={size}
                   style={{ color: '#3b82f6' }} 

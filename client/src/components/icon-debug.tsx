@@ -1,4 +1,4 @@
-import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
+import { SimpleServiceIcon } from "@/components/simple-service-icon";
 
 export function IconDebug() {
   const handleHardRefresh = () => {
@@ -23,15 +23,15 @@ export function IconDebug() {
       </button>
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <InlineSvgServiceIcon iconName="wrench" size={24} style={{ color: 'white' }} />
+          <SimpleServiceIcon iconName="wrench" size={24} style={{ color: 'white' }} />
           <span>Wrench (should be wrench icon)</span>
         </div>
         <div className="flex items-center gap-2">
-          <InlineSvgServiceIcon iconName="zap" size={24} style={{ color: 'yellow' }} />
+          <SimpleServiceIcon iconName="zap" size={24} style={{ color: 'yellow' }} />
           <span>Zap (should be lightning bolt)</span>
         </div>
         <div className="flex items-center gap-2">
-          <InlineSvgServiceIcon iconName="hammer" size={24} style={{ color: 'orange' }} />
+          <SimpleServiceIcon iconName="hammer" size={24} style={{ color: 'orange' }} />
           <span>Hammer (should be hammer icon)</span>
         </div>
       </div>
