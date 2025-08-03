@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
-import Landing from "@/pages/landing";
+import Login from "@/pages/login";
 import Home from "@/pages/home";
 import Categories from "@/pages/categories";
 import Providers from "@/pages/providers";
@@ -42,7 +42,7 @@ function Router() {
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/adminspecial" component={AdminSpecial} />
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <Route path="/" component={Login} />
       ) : (
         <>
           <Route path="/" component={Home} />
