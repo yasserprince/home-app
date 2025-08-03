@@ -126,16 +126,21 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     return <Search className={`${className} text-gray-500`} style={style} strokeWidth={2} />;
   }
   
-  // Get the icon component
-  let IconComponent: LucideIcon | null = null;
+  // Debug logging
+  console.log('🔧 ServiceIcon Debug:', {
+    iconName,
+    IconComponentName: iconMap[iconName as keyof typeof iconMap]?.name || 'unknown',
+    iconMapHasKey: iconName in iconMap,
+    availableKeys: Object.keys(iconMap).slice(0, 10)
+  });
   
-  // Try exact match first
-  IconComponent = iconMap[iconName as keyof typeof iconMap];
+  // Get the icon component - try exact match first
+  let IconComponent: LucideIcon | null = iconMap[iconName as keyof typeof iconMap] || null;
   
   if (!IconComponent) {
     // Clean and normalize icon name
     const cleanIconName = iconName.toLowerCase().trim();
-    IconComponent = iconMap[cleanIconName as keyof typeof iconMap];
+    IconComponent = iconMap[cleanIconName as keyof typeof iconMap] || null;
   }
   
   if (!IconComponent) {
@@ -196,14 +201,18 @@ export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceI
     });
   }
 
-  // Render exactly like the working test icons
+  // Ensure we have a valid component to render
+  if (!IconComponent || typeof IconComponent !== 'function') {
+    console.warn('ServiceIcon: Invalid icon component for', iconName, 'using fallback');
+    return <Search className={className} style={style} strokeWidth={2} />;
+  }
+
+  // Render the icon component with proper props
   return (
     <IconComponent 
       className={className}
       style={style}
       strokeWidth={2}
-      fill="none"
-      stroke="currentColor"
     />
   );
 }

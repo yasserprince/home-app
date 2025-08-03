@@ -480,7 +480,9 @@ export default function Home() {
         </div>
       </div>
 
-      <BottomNavigation activeTab="home" />
+      <div className="pb-20">
+        <BottomNavigation activeTab="home" />
+      </div>
     </div>
   );
 }
