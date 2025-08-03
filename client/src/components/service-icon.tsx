@@ -7,7 +7,7 @@ import {
   PawPrint, Dumbbell, GraduationCap, Camera, Hand, Heart,
   Calendar, UtensilsCrossed, Music, Wine, Car, Brush,
   Calculator, Scale, Code, Snowflake, Star, Sofa, Cog,
-  Sun, Wind, Search, CircleDot, Wrench as WrenchIcon,
+  Sun, Wind, Search, CircleDot,
   type LucideIcon
 } from "lucide-react";
 
@@ -123,96 +123,111 @@ interface ServiceIconProps {
 export function ServiceIcon({ iconName, className = "w-5 h-5", style }: ServiceIconProps) {
   // Handle empty or undefined iconName
   if (!iconName || typeof iconName !== 'string') {
-    return <Search className={`${className} text-gray-500`} style={style} strokeWidth={2} />;
+    return (
+      <Search 
+        className={className} 
+        style={style} 
+        size={20}
+        color="currentColor"
+        strokeWidth={2}
+        fill="none"
+        stroke="currentColor"
+      />
+    );
   }
   
-  // Debug logging
-  console.log('🔧 ServiceIcon Debug:', {
-    iconName,
-    IconComponentName: iconMap[iconName as keyof typeof iconMap]?.name || 'unknown',
-    iconMapHasKey: iconName in iconMap,
-    availableKeys: Object.keys(iconMap).slice(0, 10)
-  });
-  
-  // Get the icon component - try exact match first
-  let IconComponent: LucideIcon | null = iconMap[iconName as keyof typeof iconMap] || null;
-  
-  if (!IconComponent) {
-    // Clean and normalize icon name
-    const cleanIconName = iconName.toLowerCase().trim();
-    IconComponent = iconMap[cleanIconName as keyof typeof iconMap] || null;
-  }
-  
-  if (!IconComponent) {
-    // Try common variations and mappings
-    const variations = [
-      iconName.toLowerCase().replace(/\s+/g, '-'), // spaces to hyphens
-      iconName.toLowerCase().replace(/[-_\s]/g, ''), // Remove all separators
-      iconName.toLowerCase().replace(/\s+/g, '_'), // spaces to underscores
-      iconName.toLowerCase().replace(/ing$/, ''), // Remove 'ing' suffix
-      iconName.toLowerCase().replace(/s$/, ''), // Remove plural 's'
-    ];
+  // Simple direct mapping approach
+  const getIconComponent = (name: string): LucideIcon => {
+    const lowerName = name.toLowerCase().trim();
     
-    // Try to find a matching icon
-    for (const variation of variations) {
-      const mappedIcon = iconMap[variation as keyof typeof iconMap];
-      if (mappedIcon) {
-        IconComponent = mappedIcon;
-        break;
-      }
+    // Direct mapping
+    switch (lowerName) {
+      case 'wrench': return Wrench;
+      case 'zap': return Zap;
+      case 'thermometer': return Thermometer;
+      case 'hammer': return Hammer;
+      case 'paintbrush': return Paintbrush;
+      case 'home': return Home;
+      case 'layout-grid':
+      case 'grid': return LayoutGrid;
+      case 'utensils': return Utensils;
+      case 'bath': return Bath;
+      case 'sparkles': return Sparkles;
+      case 'square': return Square;
+      case 'droplets': return Droplets;
+      case 'truck': return Truck;
+      case 'tree-pine': return TreePine;
+      case 'leaf': return Leaf;
+      case 'trees': return Trees;
+      case 'fence': return Fence;
+      case 'layout': return Layout;
+      case 'settings': return Settings;
+      case 'monitor': return Monitor;
+      case 'wifi': return Wifi;
+      case 'shield': return Shield;
+      case 'armchair': return Armchair;
+      case 'package': return Package;
+      case 'waves': return Waves;
+      case 'bug': return Bug;
+      case 'warehouse': return Warehouse;
+      case 'dumbbell': return Dumbbell;
+      case 'camera': return Camera;
+      case 'hand': return Hand;
+      case 'heart': return Heart;
+      case 'calendar':
+      case 'calendar-alt': return Calendar;
+      case 'utensils-crossed': return UtensilsCrossed;
+      case 'music': return Music;
+      case 'wine':
+      case 'cocktail': return Wine;
+      case 'car': return Car;
+      case 'brush':
+      case 'car-wash': return Brush;
+      case 'calculator': return Calculator;
+      case 'scale':
+      case 'gavel': return Scale;
+      case 'code': return Code;
+      case 'snowflake': return Snowflake;
+      case 'star': return Star;
+      case 'sofa': return Sofa;
+      case 'cog': return Cog;
+      case 'sun':
+      case 'solar-panel': return Sun;
+      case 'wind': return Wind;
+      case 'search': return Search;
+      case 'paw-print': return PawPrint;
+      case 'graduation-cap': return GraduationCap;
+      case 'spa': return Sparkles;
+      default:
+        // Fallback logic
+        if (lowerName.includes('plumb') || lowerName.includes('pipe')) return Wrench;
+        if (lowerName.includes('electric') || lowerName.includes('wiring')) return Zap;
+        if (lowerName.includes('hvac') || lowerName.includes('air') || lowerName.includes('heat')) return Thermometer;
+        if (lowerName.includes('handyman') || lowerName.includes('repair')) return Hammer;
+        if (lowerName.includes('paint') || lowerName.includes('color')) return Paintbrush;
+        if (lowerName.includes('clean') || lowerName.includes('wash')) return Sparkles;
+        if (lowerName.includes('roof') || lowerName.includes('house')) return Home;
+        if (lowerName.includes('landscape') || lowerName.includes('garden')) return TreePine;
+        if (lowerName.includes('security') || lowerName.includes('protect')) return Shield;
+        if (lowerName.includes('move') || lowerName.includes('transport')) return Truck;
+        return Search;
     }
-  }
-  
-  if (!IconComponent) {
-    // Category-specific fallbacks
-    const cleanIconName = iconName.toLowerCase();
-    if (cleanIconName.includes('plumb') || cleanIconName.includes('pipe') || cleanIconName.includes('water')) {
-      IconComponent = Wrench;
-    } else if (cleanIconName.includes('electric') || cleanIconName.includes('wiring') || cleanIconName.includes('light')) {
-      IconComponent = Zap;
-    } else if (cleanIconName.includes('hvac') || cleanIconName.includes('air') || cleanIconName.includes('heat') || cleanIconName.includes('cool')) {
-      IconComponent = Thermometer;
-    } else if (cleanIconName.includes('handyman') || cleanIconName.includes('repair') || cleanIconName.includes('fix')) {
-      IconComponent = Hammer;
-    } else if (cleanIconName.includes('paint') || cleanIconName.includes('color')) {
-      IconComponent = Paintbrush;
-    } else if (cleanIconName.includes('clean') || cleanIconName.includes('wash')) {
-      IconComponent = Sparkles;
-    } else if (cleanIconName.includes('roof') || cleanIconName.includes('home') || cleanIconName.includes('house')) {
-      IconComponent = Home;
-    } else if (cleanIconName.includes('landscape') || cleanIconName.includes('garden') || cleanIconName.includes('tree')) {
-      IconComponent = TreePine;
-    } else if (cleanIconName.includes('security') || cleanIconName.includes('protect')) {
-      IconComponent = Shield;
-    } else if (cleanIconName.includes('move') || cleanIconName.includes('transport')) {
-      IconComponent = Truck;
-    } else {
-      IconComponent = Search; // Ultimate fallback
-    }
-  }
-  
-  // Debug logging for troubleshooting
-  if (typeof window !== 'undefined') {
-    console.log(`🔧 ServiceIcon Debug:`, {
-      iconName,
-      IconComponentName: IconComponent?.name || 'unknown',
-      iconMapHasKey: !!iconMap[iconName as keyof typeof iconMap],
-      availableKeys: Object.keys(iconMap).slice(0, 10)
-    });
-  }
+  };
 
-  // Ensure we have a valid component to render
-  if (!IconComponent || typeof IconComponent !== 'function') {
-    console.warn('ServiceIcon: Invalid icon component for', iconName, 'using fallback');
-    return <Search className={className} style={style} strokeWidth={2} />;
-  }
+  const IconComponent = getIconComponent(iconName);
 
-  // Render the icon component with proper props
+  // Render with all required SVG props for mobile compatibility
   return (
     <IconComponent 
       className={className}
       style={style}
+      size={20}
+      color="currentColor"
       strokeWidth={2}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   );
 }

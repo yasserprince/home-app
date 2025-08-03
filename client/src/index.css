@@ -73,3 +73,17 @@
     -webkit-line-clamp: 2;
   }
 }
+
+/* SVG fix for mobile icon rendering */
+svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+  svg {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+  }
+}
