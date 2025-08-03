@@ -11,7 +11,8 @@ import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 
 import { InlineSvgServiceIcon } from "@/components/inline-svg-service-icon";
-import { MobileIconTest } from "@/components/mobile-icon-test";
+import { IconDebug } from "@/components/icon-debug";
+import { ForceIconRefresh } from "@/components/force-icon-refresh";
 import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown, Star, Calendar } from "lucide-react";
 import { 
   DropdownMenu,
@@ -397,7 +398,7 @@ export default function Home() {
         )}
         
         {/* Show More Services */}
-        {categories && (categories as any[]).length > 6 && (
+        {categories && Array.isArray(categories) && categories.length > 6 && (
           <div className="mb-6">
             <Link href="/categories">
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer border-dashed border-2 border-white/30 hover:scale-105 bg-white/10 backdrop-blur-md hover:bg-white/20">
@@ -406,7 +407,7 @@ export default function Home() {
                     <InlineSvgServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" size={32} />
                   </div>
                   <h3 className="font-semibold text-white text-sm sm:text-base">{t('viewAllServices')}</h3>
-                  <p className="text-xs text-white/70">+{(categories as any[]).length - 6} {t('moreCategories')}</p>
+                  <p className="text-xs text-white/70">+{Array.isArray(categories) ? categories.length - 6 : 0} {t('moreCategories')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -484,6 +485,8 @@ export default function Home() {
         </div>
       </div>
 
+      <IconDebug />
+      
       <div className="pb-20">
         <BottomNavigation activeTab="home" />
       </div>

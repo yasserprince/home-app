@@ -92,10 +92,27 @@ svg {
 /* Force proper SVG rendering on iOS */
 @supports (-webkit-touch-callout: none) {
   svg {
-    -webkit-appearance: none;
-    appearance: none;
-    will-change: transform;
-    transform: translate3d(0, 0, 0);
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    will-change: transform !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+/* Force cache refresh - version 2.0 */
+svg path {
+  vector-effect: non-scaling-stroke !important;
+  shape-rendering: geometricPrecision !important;
+}
+
+/* Ultimate iOS Safari icon fix */
+@supports (-webkit-touch-callout: none) {
+  .service-icon svg,
+  [class*="InlineSvgServiceIcon"] svg,
+  svg[class*="lucide"] {
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+    will-change: auto !important;
   }
 }
 
@@ -134,10 +151,9 @@ svg {
   }
   
   /* Target specific service category containers */
-  .min-h-\\[100px\\] svg,
-  .min-h-\\[120px\\] svg,
-  .h-16 svg,
-  .h-20 svg {
+  [class*="min-h"] svg,
+  [class*="h-16"] svg,
+  [class*="h-20"] svg {
     /* Ensure mobile icons display correctly in service cards */
     display: block !important;
     visibility: visible !important;
