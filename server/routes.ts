@@ -1277,14 +1277,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public profile images endpoint - Fast, no ACL checks needed
+  app.get("/public/profile-images/:imageId", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    const imagePath = `/objects/uploads/${req.params.imageId}`;
+    console.log("🖼️ Public profile image request:", imagePath);
+    
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(imagePath);
+      console.log("✅ Serving public profile image:", objectFile.name);
+      
+      // Set aggressive caching for profile images
+      res.set({
+        'Cache-Control': 'public, max-age=86400', // 24 hours
+        'Content-Type': 'image/jpeg'
+      });
+      
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("❌ Error serving profile image:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
   // Object storage endpoints - For serving profile images and other objects
   app.get("/objects/:objectPath(*)", async (req: any, res) => {
     const objectStorageService = new ObjectStorageService();
+    console.log("🔍 Object access request for:", req.path);
+    
     try {
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      console.log("📁 Object file found:", objectFile.name);
       
       // Check if user is authenticated for private access
       const userId = req.user?.claims?.sub;
+      console.log("👤 User ID:", userId || 'anonymous');
       
       const canAccess = await objectStorageService.canAccessObjectEntity({
         objectFile,
@@ -1293,16 +1323,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (!canAccess) {
-        console.log("Access denied for object:", req.path, "User:", userId);
-        return res.sendStatus(401);
+        console.log("❌ Access denied for object:", req.path, "User:", userId || 'anonymous');
+        return res.status(401).json({ message: "Unauthorized", objectPath: req.path });
       }
       
-      console.log("Serving object:", req.path, "to user:", userId || 'anonymous');
+      console.log("✅ Serving object:", req.path, "to user:", userId || 'anonymous');
       objectStorageService.downloadObject(objectFile, res);
     } catch (error) {
-      console.error("Error checking object access:", error);
+      console.error("💥 Error checking object access:", error);
       if (error instanceof ObjectNotFoundError) {
-        console.log("Object not found:", req.path);
+        console.log("🚫 Object not found:", req.path);
         return res.sendStatus(404);
       }
       return res.sendStatus(500);
@@ -1350,12 +1380,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Object path normalized:", objectPath);
 
-      // Update user profile with new image URL
-      const updatedUser = await storage.updateUser(userId, { profileImageUrl: objectPath });
-      console.log("User updated successfully");
+      // Convert to public profile image URL for faster access
+      const imageId = objectPath.split('/').pop(); // Extract UUID from path
+      const publicImageUrl = `/public/profile-images/${imageId}`;
+      
+      // Update user profile with public image URL
+      const updatedUser = await storage.updateUser(userId, { profileImageUrl: publicImageUrl });
+      console.log("User updated successfully with public image URL:", publicImageUrl);
 
       res.status(200).json({
-        objectPath: objectPath,
+        objectPath: publicImageUrl,
         user: updatedUser,
         message: "Profile image updated successfully"
       });

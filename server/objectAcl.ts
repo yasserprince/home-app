@@ -123,12 +123,26 @@ export async function setObjectAclPolicy(
 export async function getObjectAclPolicy(
   objectFile: File,
 ): Promise<ObjectAclPolicy | null> {
-  const [metadata] = await objectFile.getMetadata();
-  const aclPolicy = metadata?.metadata?.[ACL_POLICY_METADATA_KEY];
-  if (!aclPolicy) {
+  try {
+    console.log("Getting metadata for object:", objectFile.name);
+    const [metadata] = await objectFile.getMetadata();
+    console.log("Raw metadata:", JSON.stringify(metadata?.metadata || {}, null, 2));
+    
+    const aclPolicy = metadata?.metadata?.[ACL_POLICY_METADATA_KEY];
+    console.log("ACL policy raw value:", aclPolicy);
+    
+    if (!aclPolicy) {
+      console.log("No ACL policy found in metadata");
+      return null;
+    }
+    
+    const parsedPolicy = JSON.parse(aclPolicy as string);
+    console.log("Parsed ACL policy:", parsedPolicy);
+    return parsedPolicy;
+  } catch (error) {
+    console.error("Error getting ACL policy:", error);
     return null;
   }
-  return JSON.parse(aclPolicy as string);
 }
 
 // Checks if the user can access the object.
@@ -154,12 +168,15 @@ export async function canAccessObject({
     aclPolicy.visibility === "public" &&
     requestedPermission === ObjectPermission.READ
   ) {
-    console.log("Public object access granted for:", objectFile.name);
+    console.log("✅ Public object access granted for:", objectFile.name, "- No authentication required");
     return true;
   }
 
+  console.log("Object is not public or not read request. Visibility:", aclPolicy.visibility, "Permission:", requestedPermission);
+
   // Access control requires the user id.
   if (!userId) {
+    console.log("❌ No user ID provided for private object access");
     return false;
   }
 
