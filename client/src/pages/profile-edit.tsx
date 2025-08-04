@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ModernImageUploader } from "@/components/ModernImageUploader";
+import { ProfileImageManager } from "@/components/ProfileImageManager";
 import { LanguageSelector } from "@/components/language-selector";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -188,30 +188,13 @@ export default function ProfileEdit() {
         <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
           <CardContent className="p-6">
             <div className="flex flex-col items-center gap-4">
-              <div className="relative">
-                <ModernAvatar
-                  key={avatarKey} // Force re-render when image changes
-                  src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${avatarKey}` : null}
-                  name={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || ''}
-                  email={user?.email || ''}
-                  size={96}
-                  className="ring-4 ring-white/20"
-                />
-                <ModernImageUploader 
-                  onSuccess={(imageUrl) => {
-                    console.log('Avatar uploaded successfully:', imageUrl);
-                    setAvatarKey(Date.now()); // Force avatar refresh
-                  }}
-                >
-                  <Button
-                    size="icon"
-                    className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white"
-                    title="Update profile picture"
-                  >
-                    <Camera className="w-4 h-4" />
-                  </Button>
-                </ModernImageUploader>
-              </div>
+              <ProfileImageManager
+                currentImageUrl={user?.profileImageUrl}
+                userName={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || ''}
+                userEmail={user?.email || ''}
+                size={96}
+                className="ring-4 ring-white/20"
+              />
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-white">
                   {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'User'}
