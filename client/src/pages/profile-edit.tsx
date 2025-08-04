@@ -190,8 +190,12 @@ export default function ProfileEdit() {
               <div className="relative">
                 <Avatar className="w-24 h-24 ring-4 ring-white/20">
                   <AvatarImage 
-                    src={user?.profileImageUrl || ''} 
+                    src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${Date.now()}` : ''} 
                     alt={user?.firstName || 'User'} 
+                    onError={(e) => {
+                      console.log('Image failed to load:', user?.profileImageUrl);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-bold">
                     {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}

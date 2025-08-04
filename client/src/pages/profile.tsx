@@ -96,8 +96,12 @@ export default function Profile() {
               <div className="relative">
                 <Avatar className="w-20 h-20 ring-4 ring-white/20">
                   <AvatarImage 
-                    src={user?.profileImageUrl || ''} 
+                    src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${Date.now()}` : ''} 
                     alt={user?.firstName || 'User'} 
+                    onError={(e) => {
+                      console.log('Image failed to load:', user?.profileImageUrl);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
                     {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
