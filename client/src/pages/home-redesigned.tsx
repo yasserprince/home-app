@@ -31,7 +31,8 @@ export default function HomeRedesigned() {
     quickServices, 
     isLoading: categoriesLoading,
     getCategoryIcon,
-    getCategoryColor 
+    getCategoryColor,
+    getTranslatedName
   } = useCategories();
   const { t, language, changeLanguage } = useTranslation();
   
@@ -277,7 +278,7 @@ export default function HomeRedesigned() {
                       />
                     </div>
                     <h3 className="text-white text-xs font-semibold line-clamp-2">
-                      {category.name}
+                      {getTranslatedName(category.name)}
                     </h3>
                   </CardContent>
                 </Card>
@@ -329,7 +330,7 @@ export default function HomeRedesigned() {
                     </div>
                     <div>
                       <h3 className="text-white font-semibold text-sm line-clamp-1">
-                        {category.name}
+                        {getTranslatedName(category.name)}
                       </h3>
                       <p className="text-white/70 text-xs line-clamp-1">
                         {category.description}

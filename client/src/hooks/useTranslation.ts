@@ -161,11 +161,6 @@ const translations: Translations = {
     fr: 'Afficher tout',
     ar: 'عرض الكل'
   },
-  'services': {
-    en: 'services',
-    fr: 'services',
-    ar: 'خدمات'
-  },
   'noServicesFound': {
     en: 'No services found',
     fr: 'Aucun service trouvé',
@@ -746,26 +741,7 @@ const translations: Translations = {
     fr: 'Rechercher des catégories...',
     ar: 'البحث في الفئات...'
   },
-  'allServices': {
-    en: 'All Services',
-    fr: 'Tous les services',
-    ar: 'جميع الخدمات'
-  },
-  'categoriesAvailable': {
-    en: 'categories available',
-    fr: 'catégories disponibles',
-    ar: 'فئة متاحة'
-  },
-  'searchServices': {
-    en: 'Search services...',
-    fr: 'Rechercher des services...',
-    ar: 'البحث في الخدمات...'
-  },
-  'showAll': {
-    en: 'Show All',
-    fr: 'Afficher tout',
-    ar: 'إظهار الكل'
-  },
+
   'services': {
     en: 'services',
     fr: 'services',
@@ -776,18 +752,8 @@ const translations: Translations = {
     fr: 'à partir de',
     ar: 'من'
   },
-  'bookNow': {
-    en: 'Book Now',
-    fr: 'Réserver maintenant',
-    ar: 'احجز الآن'
-  },
   
-  // Profile page specific
-  'editProfile': {
-    en: 'Edit Profile',
-    fr: 'Modifier le profil',
-    ar: 'تعديل الملف الشخصي'
-  },
+  // Profile page specific (removing duplicate editProfile)
   'servicesBooked': {
     en: 'Services Booked',
     fr: 'Services réservés',
@@ -807,6 +773,127 @@ const translations: Translations = {
     en: 'Member since',
     fr: 'Membre depuis',
     ar: 'عضو منذ'
+  },
+  
+  // Settings page translations
+  'savedAddresses': {
+    en: 'Saved Addresses',
+    fr: 'Adresses sauvegardées',
+    ar: 'العناوين المحفوظة'
+  },
+  'locationSettings': {
+    en: 'Location Settings',
+    fr: 'Paramètres de localisation',
+    ar: 'إعدادات الموقع'
+  },
+  'earningsAnalytics': {
+    en: 'Earnings & Analytics',
+    fr: 'Revenus et analyses',
+    ar: 'الأرباح والتحليلات'
+  },
+  'reviewsRatings': {
+    en: 'Reviews & Ratings',
+    fr: 'Avis et évaluations',
+    ar: 'المراجعات والتقييمات'
+  },
+  'verificationCenter': {
+    en: 'Verification Center',
+    fr: 'Centre de vérification',
+    ar: 'مركز التحقق'
+  },
+  'preferencesPrivacy': {
+    en: 'Preferences & Privacy',
+    fr: 'Préférences et confidentialité',
+    ar: 'التفضيلات والخصوصية'
+  },
+  'notifications': {
+    en: 'Notifications',
+    fr: 'Notifications',
+    ar: 'الإشعارات'
+  },
+  'helpCenter': {
+    en: 'Help Center',
+    fr: 'Centre d\'aide',
+    ar: 'مركز المساعدة'
+  },
+  
+  // Individual category translations
+  'plumbing': {
+    en: 'Plumbing',
+    fr: 'Plomberie',
+    ar: 'السباكة'
+  },
+  'electrical': {
+    en: 'Electrical',
+    fr: 'Électricité',
+    ar: 'الكهرباء'
+  },
+  'hvac': {
+    en: 'HVAC',
+    fr: 'CVC',
+    ar: 'التكييف والتهوية'
+  },
+  'houseCleaning': {
+    en: 'House Cleaning',
+    fr: 'Nettoyage de maison',
+    ar: 'تنظيف المنزل'
+  },
+  'handyman': {
+    en: 'Handyman',
+    fr: 'Bricoleur',
+    ar: 'عامل صيانة'
+  },
+  'carpetCleaning': {
+    en: 'Carpet Cleaning',
+    fr: 'Nettoyage de tapis',
+    ar: 'تنظيف السجاد'
+  },
+  'painting': {
+    en: 'Painting',
+    fr: 'Peinture',
+    ar: 'الدهان'
+  },
+  'kitchenRemodeling': {
+    en: 'Kitchen Remodeling',
+    fr: 'Rénovation de cuisine',
+    ar: 'تجديد المطبخ'
+  },
+  'bathroomRemodeling': {
+    en: 'Bathroom Remodeling',
+    fr: 'Rénovation de salle de bain',
+    ar: 'تجديد الحمام'
+  },
+  'roofing': {
+    en: 'Roofing',
+    fr: 'Toiture',
+    ar: 'الأسقف'
+  },
+  'flooring': {
+    en: 'Flooring',
+    fr: 'Revêtement de sol',
+    ar: 'الأرضيات'
+  },
+  'carpentry': {
+    en: 'Carpentry',
+    fr: 'Menuiserie',
+    ar: 'النجارة'
+  },
+  'autoRepair': {
+    en: 'Auto Repair',
+    fr: 'Réparation automobile',
+    ar: 'إصلاح السيارات'
+  },
+  
+  // Settings page specific keys
+  'manageAccountPreferences': {
+    en: 'Manage your account and preferences',
+    fr: 'Gérez votre compte et préférences',
+    ar: 'إدارة حسابك وتفضيلاتك'
+  },
+  'profileInformation': {
+    en: 'Profile Information',
+    fr: 'Informations du profil',
+    ar: 'معلومات الملف الشخصي'
   }
 };
 

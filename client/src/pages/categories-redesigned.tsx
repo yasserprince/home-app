@@ -73,7 +73,7 @@ const getCategoryGroups = (t: (key: string) => string) => ({
 });
 
 export default function CategoriesRedesigned() {
-  const { categories, isLoading, getCategoryIcon, getCategoryColor } = useCategories();
+  const { categories, isLoading, getCategoryIcon, getCategoryColor, getTranslatedName } = useCategories();
   const { t, language, changeLanguage, isRTL } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -292,7 +292,7 @@ export default function CategoriesRedesigned() {
                             />
                           </div>
                           <h3 className="text-white font-semibold text-sm line-clamp-2">
-                            {category.name}
+                            {getTranslatedName(category.name)}
                           </h3>
                         </CardContent>
                       </Card>
@@ -318,7 +318,7 @@ export default function CategoriesRedesigned() {
                           </div>
                           <div className="flex-1">
                             <h3 className="text-white font-semibold line-clamp-1">
-                              {category.name}
+                              {getTranslatedName(category.name)}
                             </h3>
                             <p className="text-white/70 text-sm line-clamp-2">
                               {category.description}

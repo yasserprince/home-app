@@ -28,7 +28,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import type { User } from "@shared/schema";
 import BottomNavigation from "@/components/bottom-navigation";
-import { useTranslation, getLanguageDirection, translations } from "@/lib/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/language-selector";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import { ProfileImageUploader } from "@/components/ProfileImageUploader";
@@ -39,7 +39,7 @@ export default function Settings() {
   const { user, isLoading: userLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { t, language } = useTranslation();
+  const { t, language, isRTL } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -108,7 +108,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20" dir={getLanguageDirection(language)}>
+    <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="bg-primary text-white p-6 pt-12">
         <div className="flex items-center gap-4 mb-4">
@@ -139,7 +139,7 @@ export default function Settings() {
             </div>
             <div className="flex items-center gap-2">
               <Badge variant={user?.role === 'admin' ? 'destructive' : 'outline'}>
-                {t(user?.role?.replace('_', '') as keyof typeof translations.en) || user?.role?.replace('_', ' ')}
+                {user?.role?.replace('_', ' ')}
               </Badge>
               <Button
                 variant={isEditing ? "outline" : "default"}
