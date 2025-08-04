@@ -2,99 +2,7 @@
 
 ## Overview
 
-This is a full-stack home service booking platform that connects customers with local service providers. The application allows users to browse service categories, find providers, book appointments, and manage their service requests through an intuitive mobile-first interface.
-
-## Recent Changes (August 4, 2025)
-
-### Modern Profile System Redesign ✓ COMPLETED
-- **Settings Page Permanently Deleted**: Removed settings.tsx completely and updated all navigation to redirect to profile-edit
-- **2024 Dark Gradient UI/UX**: Applied cutting-edge Material Design dark theme principles with #121212 base surface color
-- **Modern Profile Page**: Redesigned with glassmorphism effects, animated background orbs, and professional card layouts
-- **Advanced Edit Profile**: Interactive editing system with real-time form validation and save/cancel functionality
-- **Color Elevation Technique**: Used color elevation instead of shadows for modern dark theme hierarchy
-- **Mobile-Optimized Design**: Touch-friendly interface with proper contrast ratios (15.8:1) for accessibility
-- **Algeria Wilayas Integration**: Maintained all 58 wilayas support with male/female gender options
-- **Translation System Updated**: Added missing translation keys for modern UI elements across all languages
-- **Bottom Navigation Styled**: Updated to match dark gradient theme with blue accent colors
-
-### Complete Translation System + Triple Authentication Login Page ✓ COMPLETED
-- **Full Translation System**: Implemented comprehensive useTranslation hook with English, French, and Arabic support
-- **Language Switching Fixed**: Language selector now properly applies changes with localStorage persistence and page reload
-- **RTL Support**: Added proper right-to-left text direction for Arabic language with HTML dir attribute
-- **Triple Authentication Login Page**: Created modern login/get started page with Google OAuth + email/password + Replit Auth
-- **Professional UI Design**: Applied gradient theme with glassmorphism effects matching logged-in pages
-- **Mobile-First Responsive**: Optimized for mobile devices with touch-friendly interface
-- **Trust Indicators**: Added verification badges, ratings, and featured services preview
-- **Form Validation**: Complete email/password signup with proper form handling
-- **Language Persistence**: User language preference persists across sessions
-
-## Previous Changes (August 3, 2025)
-
-### Login Page Redesigned - Replaced Misleading Landing Page ✓ COMPLETED
-- **Professional Login Page**: Created beautiful gradient-themed login page matching logged-in pages aesthetic
-- **Removed Confusing Landing**: Eliminated misleading ServiceNow landing page that was causing icon display issues
-- **Consistent Design Language**: Applied same gradient theme (gray-900 → blue-900 → purple-900) throughout
-- **Enhanced Authentication Flow**: Improved Google OAuth and email login with glassmorphism effects
-- **Trust Indicators**: Added verified providers, ratings, and service preview sections
-- **Mobile Optimized**: Responsive design with proper touch targets and mobile-first approach
-
-### ServiceIcon Component Fixed - Icons Rendering Properly ✓ COMPLETED
-- **Root Cause Identified**: Icons were showing as colored squares due to improper component mapping and missing SVG attributes
-- **Complete Component Rebuild**: Replaced complex iconMap object with reliable TypeScript Record mapping
-- **Mobile Compatibility**: Added explicit SVG style overrides and width/height props for mobile rendering
-- **CSS Enhancement**: Added SVG display fixes for mobile devices with proper vertical alignment
-- **Performance Improvement**: Eliminated debug logging and simplified icon resolution logic
-- **Bottom Navigation Update**: Replaced FontAwesome icons with proper Lucide icons and enhanced styling
-- **Research-Based Solution**: Applied web best practices for Lucide icon rendering on mobile TypeScript applications
-
-### Admin Panel Gradient Theme Applied to Home Page ✓ COMPLETED
-- **Beautiful Gradient Background**: Applied stunning admin panel gradient theme (gray-900 → blue-900 → purple-900) to home page
-- **Glassmorphism Effects**: Added modern backdrop blur and transparency effects to all cards and components
-- **Animated Background Orbs**: Implemented floating animated gradient orbs for dynamic visual appeal
-- **Professional Dark Theme**: Converted all text to white/light colors for elegant dark theme consistency
-- **Enhanced UI Elements**: Updated search bar, category cards, booking cards with glass-like transparency
-- **Removed FontAwesome Icons**: Replaced all remaining FontAwesome icons with proper Lucide icons
-- **Consistent Visual Language**: Home page now matches admin panel's professional aesthetic perfectly
-
-### Complete Categories Page Redesign Completed
-- **2024 Mobile-First Design**: Complete categories page redesign based on TaskRabbit/Thumbtack research
-- **Intelligent Category Grouping**: Organized services into 7 logical groups (Trending, Home Infrastructure, etc.)
-- **Advanced Icon Mapping**: Hardcoded reliable icon mappings using Lucide icons for consistent display
-- **Enhanced Visual Hierarchy**: Gradient backgrounds, card-based layouts with hover animations
-- **Dual View Modes**: Toggle between grid and list views for better user experience
-- **Smart Filtering System**: Category group filters with visual indicators and service counts
-- **Modern Mobile UX**: Sticky headers, horizontal scrolling filters, and smooth transitions
-- **Resolved Icon Issues**: Eliminated colored squares by using static icon mapping instead of dynamic API icons
-
-### Modern Home Page Redesign Completed
-- **TaskRabbit/Thumbtack-Inspired Design**: Complete home page redesign based on 2024 modern app patterns
-- **Enhanced ServiceIcon Component**: Improved icon mapping with better mobile compatibility and fallback systems
-- **Professional UI**: Clean card-based layouts with hover animations and modern color schemes
-- **User Profile Integration**: Beautiful user avatars with online status indicators and personalized greetings
-- **Enhanced Search**: Improved search bar with better suggestions and modern styling
-- **Quick Actions**: Added quick access cards for bookings and profile management
-- **Trust Indicators**: Added "Why Choose Us" section highlighting verified providers and quality service
-- **Admin Access**: Fixed admin panel authentication using proper Google OAuth user claims structure
-
-### Google Maps Integration Completed
-- **Interactive Maps**: Added Google Maps JavaScript API integration to location settings
-- **Real-time Location**: Users can see their exact location with custom red pin markers
-- **Secure API Handling**: Created `/api/maps/config` endpoint for secure key distribution
-- **Professional UI**: Clean map integration with loading states and error handling
-- **Location Updates**: Maps automatically center and update when user location changes
-
-### Account Management & Location Services Fixed
-- **Account Type Switching**: Fixed profile settings with intuitive "Change" button for role switching
-- **Location API**: Added `/api/location` PUT endpoint for location preference updates
-- **API Syntax Fixes**: Corrected `apiRequest` function calls throughout the application
-- **Enhanced UX**: Improved user interface for account type selection and location management
-
-### Dual Authentication System Completed
-- **Google OAuth**: Fixed critical session cookie configuration and user creation flow
-- **Email/Password**: Complete signup system with comprehensive user information collection
-- **Algeria Integration**: All 58 wilayas included in location selection
-- **Enhanced Security**: bcrypt password hashing and secure session management
-- **Logout System**: Fixed logout functionality with both GET and POST endpoints
+This is a full-stack home service booking platform connecting customers with local service providers. It enables users to browse service categories, find providers, book appointments, and manage service requests via an intuitive mobile-first interface. The project aims to provide a comprehensive, modern solution for home service bookings, with a focus on user experience, professional design, and robust functionality.
 
 ## User Preferences
 
@@ -105,138 +13,48 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript
 - **Routing**: Wouter for client-side routing
-- **Styling**: Tailwind CSS with shadcn/ui component library
-- **State Management**: TanStack Query (React Query) for server state
-- **Form Handling**: React Hook Form with Zod validation
-- **Build Tool**: Vite for development and bundling
+- **Styling**: Tailwind CSS with shadcn/ui component library, applying Material Design dark theme principles (e.g., #121212 base surface color, color elevation). UI/UX features include glassmorphism effects, animated background orbs, and professional card layouts, optimized for mobile with proper contrast ratios (15.8:1).
+- **State Management**: TanStack Query (React Query) for server state, with cache invalidation for real-time updates (e.g., profile picture uploads).
+- **Form Handling**: React Hook Form with Zod validation for interactive editing and real-time validation.
+- **Build Tool**: Vite for development and bundling.
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript (ESM modules)
 - **Database ORM**: Drizzle ORM with PostgreSQL
-- **Authentication**: Replit Auth with OpenID Connect
-- **Session Management**: Express sessions with PostgreSQL storage
+- **Authentication**: Replit Auth with OpenID Connect, complemented by Google OAuth and email/password systems using bcrypt hashing and secure session management.
+- **Session Management**: Express sessions with PostgreSQL storage.
 
 ### Mobile-First Design
-- Responsive design optimized for mobile devices
-- Bottom navigation for core app functionality
-- Touch-friendly UI components and interactions
+- Responsive design optimized for mobile devices with touch-friendly UI components.
+- Features bottom navigation for core app functionality and full RTL support for Arabic language.
 
-## Key Components
-
-### Authentication System
-- **Dual Provider**: Google OAuth + Email/Password authentication
-- **Google OAuth**: Passport.js with Google Strategy, fixed session cookie configuration
-- **Email/Password**: bcrypt hashing, comprehensive signup forms with Algeria wilayas
-- **Session Storage**: PostgreSQL-backed sessions with secure cookie settings
-- **User Management**: Automatic user creation, role-based signup flow (seeker/provider/company)
-
-### Service Management
-- **Categories**: Predefined service categories (Plumbing, Electrical, AC Repair, Cleaning, etc.)
-- **Providers**: Service provider profiles with ratings and reviews
-- **Bookings**: Appointment scheduling with status tracking
-- **Reviews**: Customer feedback and rating system
-
-### Database Schema
-- **Users**: Profile information and authentication data
-- **Service Categories**: Categorized service types
-- **Service Providers**: Provider details, availability, and ratings
-- **Bookings**: Appointment scheduling and tracking
-- **Reviews**: Customer feedback and ratings
-- **Sessions**: Authentication session storage
-
-### UI Components
-- **Design System**: shadcn/ui with Radix UI primitives
-- **Theming**: CSS variables for consistent styling
-- **Responsive Layout**: Mobile-first responsive design
-- **Form Controls**: Comprehensive form components with validation
-
-### KYC & Verification System
-- **Identity Verification**: Multi-tier verification system with trust scoring
-- **Free Services Integration**: Didit unlimited KYC, free SMS services
-- **Verification Types**: Email, phone, ID document, background check
-- **Trust Score Algorithm**: 0-100 scoring based on verification completion
-- **Real-time Status**: Live verification progress tracking
-- **Security**: Encrypted document storage and time-limited tokens
-
-### Internationalization System
-- **Multi-language Support**: English, French, and Arabic with full RTL support
-- **Translation Management**: Centralized translation system using Zustand for state management
-- **Language Persistence**: User language preference stored locally and persists across sessions
-- **Dynamic Language Switching**: Real-time language switching without page reload
-- **RTL Support**: Proper right-to-left text direction for Arabic language
-- **Comprehensive Coverage**: All UI elements, messages, and content fully translated
-- **Language Selector**: Compact and full variants available throughout the application
-
-## Data Flow
-
-### User Authentication Flow
-1. User accesses the application
-2. Landing page displayed for unauthenticated users
-3. User clicks "Get Started" and is redirected to Replit Auth
-4. Successful authentication creates/updates user profile
-5. User is redirected to main application
-
-### Service Booking Flow
-1. User browses service categories on home page
-2. User selects a category and views available providers
-3. User selects a provider and views their profile/reviews
-4. User fills out booking form with service details
-5. Booking is created and confirmation is shown
-6. Provider and user can track booking status
-
-### Data Persistence
-- All data stored in PostgreSQL database
-- Drizzle ORM handles database operations
-- Database migrations managed through Drizzle Kit
-- Real-time updates through React Query invalidation
+### Core Features & Design Decisions
+- **Profile System**: Modern redesign with a focus on user experience, including profile picture upload, interactive editing, and removal of a separate settings page.
+- **Translation System**: Comprehensive multi-language support (English, French, Arabic) with `useTranslation` hook, localStorage persistence, and dynamic switching.
+- **Authentication Pages**: Triple authentication login page with Google OAuth, email/password, and Replit Auth, featuring a gradient theme and glassmorphism effects.
+- **Service Icons**: Use of Lucide icons with static icon mapping for consistent display across all interfaces, especially on mobile.
+- **Home & Categories Pages**: Redesigned based on modern app patterns (e.g., TaskRabbit/Thumbtack), featuring intelligent category grouping, enhanced visual hierarchy, and dual view modes.
+- **Admin Panel & Home Page Theming**: Consistent application of a dark gradient theme (gray-900 → blue-900 → purple-900) with glassmorphism effects and animated background orbs.
+- **KYC & Verification**: Multi-tier verification system with trust scoring, including identity verification, free SMS services, and encrypted document storage.
 
 ## External Dependencies
 
 ### Core Dependencies
-- **@neondatabase/serverless**: PostgreSQL database connectivity
-- **drizzle-orm**: Type-safe database ORM
-- **@tanstack/react-query**: Server state management
-- **@radix-ui/***: Accessible UI primitives
-- **react-hook-form**: Form handling and validation
-- **zod**: Schema validation
-- **tailwindcss**: Utility-first CSS framework
+- **@neondatabase/serverless**: PostgreSQL database connectivity.
+- **drizzle-orm**: Type-safe database ORM.
+- **@tanstack/react-query**: Server state management.
+- **@radix-ui/***: Accessible UI primitives.
+- **react-hook-form**: Form handling and validation.
+- **zod**: Schema validation.
+- **tailwindcss**: Utility-first CSS framework.
 
 ### Authentication
-- **passport**: Authentication middleware
-- **openid-client**: OpenID Connect implementation
-- **express-session**: Session management
-- **connect-pg-simple**: PostgreSQL session store
+- **passport**: Authentication middleware for Google OAuth.
+- **openid-client**: OpenID Connect implementation for Replit Auth.
+- **express-session**: Session management.
+- **connect-pg-simple**: PostgreSQL session store.
 
-### Development Tools
-- **vite**: Build tool and development server
-- **typescript**: Type safety
-- **tsx**: TypeScript execution
-- **esbuild**: Fast JavaScript bundler
-
-## Deployment Strategy
-
-### Development Environment
-- **Local Development**: tsx server with hot reloading
-- **Frontend**: Vite dev server with HMR
-- **Database**: Neon PostgreSQL (serverless)
-- **Environment Variables**: DATABASE_URL, SESSION_SECRET, REPLIT_DOMAINS
-
-### Production Build
-- **Frontend**: Vite build to static assets
-- **Backend**: esbuild bundle for Node.js
-- **Database**: Drizzle migrations applied automatically
-- **Session Storage**: PostgreSQL-backed sessions
-
-### Replit Integration
-- **Authentication**: Seamless Replit Auth integration
-- **Development Tools**: Replit-specific development enhancements
-- **Error Handling**: Runtime error overlays for development
-
-### Environment Configuration
-- **Database**: PostgreSQL connection via DATABASE_URL
-- **Sessions**: Secure session management with SESSION_SECRET
-- **Auth**: Replit domains configuration for OIDC
-- **Build**: Separate client and server build processes
-
-The application follows a monorepo structure with shared types and utilities, ensuring type safety across the full stack while maintaining clear separation of concerns between frontend and backend code.
+### Other Integrations
+- **Google Cloud Storage**: Used for profile picture storage.
+- **Google Maps JavaScript API**: Integrated for location services and interactive maps.

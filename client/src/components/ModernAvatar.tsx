@@ -57,14 +57,26 @@ export function ModernAvatar({
 
   // Test image loading
   useEffect(() => {
+    console.log("ModernAvatar: src changed to:", src);
     if (src) {
       setStatus(AvatarStatus.Loading);
       
       const img = new Image();
-      img.onload = () => setStatus(AvatarStatus.Success);
-      img.onerror = () => setStatus(AvatarStatus.Error);
-      img.src = src;
+      img.onload = () => {
+        console.log("ModernAvatar: Image loaded successfully:", src);
+        setStatus(AvatarStatus.Success);
+      };
+      img.onerror = (error) => {
+        console.error("ModernAvatar: Image failed to load:", src, error);
+        setStatus(AvatarStatus.Error);
+      };
+      
+      // Add cache busting for immediate refreshes
+      const cacheBustingSrc = src.includes('?') ? `${src}&t=${Date.now()}` : `${src}?t=${Date.now()}`;
+      img.src = cacheBustingSrc;
+      console.log("ModernAvatar: Testing image with cache busting:", cacheBustingSrc);
     } else {
+      console.log("ModernAvatar: No src provided, using fallback");
       setStatus(AvatarStatus.Fallback);
     }
   }, [src]);
@@ -97,14 +109,20 @@ export function ModernAvatar({
 
   // Successfully loaded image
   if (status === AvatarStatus.Success && src) {
+    // Use cache busting to ensure fresh images
+    const cacheBustingSrc = src.includes('?') ? `${src}&t=${Date.now()}` : `${src}?t=${Date.now()}`;
+    
     return (
       <div className={baseClasses} style={containerStyle}>
         <img
-          src={src}
+          src={cacheBustingSrc}
           alt={name || email || 'User avatar'}
           className="w-full h-full object-cover"
-          onError={() => setStatus(AvatarStatus.Error)}
-          onLoad={() => console.log('Avatar image loaded successfully:', src)}
+          onError={() => {
+            console.error('Avatar image failed to display:', cacheBustingSrc);
+            setStatus(AvatarStatus.Error);
+          }}
+          onLoad={() => console.log('Avatar image displayed successfully:', cacheBustingSrc)}
         />
         {showOnlineStatus && (
           <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white">

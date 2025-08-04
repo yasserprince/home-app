@@ -84,14 +84,32 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
         throw error;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    onSuccess: async (data) => {
+      console.log("Upload success response:", data);
+      console.log("New profile image URL:", data.objectPath);
+      console.log("Updated user data:", data.user);
+      
+      // Update the cache directly with the new user data
+      if (data.user) {
+        queryClient.setQueryData(["/api/auth/user"], data.user);
+        console.log("Cache updated with new user data");
+      }
+      
+      // Force cache invalidation and refetch as backup
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
+      
       toast({
         title: "Success!",
         description: "Your profile picture has been updated successfully.",
       });
       setIsOpen(false);
       resetState();
+      
+      // Call the onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess(data.objectPath);
+      }
     },
     onError: (error: any) => {
       console.error("Upload error:", error);
