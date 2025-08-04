@@ -34,35 +34,49 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
+      console.log("Starting upload process for file:", file.name, file.size, file.type);
       setStep('upload');
       
-      // Get upload URL
-      const uploadResponse = await apiRequest("POST", "/api/objects/upload");
-      const { uploadURL } = uploadResponse as any;
-      
-      if (!uploadURL) {
-        throw new Error('Failed to get upload URL from server');
-      }
-      
-      // Upload to object storage
-      const uploadResult = await fetch(uploadURL, {
-        method: "PUT",
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
+      try {
+        // Get upload URL
+        console.log("Getting upload URL...");
+        const uploadResponse = await apiRequest("POST", "/api/objects/upload");
+        const { uploadURL } = uploadResponse as any;
+        console.log("Upload URL received:", uploadURL ? "Success" : "Failed");
+        
+        if (!uploadURL) {
+          throw new Error('Failed to get upload URL from server');
+        }
+        
+        // Upload to object storage
+        console.log("Uploading file to object storage...");
+        const uploadResult = await fetch(uploadURL, {
+          method: "PUT",
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
 
-      if (!uploadResult.ok) {
-        throw new Error(`Upload failed with status: ${uploadResult.status}`);
-      }
+        console.log("Upload result status:", uploadResult.status, uploadResult.statusText);
+        if (!uploadResult.ok) {
+          const errorText = await uploadResult.text();
+          console.error("Upload failed with response:", errorText);
+          throw new Error(`Upload failed with status: ${uploadResult.status} - ${errorText}`);
+        }
 
-      // Set ACL policy and update profile
-      const response = await apiRequest("PUT", "/api/profile/image", { 
-        imageURL: uploadURL
-      });
-      
-      return response;
+        // Set ACL policy and update profile
+        console.log("Setting ACL policy and updating profile...");
+        const response = await apiRequest("PUT", "/api/profile/image", { 
+          imageURL: uploadURL
+        });
+        console.log("Profile update response:", response);
+        
+        return response;
+      } catch (error) {
+        console.error("Upload mutation error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -150,8 +164,14 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
 
   const getCroppedImg = useCallback(async (): Promise<File> => {
     return new Promise((resolve, reject) => {
+      console.log("Starting image cropping process...");
+      console.log("Completed crop:", completedCrop);
+      console.log("Image ref:", imgRef.current);
+      
       if (!completedCrop || !imgRef.current) {
-        reject(new Error('No crop data available'));
+        const error = new Error('No crop data available - crop or image ref is missing');
+        console.error(error);
+        reject(error);
         return;
       }
 
@@ -160,15 +180,30 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
       const ctx = canvas.getContext('2d');
 
       if (!ctx) {
-        reject(new Error('Could not get canvas context'));
+        const error = new Error('Could not get canvas context');
+        console.error(error);
+        reject(error);
         return;
       }
+
+      console.log("Image dimensions:", {
+        natural: { width: image.naturalWidth, height: image.naturalHeight },
+        display: { width: image.width, height: image.height }
+      });
 
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
 
       canvas.width = completedCrop.width;
       canvas.height = completedCrop.height;
+
+      console.log("Canvas dimensions:", { width: canvas.width, height: canvas.height });
+      console.log("Drawing image with crop:", {
+        sourceX: completedCrop.x * scaleX,
+        sourceY: completedCrop.y * scaleY,
+        sourceWidth: completedCrop.width * scaleX,
+        sourceHeight: completedCrop.height * scaleY
+      });
 
       ctx.drawImage(
         image,
@@ -184,23 +219,31 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
 
       canvas.toBlob((blob) => {
         if (!blob) {
-          reject(new Error('Canvas is empty'));
+          const error = new Error('Canvas is empty - blob generation failed');
+          console.error(error);
+          reject(error);
           return;
         }
 
+        console.log("Canvas blob created, size:", blob.size);
+
         // Compress the cropped image
+        console.log("Starting compression...");
         new Compressor(blob, {
           quality: 0.8,
           maxWidth: 400,
           maxHeight: 400,
           mimeType: 'image/jpeg',
           success: (compressedBlob) => {
+            console.log("Compression successful, size:", compressedBlob.size);
             const file = new File([compressedBlob], 'profile-image.jpg', {
               type: 'image/jpeg',
             });
+            console.log("Final file created:", file.name, file.size, file.type);
             resolve(file);
           },
           error: (err) => {
+            console.error("Compression failed:", err);
             reject(err);
           },
         });
@@ -209,17 +252,38 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
   }, [completedCrop]);
 
   const handleUpload = async () => {
-    if (!completedCrop) return;
+    console.log("Handle upload called, completedCrop:", completedCrop);
+    if (!completedCrop) {
+      console.error("No completed crop available");
+      toast({
+        title: "No Crop Data",
+        description: "Please adjust the crop area before uploading.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsProcessing(true);
     try {
+      console.log("Getting cropped image...");
       const croppedFile = await getCroppedImg();
+      console.log("Cropped file ready, starting upload...");
       await uploadMutation.mutateAsync(croppedFile);
     } catch (error) {
       console.error('Error processing image:', error);
+      let errorMessage = "Failed to process the image. Please try again.";
+      
+      if (error.message?.includes('crop data')) {
+        errorMessage = "Invalid crop selection. Please try cropping again.";
+      } else if (error.message?.includes('Canvas is empty')) {
+        errorMessage = "Image processing failed. Please select a different image.";
+      } else if (error.message?.includes('Compression')) {
+        errorMessage = "Image compression failed. Please try a different image format.";
+      }
+      
       toast({
         title: "Processing Failed",
-        description: "Failed to process the image. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
