@@ -11,9 +11,10 @@ import 'react-image-crop/dist/ReactCrop.css';
 
 interface ModernImageUploaderProps {
   children: React.ReactNode;
+  onSuccess?: (imageUrl: string) => void;
 }
 
-export function ModernImageUploader({ children }: ModernImageUploaderProps) {
+export function ModernImageUploader({ children, onSuccess }: ModernImageUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [src, setSrc] = useState<string>('');
   const [crop, setCrop] = useState<Crop>({
