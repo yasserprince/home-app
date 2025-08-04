@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
+import LoginRedesigned from "@/pages/login-redesigned";
 import Home from "@/pages/home";
 import HomeRedesigned from "@/pages/home-redesigned";
 import Categories from "@/pages/categories";
@@ -46,7 +47,7 @@ function Router() {
       <Route path="/adminspecial" component={AdminSpecial} />
       <Route path="/icon-test" component={IconTest} />
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Login} />
+        <Route path="/" component={LoginRedesigned} />
       ) : (
         <>
           <Route path="/" component={HomeRedesigned} />

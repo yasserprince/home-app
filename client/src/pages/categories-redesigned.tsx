@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { useCategories } from "@/hooks/useCategories";
+import { useTranslation } from "@/hooks/useTranslation";
 import { ModernServiceIcon } from "@/components/modern-service-icon";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -73,24 +74,10 @@ const CATEGORY_GROUPS = {
 
 export default function CategoriesRedesigned() {
   const { categories, isLoading, getCategoryIcon, getCategoryColor } = useCategories();
+  const { t, language, changeLanguage, isRTL } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  // Simple translation function
-  const t = (key: string) => {
-    const translations: Record<string, string> = {
-      'allServices': 'All Services',
-      'searchServices': 'Search services...',
-      'categoriesAvailable': 'categories available',
-      'clearSearch': 'Clear search',
-      'gridView': 'Grid view',
-      'listView': 'List view',
-      'showAll': 'Show All',
-      'services': 'services'
-    };
-    return translations[key] || key;
-  };
 
   // Filter categories based on search and selected group
   const filteredCategories = useMemo(() => {

@@ -40,8 +40,9 @@ export function LanguageSelector({
   const handleLanguageChange = (languageCode: string) => {
     setSelectedLanguage(languageCode);
     onLanguageChange?.(languageCode);
-    // Store in localStorage for persistence
+    // Store in localStorage for persistence and reload page to apply changes
     localStorage.setItem('preferredLanguage', languageCode);
+    window.location.reload();
   };
 
   if (variant === 'compact') {

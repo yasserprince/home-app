@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useCategories } from "@/hooks/useCategories";
-// import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 import { ModernServiceIcon } from "@/components/modern-service-icon";
 import { LanguageSelector } from "@/components/language-selector";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,32 +33,7 @@ export default function HomeRedesigned() {
     getCategoryIcon,
     getCategoryColor 
   } = useCategories();
-  // Simple translation function for now
-  const t = (key: string) => {
-    const translations: Record<string, string> = {
-      'welcomeBack': 'Welcome back',
-      'findYourPerfectService': 'Find your perfect service',
-      'searchServices': 'Search for services...',
-      'profile': 'Profile',
-      'settings': 'Settings',
-      'logout': 'Logout',
-      'myBookings': 'My Bookings',
-      'topRated': 'Top Rated',
-      'allServices': 'All Services',
-      'trending': 'Trending',
-      'popular': 'Popular',
-      'featuredServices': 'Featured Services',
-      'viewAll': 'View All',
-      'whyChooseUs': 'Why Choose Us',
-      'verifiedProviders': 'Verified Providers',
-      'averageRating': 'Average Rating',
-      'recentActivity': 'Recent Activity',
-      'noRecentActivity': 'No recent activity',
-      'startByBookingService': 'Start by booking your first service',
-      'browseServices': 'Browse Services'
-    };
-    return translations[key] || key;
-  };
+  const { t, language, changeLanguage } = useTranslation();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -123,7 +98,10 @@ export default function HomeRedesigned() {
           </div>
           
           <div className="flex items-center space-x-2">
-            <LanguageSelector />
+            <LanguageSelector 
+              currentLanguage={language}
+              onLanguageChange={(lang) => changeLanguage(lang as any)}
+            />
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
