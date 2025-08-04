@@ -42,9 +42,9 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
         console.log("Getting upload URL...");
         const uploadResponse = await apiRequest("POST", "/api/objects/upload");
         console.log("Raw upload response:", uploadResponse);
-        const responseData = await uploadResponse.json();
-        console.log("Parsed response data:", responseData);
-        const { uploadURL } = responseData;
+        const uploadData = await uploadResponse.json();
+        console.log("Parsed response data:", uploadData);
+        const { uploadURL } = uploadData;
         console.log("Extracted uploadURL:", uploadURL);
         console.log("Upload URL received:", uploadURL ? "Success" : "Failed");
         
@@ -74,9 +74,11 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
         const response = await apiRequest("PUT", "/api/profile/image", { 
           imageURL: uploadURL
         });
-        console.log("Profile update response:", response);
+        const responseData = await response.json();
+        console.log("Profile update response:", responseData);
+        console.log("New profile image URL:", responseData.objectPath);
         
-        return response;
+        return responseData;
       } catch (error) {
         console.error("Upload mutation error:", error);
         throw error;
@@ -277,11 +279,11 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
       console.error('Error processing image:', error);
       let errorMessage = "Failed to process the image. Please try again.";
       
-      if (error.message?.includes('crop data')) {
+      if ((error as any)?.message?.includes('crop data')) {
         errorMessage = "Invalid crop selection. Please try cropping again.";
-      } else if (error.message?.includes('Canvas is empty')) {
+      } else if ((error as any)?.message?.includes('Canvas is empty')) {
         errorMessage = "Image processing failed. Please select a different image.";
-      } else if (error.message?.includes('Compression')) {
+      } else if ((error as any)?.message?.includes('Compression')) {
         errorMessage = "Image compression failed. Please try a different image format.";
       }
       

@@ -63,8 +63,8 @@ export default function ProfileEdit() {
         lastName: user.lastName || '',
         phone: user.phone || '',
         bio: user.bio || '',
-        location: user.location || '',
-        gender: user.gender || ''
+        location: user.wilaya || '',
+        gender: user.sex || ''
       });
     }
   }, [user]);
@@ -112,8 +112,8 @@ export default function ProfileEdit() {
         lastName: user.lastName || '',
         phone: user.phone || '',
         bio: user.bio || '',
-        location: user.location || '',
-        gender: user.gender || ''
+        location: user.wilaya || '',
+        gender: user.sex || ''
       });
     }
     setIsEditing(false);
@@ -317,7 +317,7 @@ export default function ProfileEdit() {
                 </Select>
               ) : (
                 <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10 capitalize">
-                  {user?.gender || 'Not set'}
+                  {user?.sex || 'Not set'}
                 </p>
               )}
             </div>
@@ -342,7 +342,7 @@ export default function ProfileEdit() {
                 </Select>
               ) : (
                 <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
-                  {user?.location || 'Not set'}
+                  {user?.wilaya || 'Not set'}
                 </p>
               )}
             </div>
