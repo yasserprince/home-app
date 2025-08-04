@@ -43,8 +43,7 @@ function Router() {
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/adminspecial" component={AdminSpecial} />
       <Route path="/icon-test" component={IconTest} />
-      {/* Force authenticated state for mobile icon testing */}
-      {false ? (
+      {isLoading || !isAuthenticated ? (
         <Route path="/" component={Login} />
       ) : (
         <>
