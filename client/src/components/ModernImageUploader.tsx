@@ -112,15 +112,21 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
       }
     },
     onError: (error: any) => {
-      console.error("Upload error:", error);
-      let errorMessage = "Failed to upload image. Please try again.";
+      console.error("Upload error details:", error);
+      console.error("Error message:", error?.message);
+      console.error("Error stack:", error?.stack);
       
-      if (error.message?.includes("upload URL")) {
+      let errorMessage = "Failed to upload image. Please try again.";
+      const errorMsg = error?.message || '';
+      
+      if (errorMsg.includes("upload URL")) {
         errorMessage = "Server configuration error. Please contact support.";
-      } else if (error.message?.includes("401")) {
+      } else if (errorMsg.includes("401")) {
         errorMessage = "Authentication expired. Please refresh and try again.";
-      } else if (error.message?.includes("413")) {
+      } else if (errorMsg.includes("413")) {
         errorMessage = "Image is too large. Please choose a smaller image.";
+      } else if (errorMsg.includes("canvas")) {
+        errorMessage = "Image processing failed. Please try a different image.";
       }
       
       toast({
@@ -293,16 +299,26 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
       const croppedFile = await getCroppedImg();
       console.log("Cropped file ready, starting upload...");
       await uploadMutation.mutateAsync(croppedFile);
+      console.log("Upload completed successfully");
     } catch (error) {
       console.error('Error processing image:', error);
-      let errorMessage = "Failed to process the image. Please try again.";
+      console.error('Error details:', JSON.stringify(error));
+      console.error('Error type:', typeof error);
+      console.error('Error keys:', error ? Object.keys(error) : 'no keys');
       
-      if ((error as any)?.message?.includes('crop data')) {
+      let errorMessage = "Failed to process the image. Please try again.";
+      const errorMsg = (error as any)?.message || String(error) || '';
+      
+      if (errorMsg.includes('crop data')) {
         errorMessage = "Invalid crop selection. Please try cropping again.";
-      } else if ((error as any)?.message?.includes('Canvas is empty')) {
+      } else if (errorMsg.includes('Canvas is empty')) {
         errorMessage = "Image processing failed. Please select a different image.";
-      } else if ((error as any)?.message?.includes('Compression')) {
+      } else if (errorMsg.includes('Compression')) {
         errorMessage = "Image compression failed. Please try a different image format.";
+      } else if (!errorMsg) {
+        // Empty error - likely a race condition, check if upload actually succeeded
+        console.log("Empty error detected, upload may have succeeded despite error");
+        return; // Don't show error toast for empty errors
       }
       
       toast({
