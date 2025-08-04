@@ -41,7 +41,11 @@ export function ModernImageUploader({ children }: ModernImageUploaderProps) {
         // Get upload URL
         console.log("Getting upload URL...");
         const uploadResponse = await apiRequest("POST", "/api/objects/upload");
-        const { uploadURL } = uploadResponse as any;
+        console.log("Raw upload response:", uploadResponse);
+        const responseData = await uploadResponse.json();
+        console.log("Parsed response data:", responseData);
+        const { uploadURL } = responseData;
+        console.log("Extracted uploadURL:", uploadURL);
         console.log("Upload URL received:", uploadURL ? "Success" : "Failed");
         
         if (!uploadURL) {
