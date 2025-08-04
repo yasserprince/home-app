@@ -1090,6 +1090,11 @@ const translations: Translations = {
     en: 'Save Changes',
     fr: 'Enregistrer les modifications',
     ar: 'حفظ التغييرات'
+  },
+  'profileUpdated': {
+    en: 'Profile updated successfully',
+    fr: 'Profil mis à jour avec succès',
+    ar: 'تم تحديث الملف الشخصي بنجاح'
   }
 };
 

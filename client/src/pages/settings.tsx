@@ -149,11 +149,11 @@ export default function Settings() {
               <div className="flex items-center gap-2">
                 <ProfilePreview user={user} />
                 <Button
-                  variant={isEditing ? "outline" : "default"}
+                  variant="default"
                   size="sm"
                   onClick={() => setIsEditing(!isEditing)}
                 >
-                  {isEditing ? t('cancel') : t('edit')}
+                  {t('edit')}
                 </Button>
               </div>
             </div>

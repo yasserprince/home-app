@@ -45,11 +45,21 @@ export function ProfileImageUploader({ currentImageUrl, userName, className }: P
   });
 
   const handleGetUploadParameters = async () => {
-    const response = await apiRequest("POST", "/api/objects/upload");
-    return {
-      method: "PUT" as const,
-      url: response.uploadURL,
-    };
+    try {
+      const response = await apiRequest("POST", "/api/objects/upload") as { uploadURL: string };
+      return {
+        method: "PUT" as const,
+        url: response.uploadURL,
+      };
+    } catch (error) {
+      console.error("Failed to get upload URL:", error);
+      toast({
+        title: "Upload Error",
+        description: "Failed to prepare image upload. Please try again.",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   const handleUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
