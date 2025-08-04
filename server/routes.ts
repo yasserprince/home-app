@@ -1305,8 +1305,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Upload URL request from user:", req.user?.claims?.sub);
       const objectStorageService = new ObjectStorageService();
+      console.log("About to call getObjectEntityUploadURL...");
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      console.log("Generated upload URL:", uploadURL ? "Success" : "Failed");
+      console.log("Upload URL result:", uploadURL);
+      console.log("Upload URL length:", uploadURL?.length);
+      console.log("Upload URL type:", typeof uploadURL);
       res.json({ uploadURL });
     } catch (error) {
       console.error("Error generating upload URL:", error);

@@ -271,12 +271,18 @@ async function signObjectURL({
   method: "GET" | "PUT" | "DELETE" | "HEAD";
   ttlSec: number;
 }): Promise<string> {
+  console.log("signObjectURL called with:", { bucketName, objectName, method, ttlSec });
+  
   const request = {
     bucket_name: bucketName,
     object_name: objectName,
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
+  
+  console.log("Signing request:", request);
+  console.log("Endpoint:", `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`);
+  
   const response = await fetch(
     `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
     {
@@ -287,13 +293,21 @@ async function signObjectURL({
       body: JSON.stringify(request),
     }
   );
+  
+  console.log("Sidecar response status:", response.status, response.statusText);
+  
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Sidecar error response:", errorText);
     throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, ` +
+      `Failed to sign object URL, errorcode: ${response.status}, response: ${errorText}, ` +
         `make sure you're running on Replit`
     );
   }
 
-  const { signed_url: signedURL } = await response.json();
+  const responseJson = await response.json();
+  console.log("Sidecar response JSON:", responseJson);
+  const { signed_url: signedURL } = responseJson;
+  console.log("Extracted signed URL:", signedURL);
   return signedURL;
 }
