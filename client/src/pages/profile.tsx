@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ModernAvatar from "@/components/ModernAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import BottomNavigation from "@/components/bottom-navigation";
@@ -39,6 +39,7 @@ import {
 export default function Profile() {
   const { user, isLoading } = useAuth();
   const { t } = useTranslation();
+  const [avatarKey, setAvatarKey] = useState(0);
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
@@ -93,24 +94,15 @@ export default function Profile() {
         <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <div className="relative">
-                <Avatar className="w-20 h-20 ring-4 ring-white/20">
-                  <AvatarImage 
-                    src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${Date.now()}` : ''} 
-                    alt={user?.firstName || 'User'} 
-                    onError={(e) => {
-                      console.log('Image failed to load:', user?.profileImageUrl);
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
-                    {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-              </div>
+              <ModernAvatar
+                key={avatarKey}
+                src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${avatarKey || Date.now()}` : null}
+                name={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || ''}
+                email={user?.email || ''}
+                size={80}
+                className="ring-4 ring-white/20"
+                showOnlineStatus={true}
+              />
               
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ModernAvatar from "@/components/ModernAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -47,6 +47,7 @@ export default function ProfileEdit() {
   
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [avatarKey, setAvatarKey] = useState(0); // Force avatar refresh
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -188,20 +189,20 @@ export default function ProfileEdit() {
           <CardContent className="p-6">
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
-                <Avatar className="w-24 h-24 ring-4 ring-white/20">
-                  <AvatarImage 
-                    src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${Date.now()}` : ''} 
-                    alt={user?.firstName || 'User'} 
-                    onError={(e) => {
-                      console.log('Image failed to load:', user?.profileImageUrl);
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-bold">
-                    {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <ModernImageUploader>
+                <ModernAvatar
+                  key={avatarKey} // Force re-render when image changes
+                  src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${avatarKey}` : null}
+                  name={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || ''}
+                  email={user?.email || ''}
+                  size={96}
+                  className="ring-4 ring-white/20"
+                />
+                <ModernImageUploader 
+                  onSuccess={(imageUrl) => {
+                    console.log('Avatar uploaded successfully:', imageUrl);
+                    setAvatarKey(Date.now()); // Force avatar refresh
+                  }}
+                >
                   <Button
                     size="icon"
                     className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white"
