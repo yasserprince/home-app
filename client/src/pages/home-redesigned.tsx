@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCategories } from "@/hooks/useCategories";
 // import { useTranslation } from "@/hooks/useTranslation";
 import { ModernServiceIcon } from "@/components/modern-service-icon";
+import { LanguageSelector } from "@/components/language-selector";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,7 @@ export default function HomeRedesigned() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <Avatar className="w-12 h-12 ring-2 ring-white/20">
-              <AvatarImage src={user?.profileImageUrl} alt={user?.firstName || ''} />
+              <AvatarImage src={user?.profileImageUrl || ''} alt={user?.firstName || ''} />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
                 {user?.firstName?.[0]}{user?.lastName?.[0]}
               </AvatarFallback>
@@ -121,7 +122,9 @@ export default function HomeRedesigned() {
             </div>
           </div>
           
-          <DropdownMenu>
+          <div className="flex items-center space-x-2">
+            <LanguageSelector />
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                 <Settings className="h-5 w-5" />
@@ -157,6 +160,7 @@ export default function HomeRedesigned() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
 
         {/* Enhanced Search Bar */}

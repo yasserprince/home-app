@@ -9,6 +9,7 @@ import Login from "@/pages/login";
 import Home from "@/pages/home";
 import HomeRedesigned from "@/pages/home-redesigned";
 import Categories from "@/pages/categories";
+import CategoriesRedesigned from "@/pages/categories-redesigned";
 import Providers from "@/pages/providers";
 import ProviderDetail from "@/pages/provider-detail";
 import Booking from "@/pages/booking";
@@ -50,7 +51,8 @@ function Router() {
         <>
           <Route path="/" component={HomeRedesigned} />
           <Route path="/home-old" component={Home} />
-          <Route path="/categories" component={Categories} />
+          <Route path="/categories" component={CategoriesRedesigned} />
+          <Route path="/categories-old" component={Categories} />
           <Route path="/providers" component={Providers} />
           <Route path="/provider/:id" component={ProviderDetail} />
           <Route path="/booking" component={Booking} />
