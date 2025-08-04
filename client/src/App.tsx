@@ -30,7 +30,7 @@ import Signup from "@/pages/signup";
 import Signin from "@/pages/signin";
 import EmailSignup from "@/pages/email-signup";
 import EmailSignin from "@/pages/email-signin";
-import Settings from "@/pages/settings";
+
 import IconTest from "@/pages/icon-test";
 import { AdminNav } from "@/components/admin-nav";
 
@@ -66,7 +66,7 @@ function Router() {
           <Route path="/profile/verification" component={Verification} />
           <Route path="/profile/notifications" component={Notifications} />
           <Route path="/profile/help" component={HelpSupport} />
-          <Route path="/settings" component={Settings} />
+          <Route path="/settings" component={ProfileEdit} />
           {user?.role === 'admin' && (
             <Route path="/admin" component={AdminPanel} />
           )}

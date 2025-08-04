@@ -271,7 +271,7 @@ export default function Profile() {
             <i className="fas fa-chevron-right text-gray-400"></i>
           </Button>
 
-          <Link href="/settings">
+          <Link href="/profile/edit">
             <Button
               variant="ghost"
               className="w-full justify-between p-4 h-auto"

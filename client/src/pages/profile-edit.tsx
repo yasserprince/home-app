@@ -1,76 +1,74 @@
-import { useState, useRef } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation, Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, User as UserIcon, MapPin, Shield, Bell, HelpCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
-import { useLocation } from "wouter";
-import { ArrowLeft } from "lucide-react";
+import { ProfileImageUploader } from "@/components/ProfileImageUploader";
+import { ProfilePreview } from "@/components/ProfilePreview";
+import { useTranslation } from "@/hooks/useTranslation";
+import { wilayas } from "@shared/wilayas";
 
 export default function ProfileEdit() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const { t, isRTL } = useTranslation();
+
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
-    email: user?.email || "",
     phone: user?.phone || "",
+    bio: user?.bio || "",
     address: user?.address || "",
-    city: user?.city || "",
-    state: user?.state || "",
-    zipCode: user?.zipCode || "",
-    dateOfBirth: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
-    emergencyContact: user?.emergencyContact || "",
-    emergencyPhone: user?.emergencyPhone || "",
-    notifications: user?.notifications ?? true,
+    wilaya: user?.wilaya || "",
+    locationEnabled: user?.locationEnabled || false,
+    notificationsEnabled: user?.notificationsEnabled || true,
+    role: user?.role || 'seeker'
   });
 
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(user?.profileImageUrl || null);
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phone: user.phone || "",
+        bio: user.bio || "",
+        address: user.address || "",
+        wilaya: user.wilaya || "",
+        locationEnabled: user.locationEnabled || false,
+        notificationsEnabled: user.notificationsEnabled || true,
+        role: user.role || 'seeker'
+      });
+    }
+  }, [user]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: any) => {
-      const formDataToSend = new FormData();
-      
-      // Add all form fields
-      Object.keys(data).forEach(key => {
-        if (data[key] !== null && data[key] !== undefined) {
-          formDataToSend.append(key, data[key]);
-        }
-      });
-      
-      // Add profile image if selected
-      if (profileImage) {
-        formDataToSend.append('profileImage', profileImage);
-      }
-      
-      return await apiRequest("/api/profile", {
-        method: "PUT",
-        body: formDataToSend,
-      });
+      return apiRequest("PUT", "/api/profile", data);
     },
     onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      setLocation("/profile");
-    },
-    onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update profile",
+        title: t('success'),
+        description: t('profileUpdated'),
+      });
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      console.error("Profile update error:", error);
+      toast({
+        title: t('error'),
+        description: t('failedToUpdate'),
         variant: "destructive",
       });
     },
@@ -80,318 +78,256 @@ export default function ProfileEdit() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Error",
-          description: "Image size must be less than 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Check file type
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Error",
-          description: "Please select a valid image file",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setProfileImage(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handleSave = () => {
+    if (isEditing) {
+      updateProfileMutation.mutate(formData);
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateProfileMutation.mutate(formData);
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading profile...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">{t('loading')}...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="bg-primary text-white p-4 pt-12">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/20"
-            onClick={() => setLocation("/profile")}
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <h1 className="text-xl font-semibold">Edit Profile</h1>
+      <div className="bg-primary text-white p-6 pt-12">
+        <div className="flex items-center gap-4 mb-4">
+          <Link href="/profile">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white hover:bg-blue-600 border border-white/20 hover:border-white/40 px-3 py-2"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t('back')}
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-xl font-semibold">{t('editProfile')}</h1>
+            <p className="text-blue-200 text-sm">{t('manageAccountPreferences')}</p>
+          </div>
         </div>
       </div>
 
-      <div className="p-4 -mt-6 bg-gray-50 rounded-t-3xl relative z-10">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile Image */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <i className="fas fa-camera text-primary"></i>
-                <span>Profile Photo</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center space-y-4">
-                <div className="relative">
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-4 border-primary/20"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-                      <i className="fas fa-user text-gray-400 text-2xl"></i>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary/90 transition-colors"
-                  >
-                    <i className="fas fa-pencil text-sm"></i>
-                  </button>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-                <p className="text-sm text-gray-600 text-center">
-                  Click the edit button to upload a new photo
-                  <br />
-                  <span className="text-xs">Max size: 5MB • Formats: JPG, PNG, GIF</span>
-                </p>
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Profile Section */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <UserIcon className="h-5 w-5" />
+              <CardTitle>{t('profileInformation')}</CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant={user?.role === 'admin' ? 'destructive' : 'outline'}>
+                {user?.role?.replace('_', ' ')}
+              </Badge>
+              <div className="flex items-center gap-2">
+                <ProfilePreview user={user} />
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  {t('edit')}
+                </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4 mb-6">
+              <ProfileImageUploader 
+                currentImageUrl={user?.profileImageUrl} 
+                userName={`${user?.firstName || ''} ${user?.lastName || ''}`.trim()}
+              />
+              <div>
+                <h3 className="font-medium text-lg">
+                  {user?.firstName && user?.lastName 
+                    ? `${user.firstName} ${user.lastName}`
+                    : user?.email
+                  }
+                </h3>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+              </div>
+            </div>
 
-          {/* Personal Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <i className="fas fa-user text-primary"></i>
-                <span>Personal Information</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange("firstName", e.target.value)}
-                    placeholder="Enter first name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange("lastName", e.target.value)}
-                    placeholder="Enter last name"
-                  />
-                </div>
-              </div>
-              
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="firstName">{t('firstName')}</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="Enter email address"
+                  id="firstName"
+                  value={isEditing ? formData.firstName : user?.firstName || ''}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  disabled={!isEditing}
+                  placeholder={t('firstName')}
                 />
               </div>
-              
               <div>
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="lastName">{t('lastName')}</Label>
+                <Input
+                  id="lastName"
+                  value={isEditing ? formData.lastName : user?.lastName || ''}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  disabled={!isEditing}
+                  placeholder={t('lastName')}
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">{t('phone')}</Label>
                 <Input
                   id="phone"
                   type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  placeholder="Enter phone number"
+                  value={isEditing ? formData.phone : user?.phone || ''}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  disabled={!isEditing}
+                  placeholder={t('phone')}
                 />
               </div>
-              
               <div>
-                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
-                  id="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                  id="email"
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="bg-gray-50"
                 />
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Address Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <i className="fas fa-map-marker-alt text-primary"></i>
-                <span>Address Information</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="address">Street Address</Label>
+              <div className="col-span-2">
+                <Label htmlFor="bio">Bio (Max 300 characters)</Label>
                 <Textarea
+                  id="bio"
+                  value={isEditing ? formData.bio : user?.bio || ''}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 300) {
+                      handleInputChange('bio', e.target.value);
+                    }
+                  }}
+                  disabled={!isEditing}
+                  placeholder={t('tellUsAboutYourself')}
+                  rows={3}
+                  className="resize-none"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {(isEditing ? formData.bio : user?.bio || '').length}/300 characters
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Location Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              <CardTitle>{t('location')}</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="wilaya">{t('wilaya')}</Label>
+                <select
+                  id="wilaya"
+                  value={isEditing ? formData.wilaya : user?.wilaya || ''}
+                  onChange={(e) => handleInputChange('wilaya', e.target.value)}
+                  disabled={!isEditing}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">{t('selectWilaya')}</option>
+                  {wilayas.map((wilaya) => (
+                    <option key={wilaya.code} value={wilaya.name}>
+                      {wilaya.code} - {wilaya.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="address">{t('address')}</Label>
+                <Input
                   id="address"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange("address", e.target.value)}
-                  placeholder="Enter street address"
-                  rows={2}
+                  value={isEditing ? formData.address : user?.address || ''}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  disabled={!isEditing}
+                  placeholder={t('enterYourAddress')}
                 />
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    value={formData.city}
-                    onChange={(e) => handleInputChange("city", e.target.value)}
-                    placeholder="Enter city"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="state">State</Label>
-                  <Input
-                    id="state"
-                    value={formData.state}
-                    onChange={(e) => handleInputChange("state", e.target.value)}
-                    placeholder="Enter state"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="zipCode">ZIP Code</Label>
-                <Input
-                  id="zipCode"
-                  value={formData.zipCode}
-                  onChange={(e) => handleInputChange("zipCode", e.target.value)}
-                  placeholder="Enter ZIP code"
-                />
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Emergency Contact */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <i className="fas fa-phone text-primary"></i>
-                <span>Emergency Contact</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        {/* Account Management Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              <CardTitle>{t('accountManagement')}</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <Label htmlFor="emergencyContact">Contact Name</Label>
-                <Input
-                  id="emergencyContact"
-                  value={formData.emergencyContact}
-                  onChange={(e) => handleInputChange("emergencyContact", e.target.value)}
-                  placeholder="Enter emergency contact name"
-                />
+                <h4 className="font-medium">{t('accountType')}</h4>
+                <p className="text-sm text-muted-foreground">
+                  {t('currentlySignedUpAs')}: <span className="font-medium capitalize">{user?.role}</span>
+                </p>
               </div>
-              
-              <div>
-                <Label htmlFor="emergencyPhone">Contact Phone</Label>
-                <Input
-                  id="emergencyPhone"
-                  type="tel"
-                  value={formData.emergencyPhone}
-                  onChange={(e) => handleInputChange("emergencyPhone", e.target.value)}
-                  placeholder="Enter emergency contact phone"
-                />
-              </div>
-            </CardContent>
-          </Card>
+              <Link href="/signup-choice">
+                <Button variant="outline" size="sm">
+                  {t('change')}
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Preferences */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <i className="fas fa-cog text-primary"></i>
-                <span>Preferences</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link href="/notifications">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <CardContent className="flex items-center gap-3 p-4">
+                <Bell className="h-5 w-5 text-blue-600" />
                 <div>
-                  <Label htmlFor="notifications" className="text-base font-medium">
-                    Push Notifications
-                  </Label>
-                  <p className="text-sm text-gray-600">
-                    Receive notifications about bookings and updates
-                  </p>
+                  <h4 className="font-medium">{t('notifications')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('manageNotificationSettings')}</p>
                 </div>
-                <Switch
-                  id="notifications"
-                  checked={formData.notifications}
-                  onCheckedChange={(checked) => handleInputChange("notifications", checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          {/* Save Button */}
-          <div className="pt-4">
+          <Link href="/help-support">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <CardContent className="flex items-center gap-3 p-4">
+                <HelpCircle className="h-5 w-5 text-green-600" />
+                <div>
+                  <h4 className="font-medium">{t('helpSupport')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('getHelpOrContactSupport')}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+
+        {/* Save Button - Only show when editing */}
+        {isEditing && (
+          <div className="sticky bottom-6 z-10">
             <Button
-              type="submit"
-              className="w-full py-3 font-medium"
+              onClick={handleSave}
+              className="w-full"
               disabled={updateProfileMutation.isPending}
             >
-              {updateProfileMutation.isPending ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Saving Changes...</span>
-                </div>
-              ) : (
-                <>
-                  <i className="fas fa-save mr-2"></i>
-                  Save Changes
-                </>
-              )}
+              {updateProfileMutation.isPending ? t('saving') : t('saveChanges')}
             </Button>
           </div>
-        </form>
+        )}
       </div>
     </div>
   );
