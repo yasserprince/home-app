@@ -45,6 +45,7 @@ export const users = pgTable("users", {
   state: varchar("state"),
   wilaya: varchar("wilaya"), // Algerian wilaya code for Algerian users
   zipCode: varchar("zip_code"),
+  sex: varchar("sex"), // 'male' or 'female'
   dateOfBirth: timestamp("date_of_birth"),
   emergencyContact: varchar("emergency_contact"),
   emergencyPhone: varchar("emergency_phone"),

@@ -33,6 +33,8 @@ import { LanguageSelector } from "@/components/language-selector";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import { ProfileImageUploader } from "@/components/ProfileImageUploader";
 import { PortfolioManager } from "@/components/PortfolioManager";
+import { ProfilePreview } from "@/components/ProfilePreview";
+import { ALGERIA_WILAYAS } from "@shared/wilayas";
 import type { UploadResult } from "@uppy/core";
 
 export default function Settings() {
@@ -48,7 +50,9 @@ export default function Settings() {
     address: user?.address || '',
     city: user?.city || '',
     state: user?.state || '',
+    wilaya: user?.wilaya || '',
     zipCode: user?.zipCode || '',
+    sex: user?.sex || '',
     notifications: user?.notifications || false,
     role: user?.role || 'service_seeker',
     accountType: user?.accountType || 'individual',
@@ -141,13 +145,16 @@ export default function Settings() {
               <Badge variant={user?.role === 'admin' ? 'destructive' : 'outline'}>
                 {user?.role?.replace('_', ' ')}
               </Badge>
-              <Button
-                variant={isEditing ? "outline" : "default"}
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                {isEditing ? t('cancel') : t('edit')}
-              </Button>
+              <div className="flex items-center gap-2">
+                <ProfilePreview user={user} />
+                <Button
+                  variant={isEditing ? "outline" : "default"}
+                  size="sm"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  {isEditing ? t('cancel') : t('edit')}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -397,6 +404,25 @@ export default function Settings() {
                 />
               </div>
               <div>
+                <Label htmlFor="wilaya">{t('wilaya')}</Label>
+                <Select
+                  value={isEditing ? formData.wilaya : user?.wilaya || ''}
+                  onValueChange={(value) => handleInputChange('wilaya', value)}
+                  disabled={!isEditing}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectWilaya')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ALGERIA_WILAYAS.map((wilaya) => (
+                      <SelectItem key={wilaya.code} value={wilaya.code}>
+                        {language === 'ar' ? wilaya.arabic : wilaya.latin} ({wilaya.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label htmlFor="zipCode">{t('zipCode')}</Label>
                 <Input
                   id="zipCode"
@@ -405,6 +431,26 @@ export default function Settings() {
                   disabled={!isEditing}
                   placeholder={t('zipCode')}
                 />
+              </div>
+            </div>
+            
+            {/* Additional Profile Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <Label htmlFor="sex">{t('sex')}</Label>
+                <Select
+                  value={isEditing ? formData.sex : user?.sex || ''}
+                  onValueChange={(value) => handleInputChange('sex', value)}
+                  disabled={!isEditing}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectSex')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">{t('male')}</SelectItem>
+                    <SelectItem value="female">{t('female')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>

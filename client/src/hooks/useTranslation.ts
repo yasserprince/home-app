@@ -1026,6 +1026,55 @@ const translations: Translations = {
     en: 'Logout',
     fr: 'Déconnexion',
     ar: 'تسجيل خروج'
+  },
+  
+  // Address and personal information
+  'wilaya': {
+    en: 'Wilaya',
+    fr: 'Wilaya',
+    ar: 'الولاية'
+  },
+  'selectWilaya': {
+    en: 'Select Wilaya',
+    fr: 'Sélectionnez la wilaya',
+    ar: 'اختر الولاية'
+  },
+  'sex': {
+    en: 'Sex',
+    fr: 'Sexe',
+    ar: 'الجنس'
+  },
+  'selectSex': {
+    en: 'Select Sex',
+    fr: 'Sélectionnez le sexe',
+    ar: 'اختر الجنس'
+  },
+  'male': {
+    en: 'Male',
+    fr: 'Homme',
+    ar: 'ذكر'
+  },
+  'female': {
+    en: 'Female',
+    fr: 'Femme',
+    ar: 'أنثى'
+  },
+  
+  // Profile preview
+  'previewProfile': {
+    en: 'Preview Profile',
+    fr: 'Aperçu du profil',
+    ar: 'معاينة الملف الشخصي'
+  },
+  'viewAsOthers': {
+    en: 'View as others see you',
+    fr: 'Voir comme les autres vous voient',
+    ar: 'عرض كما يراك الآخرون'
+  },
+  'joinedIn': {
+    en: 'Joined',
+    fr: 'Inscrit',
+    ar: 'انضم في'
   }
 };
 
