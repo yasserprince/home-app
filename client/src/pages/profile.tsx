@@ -5,11 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import BottomNavigation from "@/components/bottom-navigation";
 import { Shield, ShieldCheck, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
-import { useTranslation, getLanguageDirection, translations } from "@/lib/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
-  const { t, language } = useTranslation();
+  const { t, language, isRTL } = useTranslation();
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
@@ -48,7 +48,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20" dir={getLanguageDirection(language)}>
+    <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="bg-primary text-white p-6 pt-12">
         <div className="flex items-center justify-between mb-4">
@@ -83,7 +83,7 @@ export default function Profile() {
             </h1>
             <p className="text-blue-200">{user?.email}</p>
             <p className="text-blue-200 text-sm">
-              Member since {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              {t('memberSince')} {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
             </p>
           </div>
         </div>
@@ -94,18 +94,18 @@ export default function Profile() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900">0</p>
-            <p className="text-sm text-gray-600">Services Booked</p>
+            <p className="text-sm text-gray-600">{t('servicesBooked')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900">$0</p>
-            <p className="text-sm text-gray-600">Total Spent</p>
+            <p className="text-sm text-gray-600">{t('totalSpent')}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center space-x-1">
               <p className="text-2xl font-bold text-gray-900">5.0</p>
               <i className="fas fa-star text-yellow-400 text-sm"></i>
             </div>
-            <p className="text-sm text-gray-600">Your Rating</p>
+            <p className="text-sm text-gray-600">{t('yourRating')}</p>
           </div>
         </div>
 

@@ -691,6 +691,122 @@ const translations: Translations = {
     en: 'Your cancelled bookings will appear here',
     fr: 'Vos réservations annulées apparaîtront ici',
     ar: 'ستظهر حجوزاتك الملغية هنا'
+  },
+  
+  // Categories page translations
+  'trending': {
+    en: 'Trending',
+    fr: 'Tendance',
+    ar: 'الأكثر طلباً'
+  },
+  'homeInfrastructure': {
+    en: 'Home Infrastructure',
+    fr: 'Infrastructure domestique',
+    ar: 'البنية التحتية للمنزل'
+  },
+  'homeImprovement': {
+    en: 'Home Improvement',
+    fr: 'Amélioration de l\'habitat',
+    ar: 'تحسين المنزل'
+  },
+  'cleaningMaintenance': {
+    en: 'Cleaning & Maintenance',
+    fr: 'Nettoyage et entretien',
+    ar: 'التنظيف والصيانة'
+  },
+  'personalServices': {
+    en: 'Personal Services',
+    fr: 'Services personnels',
+    ar: 'الخدمات الشخصية'
+  },
+  'professionalServices': {
+    en: 'Professional Services',
+    fr: 'Services professionnels',
+    ar: 'الخدمات المهنية'
+  },
+  'automotiveTransport': {
+    en: 'Automotive & Transport',
+    fr: 'Automobile et transport',
+    ar: 'السيارات والنقل'
+  },
+  
+  // Common terms
+  'back': {
+    en: 'Back',
+    fr: 'Retour',
+    ar: 'العودة'
+  },
+  'allCategories': {
+    en: 'All Categories',
+    fr: 'Toutes les catégories',
+    ar: 'جميع الفئات'
+  },
+  'searchCategories': {
+    en: 'Search categories...',
+    fr: 'Rechercher des catégories...',
+    ar: 'البحث في الفئات...'
+  },
+  'allServices': {
+    en: 'All Services',
+    fr: 'Tous les services',
+    ar: 'جميع الخدمات'
+  },
+  'categoriesAvailable': {
+    en: 'categories available',
+    fr: 'catégories disponibles',
+    ar: 'فئة متاحة'
+  },
+  'searchServices': {
+    en: 'Search services...',
+    fr: 'Rechercher des services...',
+    ar: 'البحث في الخدمات...'
+  },
+  'showAll': {
+    en: 'Show All',
+    fr: 'Afficher tout',
+    ar: 'إظهار الكل'
+  },
+  'services': {
+    en: 'services',
+    fr: 'services',
+    ar: 'خدمات'
+  },
+  'from': {
+    en: 'from',
+    fr: 'à partir de',
+    ar: 'من'
+  },
+  'bookNow': {
+    en: 'Book Now',
+    fr: 'Réserver maintenant',
+    ar: 'احجز الآن'
+  },
+  
+  // Profile page specific
+  'editProfile': {
+    en: 'Edit Profile',
+    fr: 'Modifier le profil',
+    ar: 'تعديل الملف الشخصي'
+  },
+  'servicesBooked': {
+    en: 'Services Booked',
+    fr: 'Services réservés',
+    ar: 'الخدمات المحجوزة'
+  },
+  'totalSpent': {
+    en: 'Total Spent',
+    fr: 'Total dépensé',
+    ar: 'إجمالي المبلغ المنفق'
+  },
+  'yourRating': {
+    en: 'Your Rating',
+    fr: 'Votre note',
+    ar: 'تقييمك'
+  },
+  'memberSince': {
+    en: 'Member since',
+    fr: 'Membre depuis',
+    ar: 'عضو منذ'
   }
 };
 

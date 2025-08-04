@@ -26,51 +26,51 @@ import {
   Calculator
 } from "lucide-react";
 
-// Category groups for better organization
-const CATEGORY_GROUPS = {
+// Category groups for better organization - will be translated
+const getCategoryGroups = (t: (key: string) => string) => ({
   trending: {
-    name: "Trending",
+    name: t('trending'),
     icon: TrendingUp,
     color: "hsl(39, 96%, 49%)",
     categories: ["House Cleaning", "Handyman", "TV Mounting", "Furniture Assembly", "Plumbing", "Electrical"]
   },
   home: {
-    name: "Home Infrastructure", 
+    name: t('homeInfrastructure'), 
     icon: HomeIcon,
     color: "hsl(207, 90%, 54%)",
     categories: ["Plumbing", "Electrical", "HVAC", "Roofing", "Security Systems"]
   },
   improvement: {
-    name: "Home Improvement",
+    name: t('homeImprovement'),
     icon: Zap,
     color: "hsl(25, 85%, 55%)",
     categories: ["Kitchen Remodeling", "Bathroom Remodeling", "Painting", "Flooring", "Carpentry", "Handyman"]
   },
   cleaning: {
-    name: "Cleaning & Maintenance",
+    name: t('cleaningMaintenance'),
     icon: Zap,
     color: "hsl(142, 71%, 45%)",
     categories: ["House Cleaning", "Carpet Cleaning", "Window Cleaning", "Pressure Washing", "Junk Removal"]
   },
   personal: {
-    name: "Personal Services",
+    name: t('personalServices'),
     icon: User,
     color: "hsl(291, 64%, 58%)",
     categories: ["Pet Services", "Personal Training", "Tutoring", "Photography", "Massage Therapy", "Elder Care"]
   },
   professional: {
-    name: "Professional Services",
+    name: t('professionalServices'),
     icon: Calculator,
     color: "hsl(217, 91%, 60%)",
     categories: ["Accounting", "Legal Services", "Web Design"]
   },
   automotive: {
-    name: "Automotive & Transport",
+    name: t('automotiveTransport'),
     icon: Car,
     color: "hsl(0, 84%, 60%)",
     categories: ["Auto Repair", "Car Detailing"]
   }
-};
+});
 
 export default function CategoriesRedesigned() {
   const { categories, isLoading, getCategoryIcon, getCategoryColor } = useCategories();
@@ -78,6 +78,8 @@ export default function CategoriesRedesigned() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  const CATEGORY_GROUPS = getCategoryGroups(t);
 
   // Filter categories based on search and selected group
   const filteredCategories = useMemo(() => {
