@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProfileImageUploader } from "@/components/ProfileImageUploader";
+import { ModernImageUploader } from "@/components/ModernImageUploader";
 import { LanguageSelector } from "@/components/language-selector";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -194,10 +194,10 @@ export default function ProfileEdit() {
                     alt={user?.firstName || 'User'} 
                   />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-bold">
-                    {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                    {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <ProfileImageUploader>
+                <ModernImageUploader>
                   <Button
                     size="icon"
                     className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white"
@@ -205,7 +205,7 @@ export default function ProfileEdit() {
                   >
                     <Camera className="w-4 h-4" />
                   </Button>
-                </ProfileImageUploader>
+                </ModernImageUploader>
               </div>
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-white">

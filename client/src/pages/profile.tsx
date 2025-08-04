@@ -100,7 +100,7 @@ export default function Profile() {
                     alt={user?.firstName || 'User'} 
                   />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
-                    {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                    {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
