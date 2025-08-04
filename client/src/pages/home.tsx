@@ -12,9 +12,8 @@ import BottomNavigation from "@/components/bottom-navigation";
 
 import { SimpleServiceIcon } from "@/components/simple-service-icon";
 import { MobileEnhancedIcon } from "@/components/mobile-enhanced-icon";
-import { IconDebug } from "@/components/icon-debug";
-import { ForceIconRefresh } from "@/components/force-icon-refresh";
-import { MobileIconDebug } from "@/components/mobile-icon-debug";
+import { IconRenderTest } from "@/components/icon-render-test";
+
 import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown, Star, Calendar } from "lucide-react";
 import { 
   DropdownMenu,
@@ -486,12 +485,14 @@ export default function Home() {
         </div>
       </div>
 
-      <IconDebug />
-      <MobileIconDebug />
+
       
       <div className="pb-20">
         <BottomNavigation activeTab="home" />
       </div>
+      
+      {/* Mobile icon debugging test component */}
+      <IconRenderTest />
     </div>
   );
 }
