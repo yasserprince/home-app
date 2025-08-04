@@ -1075,6 +1075,21 @@ const translations: Translations = {
     en: 'Joined',
     fr: 'Inscrit',
     ar: 'انضم في'
+  },
+  'failedToUpdate': {
+    en: 'Failed to update profile',
+    fr: 'Échec de la mise à jour du profil',
+    ar: 'فشل في تحديث الملف الشخصي'
+  },
+  'saving': {
+    en: 'Saving...',
+    fr: 'Enregistrement...',
+    ar: 'حفظ...'
+  },
+  'saveChanges': {
+    en: 'Save Changes',
+    fr: 'Enregistrer les modifications',
+    ar: 'حفظ التغييرات'
   }
 };
 

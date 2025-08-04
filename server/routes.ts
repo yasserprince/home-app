@@ -241,7 +241,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Profile update route
   app.put('/api/profile', isAnyAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      // Handle different auth types
+      const userId = req.user?.claims?.sub || req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: 'User ID not found in session' });
+      }
+      
       const updates = req.body;
       
       // Validate role change if provided
@@ -270,7 +276,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Location update route
   app.put('/api/location', isAnyAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      // Handle different auth types
+      const userId = req.user?.claims?.sub || req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: 'User ID not found in session' });
+      }
+      
       const { locationEnabled, latitude, longitude } = req.body;
       
       const updates: any = { locationEnabled };

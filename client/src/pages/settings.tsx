@@ -93,6 +93,7 @@ export default function Settings() {
   });
 
   const handleSave = () => {
+    console.log('Saving profile data:', formData);
     updateProfileMutation.mutate(formData);
   };
 
@@ -456,28 +457,7 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Language Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="h-5 w-5">🌐</div>
-              <CardTitle>{t('language')}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base font-medium">
-                  {t('selectLanguage')}
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Choose your preferred language
-                </p>
-              </div>
-              <LanguageSelector />
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Notifications Section */}
         <Card>
@@ -577,6 +557,30 @@ export default function Settings() {
             userId={user.id} 
             isProvider={true} 
           />
+        )}
+
+        {/* Save Button at Bottom */}
+        {isEditing && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                >
+                  {t('cancel')}
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={updateProfileMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {updateProfileMutation.isPending ? t('saving') : t('saveChanges')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
 
