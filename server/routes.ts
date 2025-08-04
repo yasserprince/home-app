@@ -481,58 +481,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object storage endpoints for profile image uploads
-  app.post('/api/objects/upload', isAuthenticated, async (req: any, res) => {
-    try {
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      res.json({ uploadURL });
-    } catch (error) {
-      console.error("Error getting upload URL:", error);
-      res.status(500).json({ 
-        error: "Failed to get upload URL",
-        message: "Unable to prepare file upload. Please try again."
-      });
-    }
-  });
+  // Deprecated - moved to proper object storage section below around line 1353
 
-  // Set ACL policy for uploaded profile images (public visibility)
-  app.put('/api/profile/image', isAuthenticated, async (req: any, res) => {
-    try {
-      const { imageURL } = req.body;
-      if (!imageURL) {
-        return res.status(400).json({ error: "imageURL is required" });
-      }
-
-      const userId = req.user?.claims?.sub;
-      const objectStorageService = new ObjectStorageService();
-      
-      // Set ACL policy for profile image (public visibility)
-      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-        imageURL,
-        {
-          owner: userId,
-          visibility: "public", // Profile images are public
-        }
-      );
-
-      // Update user profile with new image path
-      await storage.updateUser(userId, {
-        profileImageUrl: objectPath
-      });
-
-      res.json({
-        objectPath: objectPath,
-        message: "Profile image updated successfully"
-      });
-    } catch (error) {
-      console.error("Error setting profile image:", error);
-      res.status(500).json({ 
-        error: "Failed to update profile image",
-        message: "Unable to save profile image. Please try again."
-      });
-    }
-  });
+  // Deprecated - moved to proper object storage section below around line 1360
 
   // Serve private objects with ACL check
   app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {

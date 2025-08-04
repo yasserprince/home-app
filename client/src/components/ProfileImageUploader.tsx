@@ -33,10 +33,11 @@ export function ProfileImageUploader({ currentImageUrl, userName, className }: P
       });
 
       // Get upload URL
-      const uploadResponse = await apiRequest("POST", "/api/objects/upload") as { uploadURL: string };
+      const uploadResponse = await apiRequest("POST", "/api/objects/upload");
+      const uploadURL = (uploadResponse as any).uploadURL;
       
       // Upload to object storage
-      const uploadResult = await fetch(uploadResponse.uploadURL, {
+      const uploadResult = await fetch(uploadURL, {
         method: "PUT",
         body: compressedBlob,
         headers: {
@@ -50,7 +51,7 @@ export function ProfileImageUploader({ currentImageUrl, userName, className }: P
 
       // Set ACL policy and update profile
       const response = await apiRequest("PUT", "/api/profile/image", { 
-        imageURL: uploadResponse.uploadURL 
+        imageURL: uploadURL 
       });
       return response;
     },
