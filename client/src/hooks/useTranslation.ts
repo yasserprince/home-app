@@ -166,6 +166,369 @@ const translations: Translations = {
     fr: 'services',
     ar: 'خدمات'
   },
+  'noServicesFound': {
+    en: 'No services found',
+    fr: 'Aucun service trouvé',
+    ar: 'لم يتم العثور على خدمات'
+  },
+  'tryAdjustingFilters': {
+    en: 'Try adjusting your search or filters',
+    fr: 'Essayez d\'ajuster votre recherche ou vos filtres',
+    ar: 'حاول تعديل البحث أو المرشحات'
+  },
+  'clearFilters': {
+    en: 'Clear filters',
+    fr: 'Effacer les filtres',
+    ar: 'مسح المرشحات'
+  },
+
+  // Navigation & Menu
+  'home': {
+    en: 'Home',
+    fr: 'Accueil',
+    ar: 'الرئيسية'
+  },
+  'categories': {
+    en: 'Categories',
+    fr: 'Catégories',
+    ar: 'الفئات'
+  },
+  'bookings': {
+    en: 'Bookings',
+    fr: 'Réservations',
+    ar: 'الحجوزات'
+  },
+  'providers': {
+    en: 'Providers',
+    fr: 'Fournisseurs',
+    ar: 'مقدمو الخدمات'
+  },
+
+  // Profile & User Management
+  'firstName': {
+    en: 'First Name',
+    fr: 'Prénom',
+    ar: 'الاسم الأول'
+  },
+  'lastName': {
+    en: 'Last Name',
+    fr: 'Nom de famille',
+    ar: 'اسم العائلة'
+  },
+  'phoneNumber': {
+    en: 'Phone Number',
+    fr: 'Numéro de téléphone',
+    ar: 'رقم الهاتف'
+  },
+  'dateOfBirth': {
+    en: 'Date of Birth',
+    fr: 'Date de naissance',
+    ar: 'تاريخ الميلاد'
+  },
+  'gender': {
+    en: 'Gender',
+    fr: 'Genre',
+    ar: 'الجنس'
+  },
+  'location': {
+    en: 'Location',
+    fr: 'Localisation',
+    ar: 'الموقع'
+  },
+  'bio': {
+    en: 'Bio',
+    fr: 'Biographie',
+    ar: 'السيرة الذاتية'
+  },
+  'editProfile': {
+    en: 'Edit Profile',
+    fr: 'Modifier le profil',
+    ar: 'تحرير الملف الشخصي'
+  },
+  'saveChanges': {
+    en: 'Save Changes',
+    fr: 'Enregistrer les modifications',
+    ar: 'حفظ التغييرات'
+  },
+  'cancel': {
+    en: 'Cancel',
+    fr: 'Annuler',
+    ar: 'إلغاء'
+  },
+
+  // Booking & Services
+  'bookNow': {
+    en: 'Book Now',
+    fr: 'Réserver maintenant',
+    ar: 'احجز الآن'
+  },
+  'selectDate': {
+    en: 'Select Date',
+    fr: 'Sélectionner la date',
+    ar: 'اختر التاريخ'
+  },
+  'selectTime': {
+    en: 'Select Time',
+    fr: 'Sélectionner l\'heure',
+    ar: 'اختر الوقت'
+  },
+  'serviceDetails': {
+    en: 'Service Details',
+    fr: 'Détails du service',
+    ar: 'تفاصيل الخدمة'
+  },
+  'price': {
+    en: 'Price',
+    fr: 'Prix',
+    ar: 'السعر'
+  },
+  'duration': {
+    en: 'Duration',
+    fr: 'Durée',
+    ar: 'المدة'
+  },
+  'rating': {
+    en: 'Rating',
+    fr: 'Note',
+    ar: 'التقييم'
+  },
+  'reviews': {
+    en: 'Reviews',
+    fr: 'Avis',
+    ar: 'المراجعات'
+  },
+  'availability': {
+    en: 'Availability',
+    fr: 'Disponibilité',
+    ar: 'التوفر'
+  },
+
+  // Status & States
+  'pending': {
+    en: 'Pending',
+    fr: 'En attente',
+    ar: 'معلق'
+  },
+  'confirmed': {
+    en: 'Confirmed',
+    fr: 'Confirmé',
+    ar: 'مؤكد'
+  },
+  'completed': {
+    en: 'Completed',
+    fr: 'Terminé',
+    ar: 'مكتمل'
+  },
+  'cancelled': {
+    en: 'Cancelled',
+    fr: 'Annulé',
+    ar: 'ملغى'
+  },
+  'available': {
+    en: 'Available',
+    fr: 'Disponible',
+    ar: 'متاح'
+  },
+  'unavailable': {
+    en: 'Unavailable',
+    fr: 'Indisponible',
+    ar: 'غير متاح'
+  },
+
+  // Common Actions
+  'search': {
+    en: 'Search',
+    fr: 'Rechercher',
+    ar: 'بحث'
+  },
+  'filter': {
+    en: 'Filter',
+    fr: 'Filtrer',
+    ar: 'تصفية'
+  },
+  'sort': {
+    en: 'Sort',
+    fr: 'Trier',
+    ar: 'ترتيب'
+  },
+  'edit': {
+    en: 'Edit',
+    fr: 'Modifier',
+    ar: 'تحرير'
+  },
+  'delete': {
+    en: 'Delete',
+    fr: 'Supprimer',
+    ar: 'حذف'
+  },
+  'save': {
+    en: 'Save',
+    fr: 'Enregistrer',
+    ar: 'حفظ'
+  },
+  'back': {
+    en: 'Back',
+    fr: 'Retour',
+    ar: 'رجوع'
+  },
+  'next': {
+    en: 'Next',
+    fr: 'Suivant',
+    ar: 'التالي'
+  },
+  'previous': {
+    en: 'Previous',
+    fr: 'Précédent',
+    ar: 'السابق'
+  },
+  'confirm': {
+    en: 'Confirm',
+    fr: 'Confirmer',
+    ar: 'تأكيد'
+  },
+  'close': {
+    en: 'Close',
+    fr: 'Fermer',
+    ar: 'إغلاق'
+  },
+  'loading': {
+    en: 'Loading...',
+    fr: 'Chargement...',
+    ar: 'جاري التحميل...'
+  },
+
+  // Time & Date
+  'today': {
+    en: 'Today',
+    fr: 'Aujourd\'hui',
+    ar: 'اليوم'
+  },
+  'tomorrow': {
+    en: 'Tomorrow',
+    fr: 'Demain',
+    ar: 'غداً'
+  },
+  'thisWeek': {
+    en: 'This Week',
+    fr: 'Cette semaine',
+    ar: 'هذا الأسبوع'
+  },
+  'nextWeek': {
+    en: 'Next Week',
+    fr: 'La semaine prochaine',
+    ar: 'الأسبوع القادم'
+  },
+  'morning': {
+    en: 'Morning',
+    fr: 'Matin',
+    ar: 'صباح'
+  },
+  'afternoon': {
+    en: 'Afternoon',
+    fr: 'Après-midi',
+    ar: 'بعد الظهر'
+  },
+  'evening': {
+    en: 'Evening',
+    fr: 'Soir',
+    ar: 'مساء'
+  },
+
+  // Messages & Notifications
+  'success': {
+    en: 'Success',
+    fr: 'Succès',
+    ar: 'نجح'
+  },
+  'error': {
+    en: 'Error',
+    fr: 'Erreur',
+    ar: 'خطأ'
+  },
+  'warning': {
+    en: 'Warning',
+    fr: 'Avertissement',
+    ar: 'تحذير'
+  },
+  'info': {
+    en: 'Info',
+    fr: 'Information',
+    ar: 'معلومات'
+  },
+  
+  // Profile specific
+  'myBookings': {
+    en: 'My Bookings',
+    fr: 'Mes réservations',
+    ar: 'حجوزاتي'
+  },
+  'favorites': {
+    en: 'Favorites',
+    fr: 'Favoris',
+    ar: 'المفضلات'
+  },
+  'paymentMethods': {
+    en: 'Payment Methods',
+    fr: 'Méthodes de paiement',
+    ar: 'طرق الدفع'
+  },
+  'settings': {
+    en: 'Settings',
+    fr: 'Paramètres',
+    ar: 'الإعدادات'
+  },
+  'helpSupport': {
+    en: 'Help & Support',
+    fr: 'Aide et support',
+    ar: 'المساعدة والدعم'
+  },
+  'logout': {
+    en: 'Logout',
+    fr: 'Déconnexion',
+    ar: 'تسجيل الخروج'
+  },
+
+  // Booking status and actions
+  'active': {
+    en: 'Active',
+    fr: 'Actif',
+    ar: 'نشط'
+  },
+  'past': {
+    en: 'Past',
+    fr: 'Passé',
+    ar: 'السابق'
+  },
+  'upcoming': {
+    en: 'Upcoming',
+    fr: 'À venir',
+    ar: 'القادم'
+  },
+  'cancelBooking': {
+    en: 'Cancel Booking',
+    fr: 'Annuler la réservation',
+    ar: 'إلغاء الحجز'
+  },
+  'viewDetails': {
+    en: 'View Details',
+    fr: 'Voir les détails',
+    ar: 'عرض التفاصيل'
+  },
+  'noBookingsYet': {
+    en: 'No bookings yet',
+    fr: 'Aucune réservation encore',
+    ar: 'لا توجد حجوزات بعد'
+  },
+  'getStarted': {
+    en: 'Get started by booking your first service',
+    fr: 'Commencez par réserver votre premier service',
+    ar: 'ابدأ بحجز خدمتك الأولى'
+  },
+  'browseServices': {
+    en: 'Browse Services',
+    fr: 'Parcourir les services',
+    ar: 'تصفح الخدمات'
+  },
 
   // Login Page
   'welcomeToServiceNow': {
@@ -232,6 +595,102 @@ const translations: Translations = {
     en: 'Sign in here',
     fr: 'Connectez-vous ici',
     ar: 'سجل الدخول هنا'
+  },
+  
+  // Toast messages and additional common terms
+  'bookingCancelledSuccess': {
+    en: 'Booking cancelled successfully',
+    fr: 'Réservation annulée avec succès',
+    ar: 'تم إلغاء الحجز بنجاح'
+  },
+  'unauthorized': {
+    en: 'Unauthorized',
+    fr: 'Non autorisé',
+    ar: 'غير مُصرح'
+  },
+  'loggedOutRedirecting': {
+    en: 'You are logged out. Logging in again...',
+    fr: 'Vous êtes déconnecté. Reconnexion en cours...',
+    ar: 'تم تسجيل خروجك. جاري تسجيل الدخول مرة أخرى...'
+  },
+  'failedToCancelBooking': {
+    en: 'Failed to cancel booking',
+    fr: 'Échec de l\'annulation de la réservation',
+    ar: 'فشل في إلغاء الحجز'
+  },
+  'myProfile': {
+    en: 'My Profile',
+    fr: 'Mon profil',
+    ar: 'ملفي الشخصي'
+  },
+  
+  // Booking specific terms
+  'dateTime': {
+    en: 'Date & Time',
+    fr: 'Date et heure',
+    ar: 'التاريخ والوقت'
+  },
+  'totalCost': {
+    en: 'Total Cost',
+    fr: 'Coût total',
+    ar: 'التكلفة الإجمالية'
+  },
+  'call': {
+    en: 'Call',
+    fr: 'Appeler',
+    ar: 'اتصال'
+  },
+  'message': {
+    en: 'Message',
+    fr: 'Message',
+    ar: 'رسالة'
+  },
+  'cancel': {
+    en: 'Cancel',
+    fr: 'Annuler',
+    ar: 'إلغاء'
+  },
+  'completed': {
+    en: 'Completed',
+    fr: 'Terminé',
+    ar: 'مكتمل'
+  },
+  'cancelled': {
+    en: 'Cancelled',
+    fr: 'Annulé',
+    ar: 'ملغي'
+  },
+  
+  // Empty states
+  'noUpcomingBookings': {
+    en: 'No upcoming bookings',
+    fr: 'Aucune réservation à venir',
+    ar: 'لا توجد حجوزات قادمة'
+  },
+  'bookServiceToSeeAppointments': {
+    en: 'Book a service to see your appointments here',
+    fr: 'Réservez un service pour voir vos rendez-vous ici',
+    ar: 'احجز خدمة لرؤية مواعيدك هنا'
+  },
+  'noCompletedBookings': {
+    en: 'No completed bookings',
+    fr: 'Aucune réservation terminée',
+    ar: 'لا توجد حجوزات مكتملة'
+  },
+  'completedBookingsWillAppear': {
+    en: 'Your completed bookings will appear here',
+    fr: 'Vos réservations terminées apparaîtront ici',
+    ar: 'ستظهر حجوزاتك المكتملة هنا'
+  },
+  'noCancelledBookings': {
+    en: 'No cancelled bookings',
+    fr: 'Aucune réservation annulée',
+    ar: 'لا توجد حجوزات ملغية'
+  },
+  'cancelledBookingsWillAppear': {
+    en: 'Your cancelled bookings will appear here',
+    fr: 'Vos réservations annulées apparaîtront ici',
+    ar: 'ستظهر حجوزاتك الملغية هنا'
   }
 };
 

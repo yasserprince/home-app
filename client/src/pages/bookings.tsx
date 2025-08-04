@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 export default function Bookings() {
   const { user, isLoading: userLoading } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: bookings, isLoading } = useQuery({
@@ -29,16 +31,16 @@ export default function Bookings() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Booking cancelled successfully",
+        title: t('success'),
+        description: t('bookingCancelledSuccess'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: t('unauthorized'),
+          description: t('loggedOutRedirecting'),
           variant: "destructive",
         });
         setTimeout(() => {
@@ -47,8 +49,8 @@ export default function Bookings() {
         return;
       }
       toast({
-        title: "Error",
-        description: "Failed to cancel booking",
+        title: t('error'),
+        description: t('failedToCancelBooking'),
         variant: "destructive",
       });
     },
@@ -112,7 +114,7 @@ export default function Bookings() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <div className="bg-white p-4 pt-12 border-b border-gray-200">
-        <h1 className="text-xl font-semibold text-gray-900">My Bookings</h1>
+        <h1 className="text-xl font-semibold text-gray-900">{t('myBookings')}</h1>
       </div>
 
       {/* Booking Tabs */}
@@ -120,13 +122,13 @@ export default function Bookings() {
         <div className="bg-white px-4 pb-4">
           <TabsList className="grid w-full grid-cols-3 bg-gray-100 h-10">
             <TabsTrigger value="upcoming" className="text-sm font-medium">
-              Upcoming
+              {t('upcoming')}
             </TabsTrigger>
             <TabsTrigger value="completed" className="text-sm font-medium">
-              Completed
+              {t('completed')}
             </TabsTrigger>
             <TabsTrigger value="cancelled" className="text-sm font-medium">
-              Cancelled
+              {t('cancelled')}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -184,7 +186,7 @@ export default function Bookings() {
 
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <p className="text-xs text-gray-600">Date & Time</p>
+                      <p className="text-xs text-gray-600">{t('dateTime')}</p>
                       <p className="text-sm font-medium text-gray-900">
                         {new Date(booking.scheduledDate).toLocaleDateString('en-US', { 
                           month: 'short', 
@@ -193,7 +195,7 @@ export default function Bookings() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600">Total Cost</p>
+                      <p className="text-xs text-gray-600">{t('totalCost')}</p>
                       <p className="text-sm font-medium text-gray-900">
                         ${booking.estimatedCost}
                       </p>
@@ -203,11 +205,11 @@ export default function Bookings() {
                   <div className="flex space-x-3">
                     <Button variant="secondary" className="flex-1" size="sm" disabled>
                       <i className="fas fa-phone mr-1 text-xs"></i>
-                      Call
+                      {t('call')}
                     </Button>
                     <Button variant="secondary" className="flex-1" size="sm" disabled>
                       <i className="fas fa-comment mr-1 text-xs"></i>
-                      Message
+                      {t('message')}
                     </Button>
                     <Button
                       variant="destructive"
@@ -216,7 +218,7 @@ export default function Bookings() {
                       onClick={() => cancelBookingMutation.mutate(booking.id)}
                       disabled={cancelBookingMutation.isPending}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Button>
                   </div>
                 </CardContent>
@@ -228,9 +230,9 @@ export default function Bookings() {
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <i className="fas fa-calendar text-gray-400 text-2xl"></i>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-2">No upcoming bookings</h3>
+                <h3 className="font-medium text-gray-900 mb-2">{t('noUpcomingBookings')}</h3>
                 <p className="text-sm text-gray-600">
-                  Book a service to see your appointments here
+                  {t('bookServiceToSeeAppointments')}
                 </p>
               </CardContent>
             </Card>

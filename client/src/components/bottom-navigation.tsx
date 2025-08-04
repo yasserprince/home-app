@@ -1,12 +1,15 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Home, Calendar, User } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface BottomNavigationProps {
   activeTab: 'home' | 'bookings' | 'profile';
 }
 
 export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-white/20 shadow-lg">
       <div className="max-w-md mx-auto">
@@ -22,7 +25,7 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
             >
               <Home className={`w-6 h-6 ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-500'}`} strokeWidth={2} />
               <span className={`text-xs font-medium ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-500'}`}>
-                Home
+                {t('home')}
               </span>
             </Button>
           </Link>
@@ -38,7 +41,7 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
             >
               <Calendar className={`w-6 h-6 ${activeTab === 'bookings' ? 'text-blue-600' : 'text-gray-500'}`} strokeWidth={2} />
               <span className={`text-xs font-medium ${activeTab === 'bookings' ? 'text-blue-600' : 'text-gray-500'}`}>
-                Bookings
+                {t('bookings')}
               </span>
             </Button>
           </Link>
@@ -54,7 +57,7 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
             >
               <User className={`w-6 h-6 ${activeTab === 'profile' ? 'text-blue-600' : 'text-gray-500'}`} strokeWidth={2} />
               <span className={`text-xs font-medium ${activeTab === 'profile' ? 'text-blue-600' : 'text-gray-500'}`}>
-                Profile
+                {t('profile')}
               </span>
             </Button>
           </Link>

@@ -335,8 +335,8 @@ export default function CategoriesRedesigned() {
         {filteredCategories.length === 0 && (
           <div className="text-center py-12">
             <Search className="w-16 h-16 text-white/30 mx-auto mb-4" />
-            <h3 className="text-white text-xl font-semibold mb-2">No services found</h3>
-            <p className="text-white/70 mb-4">Try adjusting your search or filters</p>
+            <h3 className="text-white text-xl font-semibold mb-2">{t('noServicesFound')}</h3>
+            <p className="text-white/70 mb-4">{t('tryAdjustingFilters')}</p>
             <Button 
               onClick={() => {
                 setSearchQuery("");
@@ -344,7 +344,7 @@ export default function CategoriesRedesigned() {
               }}
               className="bg-white text-gray-900 hover:bg-white/90"
             >
-              Clear filters
+              {t('clearFilters')}
             </Button>
           </div>
         )}
