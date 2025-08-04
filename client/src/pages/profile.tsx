@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import BottomNavigation from "@/components/bottom-navigation";
 import { LanguageSelector } from "@/components/language-selector";
+import { ProfileImageUploader } from "@/components/ProfileImageUploader";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +33,8 @@ import {
   MoreVertical,
   Verified,
   Award,
-  Clock
+  Clock,
+  Camera
 } from "lucide-react";
 
 export default function Profile() {
@@ -102,7 +104,20 @@ export default function Profile() {
                     {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                
+                {/* Profile Image Upload Button */}
+                <ProfileImageUploader>
+                  <Button
+                    size="icon"
+                    className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white shadow-lg"
+                    title="Update profile picture"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </Button>
+                </ProfileImageUploader>
+                
+                {/* Online Status Indicator */}
+                <div className="absolute -bottom-1 -left-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
                 </div>
               </div>
