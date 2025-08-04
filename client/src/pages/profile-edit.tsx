@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// ProfileImageUploader removed - now independent on profile page
+import { ProfileImageUploader } from "@/components/ProfileImageUploader";
 import { LanguageSelector } from "@/components/language-selector";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -197,15 +197,15 @@ export default function ProfileEdit() {
                     {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <Link href="/profile">
+                <ProfileImageUploader>
                   <Button
                     size="icon"
                     className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white"
-                    title="Go to profile to change picture"
+                    title="Update profile picture"
                   >
                     <Camera className="w-4 h-4" />
                   </Button>
-                </Link>
+                </ProfileImageUploader>
               </div>
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-white">

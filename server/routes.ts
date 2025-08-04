@@ -1309,11 +1309,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Profile image upload endpoint
   app.put("/api/profile/image", isAuthenticated, async (req: any, res) => {
+    console.log("Profile image update request:", req.body);
+    
     if (!req.body.imageURL) {
+      console.log("Missing imageURL in request body");
       return res.status(400).json({ error: "imageURL is required" });
     }
 
     const userId = req.user?.claims?.sub;
+    console.log("User ID:", userId);
 
     try {
       const objectStorageService = new ObjectStorageService();
@@ -1325,16 +1329,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       );
 
+      console.log("Object path normalized:", objectPath);
+
       // Update user profile with new image URL
       const updatedUser = await storage.updateUser(userId, { profileImageUrl: objectPath });
+      console.log("User updated successfully");
 
       res.status(200).json({
         objectPath: objectPath,
         user: updatedUser,
+        message: "Profile image updated successfully"
       });
     } catch (error) {
       console.error("Error setting profile image:", error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ 
+        error: "Internal server error",
+        message: error.message || "Failed to update profile image"
+      });
     }
   });
 

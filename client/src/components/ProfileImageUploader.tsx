@@ -49,9 +49,10 @@ export function ProfileImageUploader({ currentImageUrl, userName, className }: P
         throw new Error('Failed to upload image');
       }
 
-      // Set ACL policy and update profile
+      // Set ACL policy and update profile with the presigned URL that we just uploaded to
+      console.log("Upload successful, now setting ACL policy with URL:", uploadURL);
       const response = await apiRequest("PUT", "/api/profile/image", { 
-        imageURL: uploadURL 
+        imageURL: uploadURL
       });
       return response;
     },
