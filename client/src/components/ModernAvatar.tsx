@@ -109,20 +109,17 @@ export function ModernAvatar({
 
   // Successfully loaded image
   if (status === AvatarStatus.Success && src) {
-    // Use cache busting to ensure fresh images
-    const cacheBustingSrc = src.includes('?') ? `${src}&t=${Date.now()}` : `${src}?t=${Date.now()}`;
-    
     return (
       <div className={baseClasses} style={containerStyle}>
         <img
-          src={cacheBustingSrc}
+          src={src}
           alt={name || email || 'User avatar'}
           className="w-full h-full object-cover"
           onError={() => {
-            console.error('Avatar image failed to display:', cacheBustingSrc);
+            console.error('Avatar image failed to display:', src);
             setStatus(AvatarStatus.Error);
           }}
-          onLoad={() => console.log('Avatar image displayed successfully:', cacheBustingSrc)}
+          onLoad={() => console.log('Avatar image displayed successfully:', src)}
         />
         {showOnlineStatus && (
           <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white">

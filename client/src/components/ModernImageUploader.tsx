@@ -96,9 +96,8 @@ export function ModernImageUploader({ children, onSuccess }: ModernImageUploader
         console.log("Cache updated with new user data");
       }
       
-      // Force cache invalidation and refetch as backup
-      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
+      // Only invalidate queries, don't refetch to avoid race conditions
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       
       toast({
         title: "Success!",
