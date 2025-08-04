@@ -317,49 +317,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Object storage routes for file upload
-  app.post('/api/objects/upload', isAnyAuthenticated, async (req, res) => {
-    try {
-      // This would use object storage service, but for now return a mock response
-      // Since object storage is configured but service implementation is missing
-      res.status(501).json({
-        error: 'Object storage upload not implemented yet',
-        message: 'File upload functionality will be available soon'
-      });
-    } catch (error) {
-      console.error('Error getting upload URL:', error);
-      res.status(500).json({ error: 'Failed to get upload URL' });
-    }
-  });
+  // Deprecated - this endpoint was replaced by the working one below
 
-  // Profile image update endpoint
-  app.put('/api/profile/image', isAnyAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user?.claims?.sub || req.user?.id;
-      
-      if (!userId) {
-        return res.status(401).json({ message: 'User ID not found in session' });
-      }
-
-      const { imageURL } = req.body;
-      
-      if (!imageURL) {
-        return res.status(400).json({ message: 'Image URL is required' });
-      }
-
-      const updatedUser = await storage.updateUser(userId, {
-        profileImageUrl: imageURL
-      });
-
-      res.json({
-        message: 'Profile image updated successfully',
-        user: updatedUser
-      });
-    } catch (error) {
-      console.error('Error updating profile image:', error);
-      res.status(500).json({ message: 'Failed to update profile image' });
-    }
-  });
+  // Deprecated - this endpoint was replaced by the working one below
 
   // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {

@@ -64,9 +64,21 @@ export function ProfileImageUploader({ currentImageUrl, userName, className }: P
     },
     onError: (error: any) => {
       console.error("Error updating profile image:", error);
+      let errorMessage = "Unable to update your profile image. Please try again.";
+      
+      if (error.message?.includes("401")) {
+        errorMessage = "You need to be logged in to upload images. Please refresh and try again.";
+      } else if (error.message?.includes("413") || error.message?.includes("too large")) {
+        errorMessage = "The image file is too large. Please choose a smaller image.";
+      } else if (error.message?.includes("network") || error.message?.includes("fetch")) {
+        errorMessage = "Network error. Please check your connection and try again.";
+      } else if (error.message?.includes("format") || error.message?.includes("type")) {
+        errorMessage = "Invalid image format. Please use JPG, PNG, or similar image files.";
+      }
+      
       toast({
         title: "Upload Failed",
-        description: "Unable to update your profile image. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       setUploading(false);

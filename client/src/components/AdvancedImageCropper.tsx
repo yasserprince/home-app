@@ -167,6 +167,9 @@ export function AdvancedImageCropper({
             <CropIcon className="w-5 h-5" />
             Crop & Edit Your Profile Picture
           </DialogTitle>
+          <div className="text-gray-400 text-sm">
+            Adjust your image with professional editing tools
+          </div>
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
