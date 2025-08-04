@@ -13,6 +13,7 @@ import { promises as fs } from "fs";
 import express from "express";
 import { insertBookingSchema, insertReviewSchema } from "@shared/schema";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 import sharp from "sharp";
 import { z } from "zod";
 
@@ -517,6 +518,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating user status:", error);
       res.status(500).json({ message: "Failed to update user status" });
+    }
+  });
+
+  // Object storage endpoints for profile image uploads
+  app.post('/api/objects/upload', isAuthenticated, async (req: any, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ 
+        error: "Failed to get upload URL",
+        message: "Unable to prepare file upload. Please try again."
+      });
+    }
+  });
+
+  // Set ACL policy for uploaded profile images (public visibility)
+  app.put('/api/profile/image', isAuthenticated, async (req: any, res) => {
+    try {
+      const { imageURL } = req.body;
+      if (!imageURL) {
+        return res.status(400).json({ error: "imageURL is required" });
+      }
+
+      const userId = req.user?.claims?.sub;
+      const objectStorageService = new ObjectStorageService();
+      
+      // Set ACL policy for profile image (public visibility)
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        imageURL,
+        {
+          owner: userId,
+          visibility: "public", // Profile images are public
+        }
+      );
+
+      // Update user profile with new image path
+      await storage.updateUser(userId, {
+        profileImageUrl: objectPath
+      });
+
+      res.json({
+        objectPath: objectPath,
+        message: "Profile image updated successfully"
+      });
+    } catch (error) {
+      console.error("Error setting profile image:", error);
+      res.status(500).json({ 
+        error: "Failed to update profile image",
+        message: "Unable to save profile image. Please try again."
+      });
+    }
+  });
+
+  // Serve private objects with ACL check
+  app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
+    const userId = req.user?.claims?.sub;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+        requestedPermission: ObjectPermission.READ,
+      });
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error accessing object:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Serve public objects without authentication
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
     }
   });
 
