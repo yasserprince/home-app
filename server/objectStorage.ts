@@ -211,13 +211,17 @@ export class ObjectStorageService {
     rawPath: string,
     aclPolicy: ObjectAclPolicy
   ): Promise<string> {
+    console.log("Setting ACL policy for rawPath:", rawPath, "Policy:", aclPolicy);
     const normalizedPath = this.normalizeObjectEntityPath(rawPath);
+    console.log("Normalized path:", normalizedPath);
     if (!normalizedPath.startsWith("/")) {
       return normalizedPath;
     }
 
     const objectFile = await this.getObjectEntityFile(normalizedPath);
+    console.log("Got object file:", objectFile.name, "Setting ACL policy...");
     await setObjectAclPolicy(objectFile, aclPolicy);
+    console.log("ACL policy set successfully for:", normalizedPath);
     return normalizedPath;
   }
 

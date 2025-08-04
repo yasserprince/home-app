@@ -143,7 +143,9 @@ export async function canAccessObject({
 }): Promise<boolean> {
   // When this function is called, the acl policy is required.
   const aclPolicy = await getObjectAclPolicy(objectFile);
+  console.log("ACL Policy for object:", objectFile.name, "Policy:", aclPolicy);
   if (!aclPolicy) {
+    console.log("No ACL policy found, denying access");
     return false;
   }
 
@@ -152,6 +154,7 @@ export async function canAccessObject({
     aclPolicy.visibility === "public" &&
     requestedPermission === ObjectPermission.READ
   ) {
+    console.log("Public object access granted for:", objectFile.name);
     return true;
   }
 

@@ -1277,24 +1277,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object storage endpoints
-  app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
-    const userId = req.user?.claims?.sub;
+  // Object storage endpoints - For serving profile images and other objects
+  app.get("/objects/:objectPath(*)", async (req: any, res) => {
     const objectStorageService = new ObjectStorageService();
     try {
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      
+      // Check if user is authenticated for private access
+      const userId = req.user?.claims?.sub;
+      
       const canAccess = await objectStorageService.canAccessObjectEntity({
         objectFile,
-        userId: userId,
+        userId: userId, // Can be undefined for public access
         requestedPermission: "read" as any,
       });
+      
       if (!canAccess) {
+        console.log("Access denied for object:", req.path, "User:", userId);
         return res.sendStatus(401);
       }
+      
+      console.log("Serving object:", req.path, "to user:", userId || 'anonymous');
       objectStorageService.downloadObject(objectFile, res);
     } catch (error) {
       console.error("Error checking object access:", error);
       if (error instanceof ObjectNotFoundError) {
+        console.log("Object not found:", req.path);
         return res.sendStatus(404);
       }
       return res.sendStatus(500);
@@ -1336,7 +1344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.imageURL,
         {
           owner: userId,
-          visibility: "public",
+          visibility: "public", // Make profile images public so they can be displayed without auth
         },
       );
 
