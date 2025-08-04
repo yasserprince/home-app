@@ -1,15 +1,43 @@
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import BottomNavigation from "@/components/bottom-navigation";
-import { Shield, ShieldCheck, ArrowLeft } from "lucide-react";
+import React, { useState } from "react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import BottomNavigation from "@/components/bottom-navigation";
+import { LanguageSelector } from "@/components/language-selector";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  User,
+  Edit3,
+  CreditCard,
+  MapPin,
+  Bell,
+  HelpCircle,
+  Shield,
+  Star,
+  Calendar,
+  Heart,
+  Settings,
+  LogOut,
+  ChevronRight,
+  MoreVertical,
+  Verified,
+  Award,
+  Clock
+} from "lucide-react";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
-  const { t, language, isRTL } = useTranslation();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
@@ -17,302 +45,252 @@ export default function Profile() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-primary text-white p-6 pt-12">
-          <div className="flex items-center space-x-4">
-            <Skeleton className="w-16 h-16 rounded-full" />
-            <div>
-              <Skeleton className="h-6 w-32 mb-2" />
-              <Skeleton className="h-4 w-48 mb-1" />
-              <Skeleton className="h-4 w-36" />
-            </div>
-          </div>
-        </div>
-        <div className="p-6 bg-white -mt-6 rounded-t-3xl relative z-10">
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="text-center">
-                <Skeleton className="h-8 w-12 mx-auto mb-1" />
-                <Skeleton className="h-4 w-20 mx-auto" />
-              </div>
-            ))}
-          </div>
-          <div className="space-y-1">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-16" />
-            ))}
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white/70">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="bg-primary text-white p-6 pt-12">
-        <div className="flex items-center justify-between mb-4">
-          <Link href="/">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-white hover:bg-blue-600 border border-white/20 hover:border-white/40 px-3 py-2"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('back')}
-            </Button>
-          </Link>
-          <h1 className="text-xl font-semibold">{t('profile')}</h1>
-          <div></div> {/* Spacer for center alignment */}
-        </div>
-        <div className="flex items-center space-x-4">
-          {user?.profileImageUrl ? (
-            <img
-              src={user.profileImageUrl}
-              alt="Profile"
-              className="w-16 h-16 rounded-full object-cover border-3 border-blue-300"
-            />
-          ) : (
-            <div className="w-16 h-16 bg-blue-300 rounded-full flex items-center justify-center">
-              <i className="fas fa-user text-primary text-xl"></i>
-            </div>
-          )}
-          <div>
-            <h1 className="text-xl font-semibold">
-              {user?.firstName} {user?.lastName}
-            </h1>
-            <p className="text-blue-200">{user?.email}</p>
-            <p className="text-blue-200 text-sm">
-              {t('memberSince')} {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-            </p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      {/* Profile Stats */}
-      <div className="p-6 bg-white -mt-6 rounded-t-3xl relative z-10">
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">0</p>
-            <p className="text-sm text-gray-600">{t('servicesBooked')}</p>
+      <div className="relative z-10 max-w-md mx-auto p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 pt-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">{t('profile')}</h1>
+            <p className="text-white/70 text-sm">Manage your account</p>
           </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">$0</p>
-            <p className="text-sm text-gray-600">{t('totalSpent')}</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-1">
-              <p className="text-2xl font-bold text-gray-900">5.0</p>
-              <i className="fas fa-star text-yellow-400 text-sm"></i>
-            </div>
-            <p className="text-sm text-gray-600">{t('yourRating')}</p>
+          <div className="flex items-center gap-2">
+            <LanguageSelector variant="compact" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                  <MoreVertical className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-gray-800/95 backdrop-blur-lg border-gray-700">
+                <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:text-red-300 hover:bg-red-400/10">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
+
+        {/* Profile Header Card */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="relative">
+                <Avatar className="w-20 h-20 ring-4 ring-white/20">
+                  <AvatarImage 
+                    src={user?.profileImageUrl || ''} 
+                    alt={user?.firstName || 'User'} 
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
+                    {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                </div>
+              </div>
+              
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-xl font-bold text-white">
+                    {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'User'}
+                  </h2>
+                  {user?.isVerified && (
+                    <Verified className="w-5 h-5 text-blue-400" />
+                  )}
+                </div>
+                <p className="text-white/70 text-sm mb-2">@{user?.email?.split('@')[0] || 'user'}</p>
+                <div className="flex items-center gap-4 text-sm text-white/60">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-400" />
+                    <span>5.0</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Award className="w-4 h-4 text-purple-400" />
+                    <span>Pro</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4 text-green-400" />
+                    <span>Online</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-white/10">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">12</div>
+                <div className="text-xs text-white/60">{t('bookings')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">4.9</div>
+                <div className="text-xs text-white/60">{t('rating')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">8</div>
+                <div className="text-xs text-white/60">{t('favorites')}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Button
-            variant="outline"
-            className="p-4 h-auto flex flex-col items-center space-y-2"
-            onClick={() => window.location.href = '/bookings'}
-          >
-            <i className="fas fa-calendar-check text-primary text-lg"></i>
-            <span className="text-sm font-medium">{t('myBookings')}</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="p-4 h-auto flex flex-col items-center space-y-2"
-            onClick={() => window.location.href = '/providers?favorites=true'}
-          >
-            <i className="fas fa-heart text-red-500 text-lg"></i>
-            <span className="text-sm font-medium">{t('favorites')}</span>
-          </Button>
-        </div>
-
-        {/* Menu Items */}
-        <div className="space-y-1">
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/edit'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-user text-primary"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('editProfile')}</span>
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardHeader className="pb-3">
+            <h3 className="text-lg font-semibold text-white">Quick Actions</h3>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/bookings">
+                <Button variant="ghost" className="w-full h-auto p-4 flex flex-col items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20">
+                  <Calendar className="w-6 h-6 text-blue-400" />
+                  <span className="text-sm font-medium text-white">{t('myBookings')}</span>
+                </Button>
+              </Link>
+              <Link href="/providers?favorites=true">
+                <Button variant="ghost" className="w-full h-auto p-4 flex flex-col items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20">
+                  <Heart className="w-6 h-6 text-red-400" />
+                  <span className="text-sm font-medium text-white">{t('favorites')}</span>
+                </Button>
+              </Link>
             </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
+          </CardContent>
+        </Card>
 
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/payment-methods'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-credit-card text-green-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('paymentMethods')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/addresses'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-map-marker-alt text-yellow-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('savedAddresses')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/location'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-map-pin text-orange-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('locationSettings')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/earnings'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-chart-line text-green-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('earningsAnalytics')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/reviews'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-star text-yellow-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('reviewsRatings')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/verification'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-blue-600" />
-              </div>
-              <span className="font-medium text-gray-900">{t('verificationCenter')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/preferences'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-sliders-h text-indigo-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('preferencesPrivacy')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/notifications'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-bell text-purple-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('notifications')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-between p-4 h-auto"
-            onClick={() => window.location.href = '/profile/help'}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-headset text-gray-600"></i>
-              </div>
-              <span className="font-medium text-gray-900">{t('helpCenter')}</span>
-            </div>
-            <i className="fas fa-chevron-right text-gray-400"></i>
-          </Button>
-
-          <Link href="/profile/edit">
-            <Button
-              variant="ghost"
-              className="w-full justify-between p-4 h-auto"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <i className="fas fa-cog text-gray-600"></i>
-                </div>
-                <span className="font-medium text-gray-900">{t('settings')}</span>
-              </div>
-              <i className="fas fa-chevron-right text-gray-400"></i>
-            </Button>
-          </Link>
-
-          {/* Admin Panel - only show for admin users */}
-          {user?.role === 'admin' && (
-            <Link href="/admin">
-              <Button
-                variant="ghost"
-                className="w-full justify-between p-4 h-auto bg-red-50 hover:bg-red-100"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-red-600" />
+        {/* Account Management */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardHeader className="pb-3">
+            <h3 className="text-lg font-semibold text-white">Account</h3>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-2">
+            <Link href="/profile/edit">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                    <Edit3 className="w-5 h-5 text-blue-400" />
                   </div>
-                  <span className="font-medium text-red-900">{t('adminPanel')}</span>
+                  <span className="font-medium text-white">{t('editProfile')}</span>
                 </div>
-                <i className="fas fa-chevron-right text-red-400"></i>
+                <ChevronRight className="w-5 h-5 text-white/50" />
               </Button>
             </Link>
-          )}
-        </div>
+
+            <Link href="/profile/payment-methods">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
+                    <CreditCard className="w-5 h-5 text-green-400" />
+                  </div>
+                  <span className="font-medium text-white">{t('paymentMethods')}</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/50" />
+              </Button>
+            </Link>
+
+            <Link href="/profile/addresses">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <span className="font-medium text-white">{t('savedAddresses')}</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/50" />
+              </Button>
+            </Link>
+
+            <Link href="/profile/verification">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium text-white">{t('verification')}</span>
+                    <Badge variant="secondary" className="text-xs bg-purple-500/20 text-purple-300 hover:bg-purple-500/30">
+                      Verified
+                    </Badge>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/50" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* Settings & Support */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardHeader className="pb-3">
+            <h3 className="text-lg font-semibold text-white">Settings & Support</h3>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-2">
+            <Link href="/profile/notifications">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                    <Bell className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <span className="font-medium text-white">{t('notifications')}</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/50" />
+              </Button>
+            </Link>
+
+            <Link href="/profile/help">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-500/20 rounded-xl flex items-center justify-center">
+                    <HelpCircle className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <span className="font-medium text-white">{t('helpCenter')}</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/50" />
+              </Button>
+            </Link>
+
+            {/* Admin Panel - only show for admin users */}
+            {user?.role === 'admin' && (
+              <Link href="/admin">
+                <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-red-500/10 hover:bg-red-500/20 border border-red-500/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
+                      <Shield className="w-5 h-5 text-red-400" />
+                    </div>
+                    <span className="font-medium text-white">{t('adminPanel')}</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-red-400/70" />
+                </Button>
+              </Link>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Logout Button */}
         <Button
           variant="destructive"
-          className="w-full mt-8 py-3 font-medium"
+          className="w-full py-4 font-medium bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30"
           onClick={handleLogout}
         >
-          <i className="fas fa-sign-out-alt mr-2"></i>
-          Logout
+          <LogOut className="w-5 h-5 mr-2" />
+          {t('logout')}
         </Button>
       </div>
 

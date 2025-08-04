@@ -1,334 +1,444 @@
-import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { useLocation, Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { ArrowLeft, User as UserIcon, MapPin, Shield, Bell, HelpCircle } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
-import { ProfileImageUploader } from "@/components/ProfileImageUploader";
-import { ProfilePreview } from "@/components/ProfilePreview";
 import { useTranslation } from "@/hooks/useTranslation";
 import { wilayas } from "@shared/wilayas";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ProfileImageUploader } from "@/components/ProfileImageUploader";
+import { LanguageSelector } from "@/components/language-selector";
+import BottomNavigation from "@/components/bottom-navigation";
+import { useToast } from "@/hooks/use-toast";
+import {
+  ArrowLeft,
+  Camera,
+  Save,
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  FileText,
+  Settings,
+  Bell,
+  HelpCircle,
+  Shield,
+  Edit3,
+  Check,
+  X
+} from "lucide-react";
 
 export default function ProfileEdit() {
   const { user, isLoading } = useAuth();
+  const { t } = useTranslation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [, setLocation] = useLocation();
-  const { t, isRTL } = useTranslation();
-
+  
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    phone: user?.phone || "",
-    bio: user?.bio || "",
-    address: user?.address || "",
-    wilaya: user?.wilaya || "",
-    locationEnabled: user?.locationEnabled || false,
-    notificationsEnabled: user?.notificationsEnabled || true,
-    role: user?.role || 'seeker'
+    firstName: '',
+    lastName: '',
+    phone: '',
+    bio: '',
+    location: '',
+    gender: ''
   });
 
   useEffect(() => {
     if (user) {
       setFormData({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        phone: user.phone || "",
-        bio: user.bio || "",
-        address: user.address || "",
-        wilaya: user.wilaya || "",
-        locationEnabled: user.locationEnabled || false,
-        notificationsEnabled: user.notificationsEnabled || true,
-        role: user.role || 'seeker'
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        phone: user.phone || '',
+        bio: user.bio || '',
+        location: user.location || '',
+        gender: user.gender || ''
       });
     }
   }, [user]);
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return apiRequest("PUT", "/api/profile", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      toast({
-        title: t('success'),
-        description: t('profileUpdated'),
-      });
-      setIsEditing(false);
-    },
-    onError: (error) => {
-      console.error("Profile update error:", error);
-      toast({
-        title: t('error'),
-        description: t('failedToUpdate'),
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string) => {
+    if (field === 'bio' && value.length > 300) return;
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    if (isEditing) {
-      updateProfileMutation.mutate(formData);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        });
+        setIsEditing(false);
+      } else {
+        throw new Error('Failed to update profile');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        phone: user.phone || '',
+        bio: user.bio || '',
+        location: user.location || '',
+        gender: user.gender || ''
+      });
+    }
+    setIsEditing(false);
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('loading')}...</p>
+          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white/70">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="bg-primary text-white p-6 pt-12">
-        <div className="flex items-center gap-4 mb-4">
-          <Link href="/profile">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-white hover:bg-blue-600 border border-white/20 hover:border-white/40 px-3 py-2"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('back')}
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-xl font-semibold">{t('editProfile')}</h1>
-            <p className="text-blue-200 text-sm">{t('manageAccountPreferences')}</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Profile Section */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <UserIcon className="h-5 w-5" />
-              <CardTitle>{t('profileInformation')}</CardTitle>
+      <div className="relative z-10 max-w-md mx-auto p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 pt-4">
+          <div className="flex items-center gap-3">
+            <Link href="/profile">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-white">{t('editProfile')}</h1>
+              <p className="text-white/70 text-sm">Update your information</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant={user?.role === 'admin' ? 'destructive' : 'outline'}>
-                {user?.role?.replace('_', ' ')}
-              </Badge>
-              <div className="flex items-center gap-2">
-                <ProfilePreview user={user} />
+          </div>
+          <div className="flex items-center gap-2">
+            <LanguageSelector variant="compact" />
+            {isEditing && (
+              <div className="flex gap-2">
                 <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setIsEditing(!isEditing)}
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCancel}
+                  className="text-white hover:bg-white/10"
                 >
-                  {t('edit')}
+                  <X className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="text-green-400 hover:bg-green-400/10"
+                >
+                  {isSaving ? (
+                    <div className="w-4 h-4 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
+                  ) : (
+                    <Check className="w-5 h-5" />
+                  )}
                 </Button>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-4 mb-6">
-              <ProfileImageUploader 
-                currentImageUrl={user?.profileImageUrl} 
-                userName={`${user?.firstName || ''} ${user?.lastName || ''}`.trim()}
-              />
-              <div>
-                <h3 className="font-medium text-lg">
-                  {user?.firstName && user?.lastName 
-                    ? `${user.firstName} ${user.lastName}`
-                    : user?.email
-                  }
-                </h3>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">{t('firstName')}</Label>
-                <Input
-                  id="firstName"
-                  value={isEditing ? formData.firstName : user?.firstName || ''}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder={t('firstName')}
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName">{t('lastName')}</Label>
-                <Input
-                  id="lastName"
-                  value={isEditing ? formData.lastName : user?.lastName || ''}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder={t('lastName')}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">{t('phone')}</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={isEditing ? formData.phone : user?.phone || ''}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder={t('phone')}
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="bg-gray-50"
-                />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="bio">Bio (Max 300 characters)</Label>
-                <Textarea
-                  id="bio"
-                  value={isEditing ? formData.bio : user?.bio || ''}
-                  onChange={(e) => {
-                    if (e.target.value.length <= 300) {
-                      handleInputChange('bio', e.target.value);
-                    }
-                  }}
-                  disabled={!isEditing}
-                  placeholder={t('tellUsAboutYourself')}
-                  rows={3}
-                  className="resize-none"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {(isEditing ? formData.bio : user?.bio || '').length}/300 characters
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Location Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              <CardTitle>{t('location')}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="wilaya">{t('wilaya')}</Label>
-                <select
-                  id="wilaya"
-                  value={isEditing ? formData.wilaya : user?.wilaya || ''}
-                  onChange={(e) => handleInputChange('wilaya', e.target.value)}
-                  disabled={!isEditing}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">{t('selectWilaya')}</option>
-                  {wilayas.map((wilaya) => (
-                    <option key={wilaya.code} value={wilaya.name}>
-                      {wilaya.code} - {wilaya.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <Label htmlFor="address">{t('address')}</Label>
-                <Input
-                  id="address"
-                  value={isEditing ? formData.address : user?.address || ''}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder={t('enterYourAddress')}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Account Management Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              <CardTitle>{t('accountManagement')}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h4 className="font-medium">{t('accountType')}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {t('currentlySignedUpAs')}: <span className="font-medium capitalize">{user?.role}</span>
-                </p>
-              </div>
-              <Link href="/signup-choice">
-                <Button variant="outline" size="sm">
-                  {t('change')}
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link href="/notifications">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardContent className="flex items-center gap-3 p-4">
-                <Bell className="h-5 w-5 text-blue-600" />
-                <div>
-                  <h4 className="font-medium">{t('notifications')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('manageNotificationSettings')}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/help-support">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardContent className="flex items-center gap-3 p-4">
-                <HelpCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <h4 className="font-medium">{t('helpSupport')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('getHelpOrContactSupport')}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+            )}
+          </div>
         </div>
 
-        {/* Save Button - Only show when editing */}
+        {/* Profile Picture Card */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <Avatar className="w-24 h-24 ring-4 ring-white/20">
+                  <AvatarImage 
+                    src={user?.profileImageUrl || ''} 
+                    alt={user?.firstName || 'User'} 
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-bold">
+                    {(user?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <ProfileImageUploader>
+                  <Button
+                    size="icon"
+                    className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white border-2 border-white"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </Button>
+                </ProfileImageUploader>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-white">
+                  {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'User'}
+                </h3>
+                <p className="text-white/70 text-sm">@{user?.email?.split('@')[0] || 'user'}</p>
+                <Badge variant="secondary" className="mt-2 bg-green-500/20 text-green-300 hover:bg-green-500/30">
+                  Online
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Personal Information */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <h3 className="text-lg font-semibold text-white">Personal Information</h3>
+            {!isEditing && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10"
+              >
+                <Edit3 className="w-4 h-4 mr-2" />
+                Edit
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  First Name
+                </Label>
+                {isEditing ? (
+                  <Input
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    placeholder="Enter first name"
+                  />
+                ) : (
+                  <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                    {user?.firstName || 'Not set'}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-white/80">Last Name</Label>
+                {isEditing ? (
+                  <Input
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    placeholder="Enter last name"
+                  />
+                ) : (
+                  <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                    {user?.lastName || 'Not set'}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                <Phone className="w-4 h-4" />
+                Phone Number
+              </Label>
+              {isEditing ? (
+                <Input
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  placeholder="Enter phone number"
+                  type="tel"
+                />
+              ) : (
+                <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                  {user?.phone || 'Not set'}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </Label>
+              <p className="text-white/70 bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                {user?.email} <span className="text-xs text-white/50">(cannot be changed)</span>
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-white/80">Gender</Label>
+              {isEditing ? (
+                <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
+                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800/95 backdrop-blur-lg border-gray-700">
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10 capitalize">
+                  {user?.gender || 'Not set'}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Location (Wilaya)
+              </Label>
+              {isEditing ? (
+                <Select value={formData.location} onValueChange={(value) => handleInputChange('location', value)}>
+                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                    <SelectValue placeholder="Select your wilaya" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800/95 backdrop-blur-lg border-gray-700 max-h-60">
+                    {wilayas.map((wilaya) => (
+                      <SelectItem key={wilaya.code} value={wilaya.name}>
+                        {wilaya.code} - {wilaya.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                  {user?.location || 'Not set'}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Bio {isEditing && <span className="text-xs text-white/50">({formData.bio.length}/300)</span>}
+              </Label>
+              {isEditing ? (
+                <Textarea
+                  value={formData.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 min-h-[100px]"
+                  placeholder="Tell us about yourself..."
+                  maxLength={300}
+                />
+              ) : (
+                <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10 min-h-[60px]">
+                  {user?.bio || 'No bio added yet'}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account Management */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardHeader className="pb-3">
+            <h3 className="text-lg font-semibold text-white">Account Management</h3>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-3">
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+              <div>
+                <p className="text-white font-medium">Account Type</p>
+                <p className="text-white/70 text-sm capitalize">Currently signed up as {user?.role || 'user'}</p>
+              </div>
+              <Button variant="outline" size="sm" className="border-white/30 text-white hover:bg-white/10">
+                Change
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Settings */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
+          <CardHeader className="pb-3">
+            <h3 className="text-lg font-semibold text-white">Quick Settings</h3>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-2">
+            <Link href="/profile/notifications">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                    <Bell className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <span className="font-medium text-white">Manage notification settings</span>
+                </div>
+              </Button>
+            </Link>
+
+            <Link href="/profile/help">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-500/20 rounded-xl flex items-center justify-center">
+                    <HelpCircle className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <span className="font-medium text-white">Get help or contact support</span>
+                </div>
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* Save Changes Button - Only show when editing */}
         {isEditing && (
-          <div className="sticky bottom-6 z-10">
-            <Button
-              onClick={handleSave}
-              className="w-full"
-              disabled={updateProfileMutation.isPending}
-            >
-              {updateProfileMutation.isPending ? t('saving') : t('saveChanges')}
-            </Button>
-          </div>
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="w-full py-4 font-medium bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            {isSaving ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Save className="w-5 h-5" />
+                Save Changes
+              </div>
+            )}
+          </Button>
         )}
       </div>
+
+      <BottomNavigation activeTab="profile" />
     </div>
   );
 }

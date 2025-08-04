@@ -124,6 +124,58 @@ const translations: Translations = {
     fr: 'Aucune activité récente',
     ar: 'لا يوجد نشاط حديث'
   },
+  
+  // Profile & Settings
+  'editProfile': {
+    en: 'Edit Profile',
+    fr: 'Modifier le profil',
+    ar: 'تحرير الملف الشخصي'
+  },
+  'verification': {
+    en: 'Identity Verification',
+    fr: 'Vérification d\'identité',
+    ar: 'التحقق من الهوية'
+  },
+  'paymentMethods': {
+    en: 'Payment Methods',
+    fr: 'Modes de paiement',
+    ar: 'طرق الدفع'
+  },
+  'savedAddresses': {
+    en: 'Saved Addresses',
+    fr: 'Adresses sauvegardées',
+    ar: 'العناوين المحفوظة'
+  },
+  'notifications': {
+    en: 'Notifications',
+    fr: 'Notifications',
+    ar: 'الإشعارات'
+  },
+  'helpCenter': {
+    en: 'Help Center',
+    fr: 'Centre d\'aide',
+    ar: 'مركز المساعدة'
+  },
+  'adminPanel': {
+    en: 'Admin Panel',
+    fr: 'Panneau d\'administration',
+    ar: 'لوحة الإدارة'
+  },
+  'bookings': {
+    en: 'Bookings',
+    fr: 'Réservations',
+    ar: 'الحجوزات'
+  },
+  'rating': {
+    en: 'Rating',
+    fr: 'Note',
+    ar: 'التقييم'
+  },
+  'favorites': {
+    en: 'Favorites',
+    fr: 'Favoris',
+    ar: 'المفضلة'
+  },
   'startByBookingService': {
     en: 'Start by booking your first service',
     fr: 'Commencez par réserver votre premier service',

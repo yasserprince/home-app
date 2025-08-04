@@ -11,7 +11,7 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
   const { t } = useTranslation();
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-white/20 shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-lg border-t border-white/10 shadow-2xl">
       <div className="max-w-md mx-auto">
         <div className="flex">
           <Link href="/" className="flex-1">
@@ -19,12 +19,12 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
               variant="ghost"
               className={`w-full py-4 px-4 flex flex-col items-center justify-center space-y-1 transition-all duration-200 ${
                 activeTab === 'home' 
-                  ? 'text-blue-600 bg-blue-50/50' 
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
+                  ? 'text-blue-400 bg-blue-400/20' 
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Home className={`w-6 h-6 ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-500'}`} strokeWidth={2} />
-              <span className={`text-xs font-medium ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <Home className={`w-6 h-6 ${activeTab === 'home' ? 'text-blue-400' : 'text-white/70'}`} strokeWidth={2} />
+              <span className={`text-xs font-medium ${activeTab === 'home' ? 'text-blue-400' : 'text-white/70'}`}>
                 {t('home')}
               </span>
             </Button>
@@ -35,12 +35,12 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
               variant="ghost"
               className={`w-full py-4 px-4 flex flex-col items-center justify-center space-y-1 transition-all duration-200 ${
                 activeTab === 'bookings' 
-                  ? 'text-blue-600 bg-blue-50/50' 
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
+                  ? 'text-blue-400 bg-blue-400/20' 
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Calendar className={`w-6 h-6 ${activeTab === 'bookings' ? 'text-blue-600' : 'text-gray-500'}`} strokeWidth={2} />
-              <span className={`text-xs font-medium ${activeTab === 'bookings' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <Calendar className={`w-6 h-6 ${activeTab === 'bookings' ? 'text-blue-400' : 'text-white/70'}`} strokeWidth={2} />
+              <span className={`text-xs font-medium ${activeTab === 'bookings' ? 'text-blue-400' : 'text-white/70'}`}>
                 {t('bookings')}
               </span>
             </Button>
@@ -51,12 +51,12 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
               variant="ghost"
               className={`w-full py-4 px-4 flex flex-col items-center justify-center space-y-1 transition-all duration-200 ${
                 activeTab === 'profile' 
-                  ? 'text-blue-600 bg-blue-50/50' 
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
+                  ? 'text-blue-400 bg-blue-400/20' 
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
-              <User className={`w-6 h-6 ${activeTab === 'profile' ? 'text-blue-600' : 'text-gray-500'}`} strokeWidth={2} />
-              <span className={`text-xs font-medium ${activeTab === 'profile' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <User className={`w-6 h-6 ${activeTab === 'profile' ? 'text-blue-400' : 'text-white/70'}`} strokeWidth={2} />
+              <span className={`text-xs font-medium ${activeTab === 'profile' ? 'text-blue-400' : 'text-white/70'}`}>
                 {t('profile')}
               </span>
             </Button>
