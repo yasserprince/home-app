@@ -894,6 +894,138 @@ const translations: Translations = {
     en: 'Profile Information',
     fr: 'Informations du profil',
     ar: 'معلومات الملف الشخصي'
+  },
+  
+  // Settings page missing translations
+  'phone': {
+    en: 'Phone',
+    fr: 'Téléphone',
+    ar: 'الهاتف'
+  },
+  'accountType': {
+    en: 'Account Type',
+    fr: 'Type de compte',
+    ar: 'نوع الحساب'
+  },
+  'roleSeeker': {
+    en: 'Service Seeker',
+    fr: 'Chercheur de services',
+    ar: 'باحث عن الخدمات'
+  },
+  'roleProvider': {
+    en: 'Service Provider',
+    fr: 'Fournisseur de services',
+    ar: 'مقدم الخدمات'
+  },
+  'roleCompany': {
+    en: 'Company',
+    fr: 'Entreprise',
+    ar: 'شركة'
+  },
+  'changeAccountType': {
+    en: 'Change Account Type',
+    fr: 'Changer le type de compte',
+    ar: 'تغيير نوع الحساب'
+  },
+  'companyName': {
+    en: 'Company Name',
+    fr: 'Nom de l\'entreprise',
+    ar: 'اسم الشركة'
+  },
+  'addressInformation': {
+    en: 'Address Information',
+    fr: 'Informations d\'adresse',
+    ar: 'معلومات العنوان'
+  },
+  'streetAddress': {
+    en: 'Street Address',
+    fr: 'Adresse de la rue',
+    ar: 'عنوان الشارع'
+  },
+  'city': {
+    en: 'City',
+    fr: 'Ville',
+    ar: 'المدينة'
+  },
+  'state': {
+    en: 'State',
+    fr: 'État',
+    ar: 'الولاية'
+  },
+  'zipCode': {
+    en: 'ZIP Code',
+    fr: 'Code postal',
+    ar: 'الرمز البريدي'
+  },
+  'language': {
+    en: 'Language',
+    fr: 'Langue',
+    ar: 'اللغة'
+  },
+  'selectLanguage': {
+    en: 'Select Language',
+    fr: 'Sélectionner la langue',
+    ar: 'اختر اللغة'
+  },
+  'emailNotifications': {
+    en: 'Email Notifications',
+    fr: 'Notifications par e-mail',
+    ar: 'إشعارات البريد الإلكتروني'
+  },
+  'receiveEmailUpdates': {
+    en: 'Receive email updates about your bookings and account',
+    fr: 'Recevoir des mises à jour par e-mail sur vos réservations et votre compte',
+    ar: 'تلقي تحديثات البريد الإلكتروني حول حجوزاتك وحسابك'
+  },
+  'accountSecurity': {
+    en: 'Account Security',
+    fr: 'Sécurité du compte',
+    ar: 'أمان الحساب'
+  },
+  'accountStatus': {
+    en: 'Account Status',
+    fr: 'Statut du compte',
+    ar: 'حالة الحساب'
+  },
+  'verificationStatus': {
+    en: 'Verification Status',
+    fr: 'Statut de vérification',
+    ar: 'حالة التحقق'
+  },
+  'notVerified': {
+    en: 'Not Verified',
+    fr: 'Non vérifié',
+    ar: 'غير محقق'
+  },
+  'verified': {
+    en: 'Verified',
+    fr: 'Vérifié',
+    ar: 'محقق'
+  },
+  'active': {
+    en: 'Active',
+    fr: 'Actif',
+    ar: 'نشط'
+  },
+  'inactive': {
+    en: 'Inactive',
+    fr: 'Inactif',
+    ar: 'غير نشط'
+  },
+  'signOut': {
+    en: 'Sign Out',
+    fr: 'Se déconnecter',
+    ar: 'تسجيل الخروج'
+  },
+  'signOutDescription': {
+    en: 'Sign out of your account on this device',
+    fr: 'Déconnectez-vous de votre compte sur cet appareil',
+    ar: 'تسجيل الخروج من حسابك على هذا الجهاز'
+  },
+  'logout': {
+    en: 'Logout',
+    fr: 'Déconnexion',
+    ar: 'تسجيل خروج'
   }
 };
 
