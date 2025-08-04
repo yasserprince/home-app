@@ -160,3 +160,23 @@ svg path {
     opacity: 1 !important;
   }
 }
+
+/* Enhanced icon visibility for mobile devices - Post-authentication fix */
+.simple-service-icon,
+.mobile-enhanced-icon {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: inherit !important;
+  min-height: inherit !important;
+  flex-shrink: 0 !important;
+  /* Mobile-specific rendering fixes */
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+  -webkit-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+  -webkit-font-smoothing: antialiased !important;
+  /* Post-authentication rendering fixes */
+  will-change: auto !important;
+  contain: layout style !important;
+}

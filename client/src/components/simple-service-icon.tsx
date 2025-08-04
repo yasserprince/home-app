@@ -11,7 +11,8 @@ export function SimpleServiceIcon({
   iconName, 
   size = 24, 
   className = "", 
-  style = {} 
+  style = {},
+  ...props
 }: SimpleServiceIconProps) {
   
   const getIconPath = (name: string) => {
@@ -52,6 +53,7 @@ export function SimpleServiceIcon({
 
   return (
     <svg
+      {...props}
       width={size}
       height={size}
       viewBox="0 0 24 24"
@@ -63,8 +65,12 @@ export function SimpleServiceIcon({
       className={`simple-service-icon ${className}`}
       style={{
         display: 'inline-block',
-        verticalAlign: 'middle',
+        minWidth: `${size}px`,
+        minHeight: `${size}px`,
         flexShrink: 0,
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        verticalAlign: 'middle',
         ...style
       }}
     >

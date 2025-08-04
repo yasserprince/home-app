@@ -11,8 +11,10 @@ import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
 
 import { SimpleServiceIcon } from "@/components/simple-service-icon";
+import { MobileEnhancedIcon } from "@/components/mobile-enhanced-icon";
 import { IconDebug } from "@/components/icon-debug";
 import { ForceIconRefresh } from "@/components/force-icon-refresh";
+import { MobileIconDebug } from "@/components/mobile-icon-debug";
 import { Search, X, ArrowRight, Shield, Settings, User as UserIcon, LogOut, ChevronDown, Star, Calendar } from "lucide-react";
 import { 
   DropdownMenu,
@@ -339,7 +341,7 @@ export default function Home() {
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${suggestion.color}20` }}
                   >
-                    <SimpleServiceIcon 
+                    <MobileEnhancedIcon 
                       iconName={suggestion.icon} 
                       className="w-4 h-4" 
                       style={{ color: suggestion.color }} 
@@ -370,22 +372,21 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+          <div key={`categories-${user?.id || 'guest'}-${(categories as any[])?.length || 0}`} className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
             {(categories as any[])?.slice(0, 6).map((category: any) => (
-              <Link key={category.id} href={`/providers?category=${category.id}`}>
+              <Link key={`${category.id}-${user?.id || 'guest'}`} href={`/providers?category=${category.id}`}>
                 <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer h-full hover:scale-105 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20">
                   <CardContent className="p-4 flex flex-col items-center justify-center h-full min-h-[100px] sm:min-h-[120px]">
                     <div
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center mb-3 mx-auto flex-shrink-0 shadow-sm"
                       style={{ backgroundColor: `${category.color}15`, border: `2px solid ${category.color}30` }}
                     >
-                      <SimpleServiceIcon 
+                      <MobileEnhancedIcon 
                         iconName={category.icon || 'search'} 
                         className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0" 
                         style={{ color: category.color || '#6B7280' }} 
                         size={32}
                       />
-
                     </div>
                     <h3 className="font-semibold text-white text-sm sm:text-base text-center leading-tight line-clamp-2">
                       {translateCategoryName(category.name, language)}
@@ -404,7 +405,7 @@ export default function Home() {
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer border-dashed border-2 border-white/30 hover:scale-105 bg-white/10 backdrop-blur-md hover:bg-white/20">
                 <CardContent className="p-4 text-center min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm border border-white/30">
-                    <SimpleServiceIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" size={32} />
+                    <MobileEnhancedIcon iconName="search" className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" size={32} />
                   </div>
                   <h3 className="font-semibold text-white text-sm sm:text-base">{t('viewAllServices')}</h3>
                   <p className="text-xs text-white/70">+{Array.isArray(categories) ? categories.length - 6 : 0} {t('moreCategories')}</p>
@@ -486,6 +487,7 @@ export default function Home() {
       </div>
 
       <IconDebug />
+      <MobileIconDebug />
       
       <div className="pb-20">
         <BottomNavigation activeTab="home" />
