@@ -11,10 +11,17 @@ Your app is currently running with:
 
 ## Deployment Steps
 
-### 1. Click the Deploy Button
-The deployment button has been generated in your chat interface. Click it to start the deployment process.
+### 1. Accept Git Changes First
+Before deploying, you need to accept any pending Git changes:
 
-### 2. Verify Environment Variables
+1. **Check Git Status**: Look for any pending changes in your GitHub repository (`yasserprince/home-app`)
+2. **Accept Changes**: Review and accept/merge any pending pull requests or commits
+3. **Verify Sync**: Make sure your Replit environment is synced with the latest Git changes
+
+### 2. Click the Deploy Button
+After accepting Git changes, click the deployment button in your chat interface to start the deployment process.
+
+### 3. Verify Environment Variables
 Before deploying, ensure these environment variables are set in your deployment:
 
 **Required Variables:**
@@ -26,13 +33,13 @@ Before deploying, ensure these environment variables are set in your deployment:
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
 - `SESSION_SECRET` - Session encryption key
 
-### 3. Deployment Configuration
+### 4. Deployment Configuration
 Your `.replit` file is configured for:
 - **Build**: `npm run build` (creates production static files)
 - **Start**: `npm start` (runs production server)
 - **Port**: 5000 (mapped to external port 80)
 
-### 4. Verify Deployment
+### 5. Verify Deployment
 After deployment, check these endpoints:
 
 **Comprehensive Verification (NEW):**
