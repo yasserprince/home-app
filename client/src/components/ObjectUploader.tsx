@@ -73,8 +73,11 @@ export function ObjectUploader({
         getUploadParameters: onGetUploadParameters,
       })
       .on("complete", (result) => {
-        setShowModal(false);
+        setTimeout(() => setShowModal(false), 1000); // Close after 1 second to show completion
         onComplete?.(result);
+      })
+      .on("cancel-all", () => {
+        setShowModal(false);
       })
   );
 
@@ -88,7 +91,14 @@ export function ObjectUploader({
         uppy={uppy}
         open={showModal}
         onRequestClose={() => setShowModal(false)}
+        closeModalOnClickOutside={true}
+        closeAfterFinish={true}
+        showProgressDetails={true}
         proudlyDisplayPoweredByUppy={false}
+        height={500}
+        width="90%"
+        theme="dark"
+        browserBackButtonClose={true}
         plugins={['Dashboard']}
         metaFields={[
           { id: 'title', name: 'Title', placeholder: 'Image title' },
