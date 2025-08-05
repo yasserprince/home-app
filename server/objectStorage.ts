@@ -42,8 +42,28 @@ export class ObjectNotFoundError extends Error {
 export class ObjectStorageService {
   constructor() {
     const isProduction = process.env.NODE_ENV === "production";
+    const isGitHubDeployment = Boolean(process.env.REPL_DEPLOYMENT_ID);
+    
     console.log(`🪣 ObjectStorageService initialized for ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
     console.log(`📡 Sidecar endpoint: ${REPLIT_SIDECAR_ENDPOINT}`);
+    
+    if (isGitHubDeployment) {
+      console.log(`🔗 GitHub deployment detected - ensuring identical behavior`);
+      console.log(`📦 Deployment ID: ${process.env.REPL_DEPLOYMENT_ID}`);
+    }
+    
+    // Validate critical environment variables for GitHub deployments
+    if (isGitHubDeployment || isProduction) {
+      const requiredVars = ['DEFAULT_OBJECT_STORAGE_BUCKET_ID', 'PRIVATE_OBJECT_DIR', 'PUBLIC_OBJECT_SEARCH_PATHS'];
+      const missing = requiredVars.filter(varName => !process.env[varName]);
+      
+      if (missing.length > 0) {
+        console.error(`❌ Critical object storage environment variables missing in deployment: ${missing.join(', ')}`);
+        throw new Error(`Missing object storage configuration: ${missing.join(', ')}`);
+      } else {
+        console.log(`✅ All object storage environment variables present for deployment`);
+      }
+    }
   }
 
   // Gets the public object search paths.

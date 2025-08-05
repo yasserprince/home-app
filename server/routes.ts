@@ -109,20 +109,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { getDeploymentConfig } = await import('./deploymentConfig.js');
     const config = getDeploymentConfig();
     
+    // GitHub deployment detection
+    const isGitHubDeployment = Boolean(process.env.REPL_DEPLOYMENT_ID);
+    const gitRepo = process.env.REPL_GIT_REPO || null;
+    
     res.json({
       environment: config.environment,
       timestamp: new Date().toISOString(),
       version: "1.0.0",
+      github: {
+        isDeployment: isGitHubDeployment,
+        repository: gitRepo,
+        deploymentId: process.env.REPL_DEPLOYMENT_ID || null
+      },
       objectStorage: {
         configured: Boolean(config.objectStorage.bucketId),
         publicPathsCount: config.objectStorage.publicPaths.length,
-        hasPrivateDir: Boolean(config.objectStorage.privateDir)
+        hasPrivateDir: Boolean(config.objectStorage.privateDir),
+        bucketId: config.objectStorage.bucketId ? 'SET' : 'MISSING'
       },
       database: config.database,
       auth: config.auth,
       uptime: process.uptime(),
       nodeVersion: process.version,
-      platform: process.platform
+      platform: process.platform,
+      envVars: {
+        NODE_ENV: process.env.NODE_ENV,
+        PORT: process.env.PORT,
+        REPLIT_SIDECAR_ENDPOINT: process.env.REPLIT_SIDECAR_ENDPOINT ? 'SET' : 'MISSING'
+      }
     });
   });
   

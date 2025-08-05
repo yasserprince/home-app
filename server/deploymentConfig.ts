@@ -118,6 +118,14 @@ export function ensureIdenticalBehavior(): void {
   // Log identical behavior enforcement
   console.log(`🔧 Enforcing identical behavior for ${config.environment}`);
   
+  // Detect GitHub deployment vs local development
+  const isGitHubDeployment = Boolean(process.env.REPL_DEPLOYMENT_ID);
+  const isLinkedToGitHub = Boolean(process.env.REPL_GIT_REPO);
+  
+  console.log(`📱 GitHub Integration Status:`);
+  console.log(`  - Deployment ID: ${isGitHubDeployment ? "✅ SET" : "❌ NOT SET"}`);
+  console.log(`  - Git Repo: ${isLinkedToGitHub ? "✅ LINKED" : "❌ NOT LINKED"}`);
+  
   // Set consistent defaults for missing configurations
   if (!process.env.REPLIT_SIDECAR_ENDPOINT) {
     process.env.REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
@@ -126,6 +134,21 @@ export function ensureIdenticalBehavior(): void {
   // Ensure consistent timeout and retry settings
   if (!process.env.REQUEST_TIMEOUT) {
     process.env.REQUEST_TIMEOUT = "30000"; // 30 seconds
+  }
+  
+  // GitHub deployment specific fixes
+  if (isGitHubDeployment || config.isProduction) {
+    console.log("🔄 Applying GitHub deployment fixes...");
+    
+    // Ensure production environment variables are properly set
+    if (!process.env.NODE_ENV) {
+      process.env.NODE_ENV = "production";
+    }
+    
+    // Force consistent app behavior regardless of deployment method
+    process.env.FORCE_IDENTICAL_BEHAVIOR = "true";
+    
+    console.log("✅ GitHub deployment fixes applied");
   }
   
   console.log("✅ Identical behavior enforced");
