@@ -128,7 +128,7 @@ export default function ProfileEdit() {
         languages: formData.languages
       };
 
-      const response = await fetch('/api/profile', {
+      const response = await fetch('/api/account', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -142,8 +142,8 @@ export default function ProfileEdit() {
         queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
         
         toast({
-          title: "Profile Updated",
-          description: "Your profile has been successfully updated.",
+          title: "Account Updated",
+          description: "Your account has been successfully updated.",
         });
         setIsEditing(false);
       } else {
@@ -151,10 +151,10 @@ export default function ProfileEdit() {
         throw new Error(errorData.message || 'Failed to update profile');
       }
     } catch (error) {
-      console.error('Profile update error:', error);
+      console.error('Account update error:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -205,13 +205,13 @@ export default function ProfileEdit() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-4">
           <div className="flex items-center gap-3">
-            <Link href="/profile">
+            <Link href="/account">
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-white">{t('editProfile')}</h1>
+              <h1 className="text-2xl font-bold text-white">Edit Account</h1>
               <p className="text-white/70 text-sm">Update your information</p>
             </div>
           </div>
@@ -254,9 +254,9 @@ export default function ProfileEdit() {
                     className="text-white hover:bg-white/10 focus:bg-white/10"
                   >
                     <Edit3 className="w-4 h-4 mr-2" />
-                    Edit Profile
+                    Edit Account
                   </DropdownMenuItem>
-                  <Link href="/profile">
+                  <Link href="/account">
                     <DropdownMenuItem className="text-white hover:bg-white/10 focus:bg-white/10">
                       <User className="w-4 h-4 mr-2" />
                       Account

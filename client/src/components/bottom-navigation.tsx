@@ -46,7 +46,7 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
             </Button>
           </Link>
           
-          <Link href="/profile" className="flex-1">
+          <Link href="/account" className="flex-1">
             <Button
               variant="ghost"
               className={`w-full py-4 px-4 flex flex-col items-center justify-center space-y-1 transition-all duration-200 ${

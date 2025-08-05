@@ -248,8 +248,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Profile update route
-  app.put('/api/profile', isAnyAuthenticated, async (req: any, res) => {
+  // Account update route
+  app.put('/api/account', isAnyAuthenticated, async (req: any, res) => {
     try {
       // Handle different auth types
       const userId = ((req.user as any)?.claims || {})?.sub || req.user?.id;

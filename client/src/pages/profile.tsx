@@ -69,7 +69,7 @@ export default function Profile() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">{t('profile')}</h1>
+            <h1 className="text-2xl font-bold text-white">Account</h1>
             <p className="text-white/70 text-sm">Manage your account</p>
           </div>
           <div className="flex items-center gap-2">
@@ -189,19 +189,19 @@ export default function Profile() {
             <h3 className="text-lg font-semibold text-white">Account</h3>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
-            <Link href="/profile/edit">
+            <Link href="/account/edit">
               <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
                     <Edit3 className="w-5 h-5 text-blue-400" />
                   </div>
-                  <span className="font-medium text-white">{t('editProfile')}</span>
+                  <span className="font-medium text-white">Edit Account</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-white/50" />
               </Button>
             </Link>
 
-            <Link href="/profile/payment-methods">
+            <Link href="/account/payment-methods">
               <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
@@ -213,7 +213,7 @@ export default function Profile() {
               </Button>
             </Link>
 
-            <Link href="/profile/addresses">
+            <Link href="/account/addresses">
               <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center">
@@ -225,7 +225,7 @@ export default function Profile() {
               </Button>
             </Link>
 
-            <Link href="/profile/verification">
+            <Link href="/account/verification">
               <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
@@ -250,7 +250,7 @@ export default function Profile() {
             <h3 className="text-lg font-semibold text-white">Settings & Support</h3>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
-            <Link href="/profile/notifications">
+            <Link href="/account/notifications">
               <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
@@ -262,7 +262,7 @@ export default function Profile() {
               </Button>
             </Link>
 
-            <Link href="/profile/help">
+            <Link href="/account/help">
               <Button variant="ghost" className="w-full justify-between p-4 h-auto bg-white/5 hover:bg-white/10 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-500/20 rounded-xl flex items-center justify-center">

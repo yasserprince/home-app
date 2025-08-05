@@ -58,14 +58,17 @@ function Router() {
           <Route path="/provider/:id" component={ProviderDetail} />
           <Route path="/booking" component={Booking} />
           <Route path="/bookings" component={Bookings} />
+          <Route path="/account" component={Profile} />
+          <Route path="/account/edit" component={ProfileEdit} />
+          <Route path="/account/payment-methods" component={PaymentMethods} />
+          <Route path="/account/addresses" component={SavedAddresses} />
+          <Route path="/account/location" component={LocationSettings} />
+          <Route path="/account/verification" component={Verification} />
+          <Route path="/account/notifications" component={Notifications} />
+          <Route path="/account/help" component={HelpSupport} />
+          {/* Legacy profile routes - redirect to account */}
           <Route path="/profile" component={Profile} />
           <Route path="/profile/edit" component={ProfileEdit} />
-          <Route path="/profile/payment-methods" component={PaymentMethods} />
-          <Route path="/profile/addresses" component={SavedAddresses} />
-          <Route path="/profile/location" component={LocationSettings} />
-          <Route path="/profile/verification" component={Verification} />
-          <Route path="/profile/notifications" component={Notifications} />
-          <Route path="/profile/help" component={HelpSupport} />
           <Route path="/settings" component={ProfileEdit} />
           {user?.role === 'admin' && (
             <Route path="/admin" component={AdminPanel} />
