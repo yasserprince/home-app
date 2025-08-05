@@ -17,6 +17,7 @@ import Booking from "@/pages/booking";
 import Bookings from "@/pages/bookings";
 import Profile from "@/pages/profile";
 import ProfileEdit from "@/pages/profile-edit";
+import ProfilePreview from "@/pages/profile-preview";
 import PaymentMethods from "@/pages/payment-methods";
 import SavedAddresses from "@/pages/saved-addresses";
 import LocationSettings from "@/pages/location-settings";
@@ -66,6 +67,7 @@ function Router() {
           <Route path="/portfolio/:providerId/gallery/:galleryId" component={GalleryDetail} />
           <Route path="/account" component={Profile} />
           <Route path="/account/edit" component={ProfileEdit} />
+          <Route path="/profile-preview" component={ProfilePreview} />
           <Route path="/account/payment-methods" component={PaymentMethods} />
           <Route path="/account/addresses" component={SavedAddresses} />
           <Route path="/account/location" component={LocationSettings} />

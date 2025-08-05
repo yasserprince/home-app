@@ -410,6 +410,16 @@ export default function ProfileEdit() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link href="/profile-preview">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-blue-300 border-blue-400/30 hover:bg-blue-400/10 hover:border-blue-400/50"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </Button>
+            </Link>
             <LanguageSelector variant="compact" />
             {isEditing ? (
               <div className="flex gap-2">
