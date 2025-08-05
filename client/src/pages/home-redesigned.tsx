@@ -409,29 +409,29 @@ export default function HomeRedesigned() {
         </div>
         
         <div className="space-y-4">
-          <Card className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-md border-yellow-400/30">
+          <Card className="bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/20 transition-all duration-300">
             <CardContent className="p-4 flex items-center space-x-4">
-              <div className="w-12 h-12 bg-yellow-400/30 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 rounded-full flex items-center justify-center">
                 <Star className="w-6 h-6 text-yellow-400" />
               </div>
               <div className="flex-1">
                 <h3 className="text-white font-semibold text-sm">First Booking Discount</h3>
                 <p className="text-white/70 text-xs">Save 20% on your first service booking</p>
               </div>
-              <Badge className="bg-yellow-400 text-yellow-900 font-bold">20% OFF</Badge>
+              <Badge className="bg-yellow-400/20 text-yellow-400 border-yellow-400/30 font-bold">20% OFF</Badge>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-md border-blue-400/30">
+          <Card className="bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/20 transition-all duration-300">
             <CardContent className="p-4 flex items-center space-x-4">
-              <div className="w-12 h-12 bg-blue-400/30 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-full flex items-center justify-center">
                 <Calendar className="w-6 h-6 text-blue-400" />
               </div>
               <div className="flex-1">
                 <h3 className="text-white font-semibold text-sm">Weekly Cleaning Package</h3>
                 <p className="text-white/70 text-xs">Subscribe and save 15% on regular cleaning</p>
               </div>
-              <Badge className="bg-blue-400 text-blue-900 font-bold">15% OFF</Badge>
+              <Badge className="bg-blue-400/20 text-blue-400 border-blue-400/30 font-bold">15% OFF</Badge>
             </CardContent>
           </Card>
         </div>
