@@ -2478,6 +2478,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete all portfolio images for user (must come before specific image delete)
+  app.delete('/api/portfolios/images/all', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = (req as any).user?.claims?.sub;
+      
+      // Delete all portfolio images for this user
+      await storage.deleteAllPortfolioImages(userId);
+      
+      res.json({ 
+        message: "All portfolio images deleted successfully"
+      });
+    } catch (error) {
+      console.error("Error deleting all portfolio images:", error);
+      res.status(500).json({ message: "Failed to delete portfolio images" });
+    }
+  });
+
   // Delete modern portfolio image
   app.delete('/api/portfolios/images/:imageId', isReplitAuthenticated, async (req, res) => {
     try {
@@ -2686,22 +2703,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete all portfolio images for user
-  app.delete('/api/portfolios/images/all', isReplitAuthenticated, async (req, res) => {
-    try {
-      const userId = (req as any).user?.claims?.sub;
-      
-      // Delete all portfolio images for this user
-      await storage.deleteAllPortfolioImages(userId);
-      
-      res.json({ 
-        message: "All portfolio images deleted successfully"
-      });
-    } catch (error) {
-      console.error("Error deleting all portfolio images:", error);
-      res.status(500).json({ message: "Failed to delete portfolio images" });
-    }
-  });
+
 
   // Fix ACL policies for existing images
   app.post('/api/portfolios/fix-acl', isReplitAuthenticated, async (req, res) => {
