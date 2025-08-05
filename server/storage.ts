@@ -443,6 +443,14 @@ export class DatabaseStorage implements IStorage {
     return newGallery;
   }
 
+  async getPortfolioGallery(id: string): Promise<PortfolioGallery | undefined> {
+    const [gallery] = await db
+      .select()
+      .from(portfolioGalleries)
+      .where(eq(portfolioGalleries.id, id));
+    return gallery;
+  }
+
   async getPortfolioGalleriesByProvider(providerId: string): Promise<PortfolioGallery[]> {
     const galleries = await db
       .select()

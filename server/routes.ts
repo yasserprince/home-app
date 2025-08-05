@@ -18,6 +18,29 @@ import sharp from "sharp";
 import { z } from "zod";
 import { seedServiceCategories } from "./seedCategories";
 
+// Helper functions for gallery creation
+function getGalleryTitleFromId(galleryId: string): string {
+  switch (galleryId) {
+    case 'featured-work': return 'Featured Work';
+    case 'before-after': return 'Before & After';
+    case 'work-samples': return 'Work Samples';
+    case 'tools-equipment': return 'Tools & Equipment';
+    case 'certifications': return 'Certifications';
+    default: return 'Portfolio Gallery';
+  }
+}
+
+function getCategoryFromGalleryId(galleryId: string): string {
+  switch (galleryId) {
+    case 'featured-work': return 'featured';
+    case 'before-after': return 'before_after';
+    case 'work-samples': return 'work_samples';
+    case 'tools-equipment': return 'equipment';
+    case 'certifications': return 'certifications';
+    default: return 'work_samples';
+  }
+}
+
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), 'uploads');
 
@@ -2195,6 +2218,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const images = Array.isArray(req.body) ? req.body : [req.body];
+      
+      // Ensure galleries exist or create them
+      const galleryIds = [...new Set(images.map(img => img.galleryId))];
+      for (const galleryId of galleryIds) {
+        const existingGallery = await storage.getPortfolioGallery(galleryId);
+        if (!existingGallery) {
+          // Create default gallery based on galleryId
+          const galleryTitle = getGalleryTitleFromId(galleryId);
+          const category = getCategoryFromGalleryId(galleryId);
+          
+          await storage.createPortfolioGallery({
+            id: galleryId, // Use the provided ID
+            providerId: provider.id,
+            title: galleryTitle,
+            description: `${galleryTitle} portfolio images`,
+            category: category,
+            isActive: true,
+            sortOrder: 0,
+          });
+        }
+      }
+      
       const imageData = images.map(img => ({
         ...img,
         providerId: provider.id,
