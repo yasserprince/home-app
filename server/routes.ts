@@ -2514,57 +2514,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create default galleries
         const defaultGalleries = [
           {
-            id: 'featured-work',
+            id: `${Date.now()}-featured-${Math.random().toString(36).substr(2, 9)}`,
             title: 'Featured Work',
             category: 'featured',
             userId: requestedUserId,
             images: [],
             serviceType: '',
-            isPublic: true,
+            isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
           },
           {
-            id: 'before-after',
+            id: `${Date.now()}-before-after-${Math.random().toString(36).substr(2, 9)}`,
             title: 'Before & After',
             category: 'before_after',
             userId: requestedUserId,
             images: [],
             serviceType: '',
-            isPublic: true,
+            isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
           },
           {
-            id: 'work-samples',
+            id: `${Date.now()}-work-samples-${Math.random().toString(36).substr(2, 9)}`,
             title: 'Work Samples',
             category: 'work_samples',
             userId: requestedUserId,
             images: [],
             serviceType: '',
-            isPublic: true,
+            isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
           },
           {
-            id: 'tools-equipment',
+            id: `${Date.now()}-tools-equipment-${Math.random().toString(36).substr(2, 9)}`,
             title: 'Tools & Equipment',
             category: 'equipment',
             userId: requestedUserId,
             images: [],
             serviceType: '',
-            isPublic: true,
+            isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
           },
           {
-            id: 'certifications',
+            id: `${Date.now()}-certifications-${Math.random().toString(36).substr(2, 9)}`,
             title: 'Certifications',
             category: 'certifications',
             userId: requestedUserId,
             images: [],
             serviceType: '',
-            isPublic: true,
+            isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
           }
@@ -2592,8 +2592,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user?.claims?.sub;
       const { title, category, serviceType, isPublic } = req.body;
       
-      // Generate a simple ID based on title
-      const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      // Generate a unique ID
+      const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
       const newGallery = {
         id,

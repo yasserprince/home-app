@@ -558,10 +558,20 @@ export class DatabaseStorage implements IStorage {
   // Modern Portfolio operations - database-backed storage
   async getModernPortfolioGalleries(userId: string): Promise<any[]> {
     try {
+      // Get service provider for this user first
+      const [serviceProvider] = await db
+        .select()
+        .from(serviceProviders)
+        .where(eq(serviceProviders.userId, userId));
+
+      if (!serviceProvider) {
+        return [];
+      }
+
       const galleries = await db
         .select()
         .from(portfolioGalleries)
-        .where(eq(portfolioGalleries.userId, userId))
+        .where(eq(portfolioGalleries.providerId, serviceProvider.id))
         .orderBy(asc(portfolioGalleries.createdAt));
 
       // Get images for each gallery
@@ -624,7 +634,7 @@ export class DatabaseStorage implements IStorage {
           description: gallery.description || '',
           category: gallery.category,
           serviceType: gallery.serviceType || '',
-          isPublic: gallery.isPublic ?? true,
+          isActive: gallery.isActive ?? true,
           sortOrder: gallery.sortOrder || 0,
         })
         .returning();
@@ -645,7 +655,7 @@ export class DatabaseStorage implements IStorage {
       const [gallery] = await db
         .select()
         .from(portfolioGalleries)
-        .where(and(eq(portfolioGalleries.id, galleryId), eq(portfolioGalleries.userId, userId)));
+        .where(eq(portfolioGalleries.id, galleryId));
 
       if (!gallery) {
         return null;
