@@ -225,10 +225,10 @@ export default function ProfileEdit() {
       try {
         const url = new URL(file.uploadURL);
         const pathParts = url.pathname.split('/');
-        if (pathParts.length >= 3 && pathParts[2] === '.private') {
-          // Extract the object path after .private/
-          const objectPath = pathParts.slice(3).join('/');
-          imageUrl = `/objects/uploads/${objectPath}`;
+        if (pathParts.length >= 4 && pathParts[2] === '.private' && pathParts[3] === 'uploads') {
+          // Extract just the file ID after .private/uploads/
+          const fileId = pathParts.slice(4).join('/');
+          imageUrl = `/objects/uploads/${fileId}`;
         }
       } catch (error) {
         console.error('Error parsing upload URL:', error);
