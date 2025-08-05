@@ -1000,8 +1000,8 @@ export default function ProfileEdit() {
                             <div className="relative group">
                               <div className="aspect-[16/10] bg-white/5 rounded-lg overflow-hidden border border-white/10">
                                 <img
-                                  src={primaryImage.url}
-                                  alt={primaryImage.alt || 'Primary portfolio image'}
+                                  src={primaryImage.imageUrl || primaryImage.url}
+                                  alt={primaryImage.title || primaryImage.alt || 'Primary portfolio image'}
                                   className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -1036,8 +1036,8 @@ export default function ProfileEdit() {
                             <div key={image.id} className="relative group">
                               <div className="aspect-square bg-white/5 rounded-lg overflow-hidden border border-white/10 hover:border-white/30 transition-colors cursor-pointer">
                                 <img
-                                  src={image.url}
-                                  alt={image.alt || `Portfolio image ${index + 1}`}
+                                  src={image.imageUrl || image.url}
+                                  alt={image.title || image.alt || `Portfolio image ${index + 1}`}
                                   className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
                                   onClick={() => setLightboxIndex(index)}
                                 />
@@ -1170,8 +1170,8 @@ export default function ProfileEdit() {
           const activeGallery = (portfolioGalleries as any)?.find((gallery: any) => gallery.id === activePortfolioTab);
           const images = activeGallery?.images || [];
           const lightboxSlides = images.map((image: any) => ({
-            src: image.url,
-            alt: image.alt || 'Portfolio image'
+            src: image.imageUrl || image.url,
+            alt: image.title || image.alt || 'Portfolio image'
           }));
           
           return (
