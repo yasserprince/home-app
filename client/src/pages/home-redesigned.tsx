@@ -41,7 +41,7 @@ export default function HomeRedesigned() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Search suggestions based on categories
-  const searchSuggestions = featuredCategories
+  const searchSuggestions = (featuredCategories || [])
     .filter(category => 
       category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       category.description?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -258,7 +258,7 @@ export default function HomeRedesigned() {
           </div>
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-            {trendingCategories.map((category) => (
+            {(trendingCategories || []).map((category) => (
               <Link 
                 key={category.id} 
                 href={`/providers?category=${category.id}`}
@@ -310,7 +310,7 @@ export default function HomeRedesigned() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
-            {featuredCategories.map((category) => (
+            {(featuredCategories || []).map((category) => (
               <Link 
                 key={category.id} 
                 href={`/providers?category=${category.id}`}

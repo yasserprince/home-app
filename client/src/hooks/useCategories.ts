@@ -24,9 +24,47 @@ export interface ServiceCategory {
 }
 
 export function useCategories() {
-  return useQuery<ServiceCategory[]>({
+  const { data: categories, isLoading, error } = useQuery<ServiceCategory[]>({
     queryKey: ['/api/categories'],
   });
+
+  const { data: popularCategories } = useQuery<ServiceCategory[]>({
+    queryKey: ['/api/categories/popular'],
+  });
+
+  // Transform database categories into legacy format for backward compatibility
+  const featuredCategories = categories?.slice(0, 8) || [];
+  const trendingCategories = popularCategories?.slice(0, 6) || [];
+  const quickServices = categories?.filter(cat => cat.emergencyService)?.slice(0, 4) || [];
+
+  // Helper functions for backward compatibility
+  const getCategoryIcon = (categoryName: string) => {
+    const category = categories?.find(cat => cat.name === categoryName);
+    return category?.icon || 'Square';
+  };
+
+  const getCategoryColor = (category: ServiceCategory) => {
+    return category.color || 'bg-blue-500';
+  };
+
+  const getTranslatedName = (categoryName: string) => {
+    // For now, just return the name as-is
+    // TODO: Implement proper translation based on current language
+    return categoryName;
+  };
+
+  return {
+    data: categories,
+    categories,
+    featuredCategories,
+    trendingCategories,
+    quickServices,
+    isLoading,
+    error,
+    getCategoryIcon,
+    getCategoryColor,
+    getTranslatedName
+  };
 }
 
 export function usePopularCategories() {
