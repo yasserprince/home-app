@@ -883,7 +883,14 @@ export default function ProfileEdit() {
                   </div>
                 ) : (() => {
                   const activeGallery = (portfolioGalleries as any)?.find((gallery: any) => gallery.id === activePortfolioTab);
-                  const images = activeGallery?.images || [];
+                  const rawImages = activeGallery?.images || [];
+                  
+                  // Normalize image URLs - handle both imageUrl and objectPath fields
+                  const images = rawImages.map((img: any) => ({
+                    ...img,
+                    url: img.imageUrl || img.objectPath || img.url,
+                    alt: img.title || `Portfolio image`
+                  }));
                   
                   if (images.length === 0) {
                     return (
