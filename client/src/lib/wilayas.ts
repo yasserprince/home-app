@@ -1,4 +1,4 @@
-// Complete list of Algeria's 58 wilayas (provinces/states)
+// Complete list of Algeria's 58 wilayas with authentic Latin and Arabic names (Official 2024)
 export const algerianWilayas = [
   { code: "01", name: "Adrar", nameAr: "أدرار" },
   { code: "02", name: "Chlef", nameAr: "الشلف" },
@@ -7,7 +7,7 @@ export const algerianWilayas = [
   { code: "05", name: "Batna", nameAr: "باتنة" },
   { code: "06", name: "Béjaïa", nameAr: "بجاية" },
   { code: "07", name: "Biskra", nameAr: "بسكرة" },
-  { code: "08", name: "Béchar", nameAr: "بشار" },
+  { code: "08", name: "Bechar", nameAr: "بشار" },
   { code: "09", name: "Blida", nameAr: "البليدة" },
   { code: "10", name: "Bouira", nameAr: "البويرة" },
   { code: "11", name: "Tamanrasset", nameAr: "تمنراست" },
@@ -15,7 +15,7 @@ export const algerianWilayas = [
   { code: "13", name: "Tlemcen", nameAr: "تلمسان" },
   { code: "14", name: "Tiaret", nameAr: "تيارت" },
   { code: "15", name: "Tizi Ouzou", nameAr: "تيزي وزو" },
-  { code: "16", name: "Algiers", nameAr: "الجزائر" },
+  { code: "16", name: "Alger", nameAr: "الجزائر" },
   { code: "17", name: "Djelfa", nameAr: "الجلفة" },
   { code: "18", name: "Jijel", nameAr: "جيجل" },
   { code: "19", name: "Sétif", nameAr: "سطيف" },
@@ -48,6 +48,7 @@ export const algerianWilayas = [
   { code: "46", name: "Aïn Témouchent", nameAr: "عين تموشنت" },
   { code: "47", name: "Ghardaïa", nameAr: "غرداية" },
   { code: "48", name: "Relizane", nameAr: "غليزان" },
+  // New wilayas added in December 2019 (49-58)
   { code: "49", name: "Timimoun", nameAr: "تيميمون" },
   { code: "50", name: "Bordj Badji Mokhtar", nameAr: "برج باجي مختار" },
   { code: "51", name: "Ouled Djellal", nameAr: "أولاد جلال" },
@@ -57,7 +58,7 @@ export const algerianWilayas = [
   { code: "55", name: "Touggourt", nameAr: "تقرت" },
   { code: "56", name: "Djanet", nameAr: "جانت" },
   { code: "57", name: "El M'Ghair", nameAr: "المغير" },
-  { code: "58", name: "El Meniaa", nameAr: "المنيعة" }
+  { code: "58", name: "El Menia", nameAr: "المنيعة" }
 ];
 
 export const getWilayaName = (code: string, language: 'en' | 'ar' = 'en') => {

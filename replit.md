@@ -30,13 +30,14 @@ Preferred communication style: Simple, everyday language.
 - Features bottom navigation for core app functionality and full RTL support for Arabic language.
 
 ### Core Features & Design Decisions
-- **Profile System**: Modern redesign with a focus on user experience, including profile picture upload, interactive editing, and removal of a separate settings page.
+- **Profile System**: Modern redesign with gradient-themed ProfileImageCropper featuring professional editing tools (brightness, contrast, saturation, zoom, rotation) with authentic Arabic/Latin wilaya data for location selection.
 - **Translation System**: Comprehensive multi-language support (English, French, Arabic) with `useTranslation` hook, localStorage persistence, and dynamic switching.
 - **Authentication Pages**: Triple authentication login page with Google OAuth, email/password, and Replit Auth, featuring a gradient theme and glassmorphism effects.
 - **Service Icons**: Use of Lucide icons with static icon mapping for consistent display across all interfaces, especially on mobile.
 - **Home & Categories Pages**: Redesigned based on modern app patterns (e.g., TaskRabbit/Thumbtack), featuring intelligent category grouping, enhanced visual hierarchy, and dual view modes.
 - **Admin Panel & Home Page Theming**: Consistent application of a dark gradient theme (gray-900 → blue-900 → purple-900) with glassmorphism effects and animated background orbs.
 - **KYC & Verification**: Multi-tier verification system with trust scoring, including identity verification, free SMS services, and encrypted document storage.
+- **Location System**: Complete authentic data for Algeria's 58 wilayas with both Latin and Arabic names (official 2024 data including 10 new provinces added in December 2019).
 
 ## External Dependencies
 

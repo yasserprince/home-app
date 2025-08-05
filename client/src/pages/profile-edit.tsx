@@ -323,15 +323,27 @@ export default function ProfileEdit() {
                   <SelectContent className="bg-gray-800/95 backdrop-blur-lg border-gray-700 max-h-60">
                     {wilayas.map((wilaya) => (
                       <SelectItem key={wilaya.code} value={wilaya.name}>
-                        {wilaya.code} - {wilaya.name}
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-white">{wilaya.code} - {wilaya.name}</span>
+                          <span className="text-white/60 text-sm mr-2" dir="rtl">{wilaya.arabic}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               ) : (
-                <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
-                  {user?.wilaya || 'Not set'}
-                </p>
+                <div className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                  {user?.wilaya ? (
+                    <div className="flex items-center justify-between">
+                      <span>{user.wilaya}</span>
+                      <span className="text-white/60 text-sm" dir="rtl">
+                        {wilayas.find(w => w.name === user.wilaya)?.arabic || ''}
+                      </span>
+                    </div>
+                  ) : (
+                    'Not set'
+                  )}
+                </div>
               )}
             </div>
 

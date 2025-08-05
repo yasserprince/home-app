@@ -1,4 +1,4 @@
-// Algeria's 58 Wilayas with both Latin and Arabic names
+// Complete list of Algeria's 58 Wilayas with authentic Latin and Arabic names (Official 2024)
 export const wilayas = [
   { code: '01', name: 'Adrar', arabic: 'أدرار' },
   { code: '02', name: 'Chlef', arabic: 'الشلف' },
@@ -7,7 +7,7 @@ export const wilayas = [
   { code: '05', name: 'Batna', arabic: 'باتنة' },
   { code: '06', name: 'Béjaïa', arabic: 'بجاية' },
   { code: '07', name: 'Biskra', arabic: 'بسكرة' },
-  { code: '08', name: 'Béchar', arabic: 'بشار' },
+  { code: '08', name: 'Bechar', arabic: 'بشار' },
   { code: '09', name: 'Blida', arabic: 'البليدة' },
   { code: '10', name: 'Bouira', arabic: 'البويرة' },
   { code: '11', name: 'Tamanrasset', arabic: 'تمنراست' },
@@ -15,7 +15,7 @@ export const wilayas = [
   { code: '13', name: 'Tlemcen', arabic: 'تلمسان' },
   { code: '14', name: 'Tiaret', arabic: 'تيارت' },
   { code: '15', name: 'Tizi Ouzou', arabic: 'تيزي وزو' },
-  { code: '16', name: 'Algiers', arabic: 'الجزائر' },
+  { code: '16', name: 'Alger', arabic: 'الجزائر' },
   { code: '17', name: 'Djelfa', arabic: 'الجلفة' },
   { code: '18', name: 'Jijel', arabic: 'جيجل' },
   { code: '19', name: 'Sétif', arabic: 'سطيف' },
@@ -44,10 +44,11 @@ export const wilayas = [
   { code: '42', name: 'Tipaza', arabic: 'تيبازة' },
   { code: '43', name: 'Mila', arabic: 'ميلة' },
   { code: '44', name: 'Aïn Defla', arabic: 'عين الدفلى' },
-  { code: '45', name: 'Naama', arabic: 'النعامة' },
+  { code: '45', name: 'Naâma', arabic: 'النعامة' },
   { code: '46', name: 'Aïn Témouchent', arabic: 'عين تموشنت' },
   { code: '47', name: 'Ghardaïa', arabic: 'غرداية' },
   { code: '48', name: 'Relizane', arabic: 'غليزان' },
+  // New wilayas added in December 2019 (49-58)
   { code: '49', name: 'Timimoun', arabic: 'تيميمون' },
   { code: '50', name: 'Bordj Badji Mokhtar', arabic: 'برج باجي مختار' },
   { code: '51', name: 'Ouled Djellal', arabic: 'أولاد جلال' },
@@ -57,7 +58,7 @@ export const wilayas = [
   { code: '55', name: 'Touggourt', arabic: 'تقرت' },
   { code: '56', name: 'Djanet', arabic: 'جانت' },
   { code: '57', name: 'El M\'Ghair', arabic: 'المغير' },
-  { code: '58', name: 'El Meniaa', arabic: 'المنيعة' }
+  { code: '58', name: 'El Menia', arabic: 'المنيعة' }
 ];
 
 export const ALGERIA_WILAYAS = wilayas;
