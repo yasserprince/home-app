@@ -47,9 +47,8 @@ export async function setupGoogleAuth(app: Express) {
     return;
   }
   
-  // Use the current Replit domain
-  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000';
-  const callbackURL = `https://${domain}/api/auth/google/callback`;
+  // Use the deployed domain for OAuth callback
+  const callbackURL = "https://home-app-yasserdaddi.replit.app/api/auth/google/callback";
     
   console.log("Setting up Google OAuth with:", {
     clientId: process.env.GOOGLE_CLIENT_ID?.substring(0, 10) + "...",
