@@ -9,7 +9,7 @@ import {
   setObjectAclPolicy,
 } from "./objectAcl";
 
-const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_SIDECAR_ENDPOINT || "http://127.0.0.1:1106";
 
 // The object storage client is used to interact with the object storage service.
 export const objectStorageClient = new Storage({
@@ -132,6 +132,8 @@ export class ObjectStorageService {
 
   // Gets the upload URL for an object entity.
   async getObjectEntityUploadURL(): Promise<string> {
+    console.log("🚀 Starting upload URL generation...");
+    
     const privateObjectDir = this.getPrivateObjectDir();
     if (!privateObjectDir) {
       throw new Error(
@@ -140,10 +142,22 @@ export class ObjectStorageService {
       );
     }
 
+    console.log(`📁 Using private object directory: ${privateObjectDir}`);
+
     const objectId = randomUUID();
     const fullPath = `${privateObjectDir}/uploads/${objectId}`;
+    console.log(`📄 Generated full path: ${fullPath}`);
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
+    console.log(`🪣 Bucket: ${bucketName}, Object: ${objectName}`);
+
+    // Check environment variables for debugging
+    console.log("🔧 Environment check:", {
+      NODE_ENV: process.env.NODE_ENV,
+      hasPrivateObjectDir: !!process.env.PRIVATE_OBJECT_DIR,
+      hasPublicObjectSearchPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+      sidecarEndpoint: REPLIT_SIDECAR_ENDPOINT
+    });
 
     // Sign URL for PUT method with TTL
     return signObjectURL({
@@ -277,23 +291,44 @@ async function signObjectURL({
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
-  const response = await fetch(
-    `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    }
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, ` +
-        `make sure you're running on Replit`
+  
+  try {
+    console.log(`🔗 Signing object URL for ${method} ${bucketName}/${objectName}`);
+    console.log(`📍 Using sidecar endpoint: ${REPLIT_SIDECAR_ENDPOINT}`);
+    
+    const response = await fetch(
+      `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }
     );
-  }
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ Sidecar error ${response.status}:`, errorText);
+      throw new Error(
+        `Failed to sign object URL, status: ${response.status}, ` +
+          `error: ${errorText}. Make sure you're running on Replit and object storage is configured.`
+      );
+    }
 
-  const { signed_url: signedURL } = await response.json();
-  return signedURL;
+    const responseData = await response.json();
+    const { signed_url: signedURL } = responseData;
+    
+    if (!signedURL) {
+      console.error("❌ No signed URL in response:", responseData);
+      throw new Error("No signed URL returned from sidecar");
+    }
+    
+    console.log("✅ Successfully generated signed URL");
+    return signedURL;
+    
+  } catch (error) {
+    console.error("❌ Error in signObjectURL:", error);
+    throw error;
+  }
 }
