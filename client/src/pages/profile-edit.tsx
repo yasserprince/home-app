@@ -72,6 +72,7 @@ export default function ProfileEdit() {
     yearsExperience: '',
     hourlyRate: '',
     availability: 'full-time',
+    accountType: 'seeker', // individual, provider, company
     skills: [] as string[],
     languages: [] as string[]
   });
@@ -118,6 +119,7 @@ export default function ProfileEdit() {
         yearsExperience: user.yearsExperience?.toString() || '',
         hourlyRate: user.hourlyRate?.toString() || '',
         availability: user.availability || 'full-time',
+        accountType: user.accountType || 'seeker',
         skills: user.skills || [],
         languages: user.languages || []
       });
@@ -149,10 +151,11 @@ export default function ProfileEdit() {
       const backendData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone,
+        phone: formData.phone,  
         bio: formData.bio,
         wilaya: formData.location, // Map location to wilaya
         sex: formData.gender,       // Map gender to sex
+        accountType: formData.accountType,
         yearsExperience: formData.yearsExperience ? parseInt(formData.yearsExperience) : null,
         hourlyRate: formData.hourlyRate ? parseFloat(formData.hourlyRate) : null,
         availability: formData.availability,
@@ -238,6 +241,7 @@ export default function ProfileEdit() {
         yearsExperience: user.yearsExperience?.toString() || '',
         hourlyRate: user.hourlyRate?.toString() || '',
         availability: user.availability || 'full-time',
+        accountType: user.accountType || 'seeker',
         skills: user.skills || [],
         languages: user.languages || []
       });
@@ -780,13 +784,40 @@ export default function ProfileEdit() {
           <CardContent className="pt-0 space-y-3">
             {/* Account Type */}
             <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
-              <div>
+              <div className="flex-1">
                 <p className="text-white font-medium">Account Type</p>
-                <p className="text-white/70 text-sm capitalize">Currently signed up as {user?.role || 'user'}</p>
+                {isEditing ? (
+                  <Select
+                    value={formData.accountType}
+                    onValueChange={(value) => handleInputChange('accountType', value)}
+                  >
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white mt-2 w-full">
+                      <SelectValue placeholder="Select account type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="seeker">Service Seeker</SelectItem>
+                      <SelectItem value="provider">Service Provider</SelectItem>
+                      <SelectItem value="company">Company</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-white/70 text-sm capitalize">
+                    {formData.accountType === 'seeker' ? 'Service Seeker' : 
+                     formData.accountType === 'provider' ? 'Service Provider' : 
+                     formData.accountType === 'company' ? 'Company' : 'Service Seeker'}
+                  </p>
+                )}
               </div>
-              <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg">
-                Change
-              </Button>
+              {!isEditing && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setIsEditing(true)}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg"
+                >
+                  Change
+                </Button>
+              )}
             </div>
 
             {/* ID Verification - Inspired by TaskRabbit */}

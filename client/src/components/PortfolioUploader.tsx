@@ -118,7 +118,7 @@ export function PortfolioUploader({
         
         // Get upload parameters
         const response = await onGetUploadParameters();
-        const { uploadURL: url } = response;
+        const url = response.uploadURL || response.url;
         
         // Upload file with progress tracking
         const xhr = new XMLHttpRequest();
