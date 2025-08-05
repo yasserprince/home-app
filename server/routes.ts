@@ -2427,48 +2427,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Upload images to a gallery
-  app.post('/api/portfolios/galleries/:galleryId/images', isReplitAuthenticated, upload.array('images', 10), async (req, res) => {
+  // Upload images to a gallery - handles post-upload metadata from object storage
+  app.post('/api/portfolios/galleries/:galleryId/images', isReplitAuthenticated, async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = (req as any).user?.claims?.sub;
       const { galleryId } = req.params;
-      const files = req.files as Express.Multer.File[];
+      const images = req.body; // Array of image metadata from the upload
       
-      if (!files || files.length === 0) {
-        return res.status(400).json({ message: "No files uploaded" });
+      if (!Array.isArray(images) || images.length === 0) {
+        return res.status(400).json({ message: "No image data provided" });
       }
       
-      const uploadedImages = [];
+      const processedImages = [];
       
-      for (const file of files) {
-        // Simple mock response for uploaded images
+      for (const imageData of images) {
         const imageId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const mockImage = {
+        const processedImage: any = {
           id: imageId,
-          url: `/uploads/${file.filename}`,
-          thumbnailUrl: `/uploads/thumb_${file.filename}`,
-          alt: file.originalname,
-          isPrimary: uploadedImages.length === 0, // First image is primary
+          url: imageData.imageUrl || imageData.url,
+          thumbnailUrl: imageData.imageUrl || imageData.url, // Use same URL for thumbnail for now
+          alt: imageData.title || imageData.alt || 'Portfolio image',
+          isPrimary: imageData.isPrimary || processedImages.length === 0,
           metadata: {
-            filename: file.originalname,
-            size: file.size,
-            mimetype: file.mimetype,
-            width: 800, // mock values
-            height: 600
+            filename: imageData.title || 'image',
+            imageType: imageData.imageType || 'work_sample',
+            description: imageData.description || '',
+            isPublic: imageData.isPublic !== false
           },
           uploadedAt: new Date().toISOString()
         };
         
-        uploadedImages.push(mockImage);
+        processedImages.push(processedImage);
       }
       
       res.json({ 
-        message: "Images uploaded successfully",
-        images: uploadedImages 
+        message: "Images processed successfully",
+        images: processedImages 
       });
     } catch (error) {
-      console.error("Error uploading images:", error);
-      res.status(500).json({ message: "Failed to upload images" });
+      console.error("Error processing uploaded images:", error);
+      res.status(500).json({ message: "Failed to process uploaded images" });
     }
   });
 
