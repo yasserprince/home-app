@@ -114,7 +114,9 @@ export async function setupGoogleAuth(app: Express) {
       return done(null, user);
     } catch (error) {
       console.error("Error in Google OAuth strategy:", error);
-      console.error("Error details:", error.message, error.stack);
+      if (error instanceof Error) {
+        console.error("Error details:", error.message, error.stack);
+      }
       return done(error as Error, undefined);
     }
   }));

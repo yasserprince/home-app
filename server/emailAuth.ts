@@ -77,11 +77,10 @@ export async function setupEmailAuth(app: Express) {
         lastName,
         phone,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
-        gender,
+        sex: gender,
         address,
         wilaya,
-        commune,
-        postalCode,
+        zipCode: postalCode,
         role: role || "service_seeker", // Use consistent role naming
         isActive: true,
         isVerified: false
