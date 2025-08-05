@@ -86,6 +86,17 @@ export default function ProfileEdit() {
     enabled: !!user,
   });
 
+  // Debug log to see what we're getting from the API
+  useEffect(() => {
+    if (portfolioGalleries) {
+      console.log('Portfolio galleries data:', portfolioGalleries);
+      console.log('Active tab:', activePortfolioTab);
+      const activeGallery = (portfolioGalleries as any)?.find((gallery: any) => gallery.id === activePortfolioTab);
+      console.log('Active gallery:', activeGallery);
+      console.log('Images in active gallery:', activeGallery?.images);
+    }
+  }, [portfolioGalleries, activePortfolioTab]);
+
   // Portfolio upload mutation - updated for new modern portfolio API
   const uploadPortfolioMutation = useMutation({
     mutationFn: async (images: any[]) => {
@@ -743,7 +754,7 @@ export default function ProfileEdit() {
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="text-white font-medium">Upload to {portfolioTabs.find(t => t.id === activePortfolioTab)?.label}</h4>
                     <div className="text-sm text-white/60">
-                      {(portfolioGalleries as any)?.[activePortfolioTab]?.images?.length || 0} images
+                      {(portfolioGalleries as any)?.find((gallery: any) => gallery.id === activePortfolioTab)?.images?.length || 0} images
                     </div>
                   </div>
                   
