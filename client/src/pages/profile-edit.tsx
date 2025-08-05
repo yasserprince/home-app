@@ -196,10 +196,11 @@ export default function ProfileEdit() {
 
   // Portfolio upload handlers
   const handleGetUploadParameters = async () => {
-    const response = await apiRequest('/api/portfolios/images/upload', 'POST');
+    const response = await apiRequest('POST', '/api/portfolios/images/upload');
+    const data = await response.json();
     return {
       method: 'PUT' as const,
-      url: (response as any).uploadURL,
+      url: data.uploadURL,
     };
   };
 

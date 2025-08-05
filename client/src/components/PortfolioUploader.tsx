@@ -205,10 +205,14 @@ export function PortfolioUploader({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[90vh] overflow-hidden flex flex-col" aria-describedby="upload-description">
         <DialogHeader>
           <DialogTitle className="text-white">Upload Portfolio Images</DialogTitle>
         </DialogHeader>
+        
+        <div id="upload-description" className="sr-only">
+          Upload and manage your portfolio images with drag and drop functionality
+        </div>
         
         <div className="flex-1 overflow-y-auto space-y-4">
           {/* File Drop Zone */}
