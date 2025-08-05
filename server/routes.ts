@@ -2465,7 +2465,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const imageId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         // Process the URL to convert from object storage URL to serving URL
         const objectStorageService = new ObjectStorageService();
-        const servingUrl = objectStorageService.normalizeObjectEntityPath(imageData.imageUrl || imageData.url);
+        
+        // Set ACL policy for the uploaded image
+        console.log(`🔐 Setting ACL policy for image: ${imageData.imageUrl || imageData.url}`);
+        const servingUrl = await objectStorageService.trySetObjectEntityAclPolicy(
+          imageData.imageUrl || imageData.url,
+          {
+            owner: userId,
+            visibility: "public", // Portfolio images are public
+            aclRules: [] // No additional rules needed for public images
+          }
+        );
         
         const processedImage: any = {
           id: imageId,

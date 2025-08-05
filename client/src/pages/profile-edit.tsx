@@ -237,7 +237,7 @@ export default function ProfileEdit() {
       
       return {
         galleryId: activePortfolioTab, // Use the active tab as gallery ID
-        imageUrl: imageUrl,
+        imageUrl: file.uploadURL, // Send the raw Google Storage URL so backend can set ACL
         title: file.meta?.title || file.name,
         description: file.meta?.description || '',
         imageType: getImageTypeForCategory(activePortfolioTab),
