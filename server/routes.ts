@@ -2061,11 +2061,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Catch-all GET endpoint for debugging
-  app.get('/api/portfolios/galleries', async (req, res) => {
-    console.log("WARNING: GET /api/portfolios/galleries called without provider ID!");
-    res.status(400).json({ message: "Provider ID is required. Use /api/portfolios/{providerId}/galleries" });
-  });
+  // OLD: Conflicting route removed - now handled by modern portfolio API
 
   app.post('/api/portfolios/galleries', isAuthenticated, async (req, res) => {
     try {

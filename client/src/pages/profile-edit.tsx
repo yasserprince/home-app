@@ -80,19 +80,19 @@ export default function ProfileEdit() {
   // Portfolio state
   const [activePortfolioTab, setActivePortfolioTab] = useState('featured-work');
 
-  // Portfolio galleries query
+  // Portfolio galleries query - using new modern portfolio API
   const { data: portfolioGalleries, isLoading: portfolioLoading } = useQuery({
-    queryKey: ['/api/portfolios', 'galleries'],
+    queryKey: ['/api/portfolios/galleries'],
     enabled: !!user,
   });
 
-  // Portfolio upload mutation
+  // Portfolio upload mutation - updated for new modern portfolio API
   const uploadPortfolioMutation = useMutation({
     mutationFn: async (images: any[]) => {
-      return apiRequest('/api/portfolios/images', 'POST', images);
+      return apiRequest(`/api/portfolios/galleries/${activePortfolioTab}/images`, 'POST', images);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/portfolios'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/portfolios/galleries'] });
       toast({
         title: "Success",
         description: "Portfolio images uploaded successfully!",
@@ -197,9 +197,9 @@ export default function ProfileEdit() {
     }
   };
 
-  // Portfolio upload handlers
+  // Portfolio upload handlers - updated for new modern portfolio API
   const handleGetUploadParameters = async () => {
-    const response = await apiRequest('/api/portfolios/images/upload', 'POST');
+    const response = await apiRequest('/api/objects/upload', 'POST');
     const data = await response.json();
     return {
       method: 'PUT' as const,
@@ -747,7 +747,7 @@ export default function ProfileEdit() {
                   <div className="text-white/60 text-center py-8">Loading portfolio...</div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {(portfolioGalleries as any)?.[activePortfolioTab]?.images?.map((image: any) => (
+                    {(portfolioGalleries as any)?.find((gallery: any) => gallery.id === activePortfolioTab)?.images?.map((image: any) => (
                       <div key={image.id} className="relative group">
                         <div className="aspect-square bg-white/5 rounded-lg overflow-hidden border border-white/10">
                           <img
