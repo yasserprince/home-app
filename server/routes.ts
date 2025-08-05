@@ -2309,6 +2309,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update portfolio image metadata
+  app.put('/api/portfolios/images/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { id } = req.params;
+      const { description, alt, isPrimary } = req.body;
+      
+      // Verify ownership
+      const provider = await storage.getServiceProviderByUserId(userId!);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const updated = await storage.updatePortfolioImage(id, {
+        description,
+        alt,
+        isPrimary
+      });
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      res.json({ message: "Image updated successfully", image: updated });
+    } catch (error) {
+      console.error("Error updating portfolio image:", error);
+      res.status(500).json({ message: "Failed to update portfolio image" });
+    }
+  });
+
   app.delete('/api/portfolios/images/:id', isAuthenticated, async (req, res) => {
     try {
       const userId = req.user?.claims?.sub;
@@ -2332,10 +2362,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clean up orphaned/non-working portfolio images
+  app.delete('/api/portfolios/cleanup-images', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get all modern portfolio galleries for the user
+      const galleries = await storage.getModernPortfolioGalleries(userId);
+      let deletedCount = 0;
+      
+      for (const gallery of galleries) {
+        const images = gallery.images || [];
+        for (const image of images) {
+          try {
+            // Test if the image URL is accessible
+            const response = await fetch(image.url, { method: 'HEAD' });
+            if (!response.ok) {
+              // Image is not accessible, remove it from the gallery
+              await storage.deleteModernPortfolioImage(gallery.id, image.id);
+              deletedCount++;
+              console.log(`Deleted non-working image: ${image.id} from gallery ${gallery.id}`);
+            }
+          } catch (error) {
+            // Image is not accessible, remove it from the gallery
+            await storage.deleteModernPortfolioImage(gallery.id, image.id);
+            deletedCount++;
+            console.log(`Deleted inaccessible image: ${image.id} from gallery ${gallery.id}`);
+          }
+        }
+      }
+
+      res.json({ message: `Cleaned up ${deletedCount} non-working images` });
+    } catch (error) {
+      console.error("Error cleaning up portfolio images:", error);
+      res.status(500).json({ message: "Failed to clean up portfolio images" });
+    }
+  });
+
   // ===============================
   // NEW MODERN PORTFOLIO API ROUTES  
   // ===============================
   
+  // Add image to modern portfolio gallery
+  app.post('/api/portfolios/modern-images', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = (req as any).user?.claims?.sub;
+      const { galleryId, objectPath, filename, description, imageType } = req.body;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Set ACL policy for the uploaded object
+      const { ObjectStorageService } = await import('./objectStorage');
+      const objectStorageService = new ObjectStorageService();
+      
+      const normalizedPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        objectPath,
+        {
+          owner: userId,
+          visibility: 'public',
+          aclRules: []
+        }
+      );
+
+      // Add image to the gallery
+      const imageData = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        url: normalizedPath,
+        thumbnailUrl: normalizedPath,
+        alt: filename,
+        isPrimary: false,
+        metadata: {
+          filename,
+          imageType: imageType || 'work_sample',
+          description: description || '',
+          isPublic: true
+        },
+        uploadedAt: new Date()
+      };
+
+      await storage.addImageToModernPortfolioGallery(galleryId, imageData);
+      
+      res.json({ 
+        message: "Image added successfully", 
+        image: imageData 
+      });
+    } catch (error) {
+      console.error("Error adding image to modern portfolio:", error);
+      res.status(500).json({ message: "Failed to add image to portfolio" });
+    }
+  });
+
+  // Update modern portfolio image
+  app.put('/api/portfolios/images/:imageId', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = (req as any).user?.claims?.sub;
+      const { imageId } = req.params;
+      const { description } = req.body;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const updated = await storage.updateModernPortfolioImage(imageId, { description });
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+      
+      res.json({ message: "Image updated successfully" });
+    } catch (error) {
+      console.error("Error updating modern portfolio image:", error);
+      res.status(500).json({ message: "Failed to update image" });
+    }
+  });
+
+  // Delete modern portfolio image
+  app.delete('/api/portfolios/images/:imageId', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = (req as any).user?.claims?.sub;
+      const { imageId } = req.params;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const deleted = await storage.deleteModernPortfolioImageById(imageId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+      
+      res.json({ message: "Image deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting modern portfolio image:", error);
+      res.status(500).json({ message: "Failed to delete image" });
+    }
+  });
+
   // Get galleries for current user (simplified API)
   app.get('/api/portfolios/galleries/:userId?', isReplitAuthenticated, async (req, res) => {
     try {

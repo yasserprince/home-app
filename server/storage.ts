@@ -586,6 +586,72 @@ export class DatabaseStorage implements IStorage {
     
     return null;
   }
+
+  async addImageToModernPortfolioGallery(galleryId: string, imageData: any): Promise<any> {
+    // Find which user owns this gallery
+    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
+      const galleryIndex = galleries.findIndex(g => g.id === galleryId);
+      if (galleryIndex >= 0) {
+        if (!galleries[galleryIndex].images) {
+          galleries[galleryIndex].images = [];
+        }
+        galleries[galleryIndex].images.push(imageData);
+        galleries[galleryIndex].updatedAt = new Date();
+        this.modernPortfolioData.set(userId, galleries);
+        return imageData;
+      }
+    }
+    return null;
+  }
+
+  async deleteModernPortfolioImage(galleryId: string, imageId: string): Promise<boolean> {
+    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
+      const galleryIndex = galleries.findIndex(g => g.id === galleryId);
+      if (galleryIndex >= 0) {
+        const images = galleries[galleryIndex].images || [];
+        const imageIndex = images.findIndex(img => img.id === imageId);
+        if (imageIndex >= 0) {
+          images.splice(imageIndex, 1);
+          galleries[galleryIndex].updatedAt = new Date();
+          this.modernPortfolioData.set(userId, galleries);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  async deleteModernPortfolioImageById(imageId: string): Promise<boolean> {
+    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
+      for (const gallery of galleries) {
+        const images = gallery.images || [];
+        const imageIndex = images.findIndex(img => img.id === imageId);
+        if (imageIndex >= 0) {
+          images.splice(imageIndex, 1);
+          gallery.updatedAt = new Date();
+          this.modernPortfolioData.set(userId, galleries);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  async updateModernPortfolioImage(imageId: string, updates: any): Promise<boolean> {
+    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
+      for (const gallery of galleries) {
+        const images = gallery.images || [];
+        const imageIndex = images.findIndex(img => img.id === imageId);
+        if (imageIndex >= 0) {
+          images[imageIndex] = { ...images[imageIndex], ...updates };
+          gallery.updatedAt = new Date();
+          this.modernPortfolioData.set(userId, galleries);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
 
 export const storage = new DatabaseStorage();

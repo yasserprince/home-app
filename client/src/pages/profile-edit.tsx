@@ -101,7 +101,17 @@ export default function ProfileEdit() {
   // Portfolio upload mutation - updated for new modern portfolio API
   const uploadPortfolioMutation = useMutation({
     mutationFn: async (images: any[]) => {
-      return apiRequest(`/api/portfolios/galleries/${activePortfolioTab}/images`, 'POST', images);
+      // Send each image individually to the modern portfolio API
+      const promises = images.map((image: any) => 
+        apiRequest('/api/portfolios/modern-images', 'POST', {
+          galleryId: image.galleryId,
+          objectPath: image.imageUrl,
+          filename: image.title,
+          description: image.description,
+          imageType: image.imageType
+        })
+      );
+      return Promise.all(promises);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/portfolios/galleries'] });
@@ -206,6 +216,81 @@ export default function ProfileEdit() {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Portfolio image handlers
+  const handleEditImage = async (imageId: string) => {
+    // For now, just show a simple prompt for editing description
+    const newDescription = prompt('Edit image description:', '');
+    if (newDescription !== null) {
+      try {
+        const response = await apiRequest(`/api/portfolios/images/${imageId}`, 'PUT', {
+          description: newDescription
+        });
+        
+        if (response.ok) {
+          // Refresh portfolio galleries
+          queryClient.invalidateQueries({ queryKey: ['/api/portfolios/galleries'] });
+          toast({
+            title: "Image Updated",
+            description: "Image description has been updated successfully.",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update image. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleDeleteImage = async (imageId: string) => {
+    if (confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
+      try {
+        const response = await apiRequest(`/api/portfolios/images/${imageId}`, 'DELETE');
+        
+        if (response.ok) {
+          // Refresh portfolio galleries
+          queryClient.invalidateQueries({ queryKey: ['/api/portfolios/galleries'] });
+          toast({
+            title: "Image Deleted",
+            description: "Image has been deleted successfully.",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete image. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleCleanupImages = async () => {
+    if (confirm('This will remove all non-working images from your portfolio. Are you sure?')) {
+      try {
+        const response = await apiRequest('/api/portfolios/cleanup-images', 'DELETE');
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Refresh portfolio galleries
+          queryClient.invalidateQueries({ queryKey: ['/api/portfolios/galleries'] });
+          toast({
+            title: "Portfolio Cleaned",
+            description: data.message,
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to clean up images. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -907,10 +992,26 @@ export default function ProfileEdit() {
                                       >
                                         <Eye className="w-4 h-4" />
                                       </Button>
-                                      <Button size="sm" variant="secondary" className="h-8 w-8 p-0">
+                                      <Button 
+                                        size="sm" 
+                                        variant="secondary" 
+                                        className="h-8 w-8 p-0"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditImage(image.id);
+                                        }}
+                                      >
                                         <Edit className="w-4 h-4" />
                                       </Button>
-                                      <Button size="sm" variant="destructive" className="h-8 w-8 p-0">
+                                      <Button 
+                                        size="sm" 
+                                        variant="destructive" 
+                                        className="h-8 w-8 p-0"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteImage(image.id);
+                                        }}
+                                      >
                                         <Trash2 className="w-4 h-4" />
                                       </Button>
                                     </div>
@@ -962,18 +1063,34 @@ export default function ProfileEdit() {
                         </div>
                       </div>
 
-                      {/* Portfolio Tips */}
-                      <div className="mt-8 p-4 bg-blue-600/10 border border-blue-600/20 rounded-lg">
-                        <h4 className="text-blue-300 font-medium mb-2 flex items-center gap-2">
-                          <Lightbulb className="w-4 h-4" />
-                          Portfolio Tips
-                        </h4>
-                        <ul className="text-sm text-blue-200/80 space-y-1">
-                          <li>• Add detailed descriptions to help customers understand your work</li>
-                          <li>• Use high-resolution images (at least 1200px width) for best quality</li>
-                          <li>• Set one image as primary to represent this category</li>
-                          <li>• Include before/after shots to showcase transformations</li>
-                        </ul>
+                      {/* Portfolio Management */}
+                      <div className="mt-8 space-y-4">
+                        {/* Cleanup Button */}
+                        <div className="flex justify-end">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={handleCleanupImages}
+                            className="bg-red-600/10 border-red-600/20 text-red-300 hover:bg-red-600/20"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Clean Up Broken Images
+                          </Button>
+                        </div>
+
+                        {/* Portfolio Tips */}
+                        <div className="p-4 bg-blue-600/10 border border-blue-600/20 rounded-lg">
+                          <h4 className="text-blue-300 font-medium mb-2 flex items-center gap-2">
+                            <Lightbulb className="w-4 h-4" />
+                            Portfolio Tips
+                          </h4>
+                          <ul className="text-sm text-blue-200/80 space-y-1">
+                            <li>• Add detailed descriptions to help customers understand your work</li>
+                            <li>• Use high-resolution images (at least 1200px width) for best quality</li>
+                            <li>• Set one image as primary to represent this category</li>
+                            <li>• Include before/after shots to showcase transformations</li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   );
