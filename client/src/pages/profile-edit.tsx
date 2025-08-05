@@ -656,7 +656,7 @@ export default function ProfileEdit() {
                   <p className="text-white/70 text-sm">Showcase your work samples</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="text-white/70 border-white/20 hover:bg-white/10">
+              <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg">
                 Manage
               </Button>
             </div>
@@ -672,7 +672,7 @@ export default function ProfileEdit() {
                   <p className="text-white/70 text-sm">Define your work radius</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="text-white/70 border-white/20 hover:bg-white/10">
+              <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg">
                 Set Area
               </Button>
             </div>
@@ -688,7 +688,7 @@ export default function ProfileEdit() {
                   <p className="text-white/70 text-sm">List your professional tools</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="text-white/70 border-white/20 hover:bg-white/10">
+              <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg">
                 Add Tools
               </Button>
             </div>
