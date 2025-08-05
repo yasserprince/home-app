@@ -196,19 +196,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Handle different auth types
       if (req.user?.claims?.sub) {
-        // Replit Auth user - return user data from claims
-        const user = {
-          id: req.user.claims.sub,
-          email: req.user.claims.email,
-          firstName: req.user.claims.first_name,
-          lastName: req.user.claims.last_name,
-          profileImageUrl: req.user.claims.profile_image_url || null,
-          authProvider: 'replit',
-          role: 'service_seeker',
-          accountType: 'individual',
-          isActive: true
-        };
-        return res.json(user);
+        // Replit Auth user - get full user data from database
+        const userId = req.user.claims.sub;
+        const dbUser = await storage.getUser(userId);
+        
+        if (dbUser) {
+          // Return database user data (includes uploaded profile images)
+          return res.json(dbUser);
+        } else {
+          // User not in database yet, create from claims
+          const newUser = {
+            id: userId,
+            email: req.user.claims.email,
+            firstName: req.user.claims.first_name,
+            lastName: req.user.claims.last_name,
+            profileImageUrl: req.user.claims.profile_image_url || null,
+            authProvider: 'replit',
+            role: 'service_seeker',
+            accountType: 'individual',
+            isActive: true
+          };
+          return res.json(newUser);
+        }
       } else if (req.user?.id) {
         // Google Auth or Email Auth user
         return res.json(req.user);
