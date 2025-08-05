@@ -1,10 +1,10 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, Calendar, User, Camera } from "lucide-react";
+import { Home, Calendar, User } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface BottomNavigationProps {
-  activeTab: 'home' | 'bookings' | 'portfolio' | 'profile';
+  activeTab: 'home' | 'bookings' | 'profile';
 }
 
 export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
@@ -42,22 +42,6 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
               <Calendar className={`w-6 h-6 ${activeTab === 'bookings' ? 'text-blue-400' : 'text-white/70'}`} strokeWidth={2} />
               <span className={`text-xs font-medium ${activeTab === 'bookings' ? 'text-blue-400' : 'text-white/70'}`}>
                 {t('bookings')}
-              </span>
-            </Button>
-          </Link>
-          
-          <Link href="/portfolio" className="flex-1">
-            <Button
-              variant="ghost"
-              className={`w-full py-4 px-4 flex flex-col items-center justify-center space-y-1 transition-all duration-200 ${
-                activeTab === 'portfolio' 
-                  ? 'text-blue-400 bg-blue-400/20' 
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <Camera className={`w-6 h-6 ${activeTab === 'portfolio' ? 'text-blue-400' : 'text-white/70'}`} strokeWidth={2} />
-              <span className={`text-xs font-medium ${activeTab === 'portfolio' ? 'text-blue-400' : 'text-white/70'}`}>
-                Portfolio
               </span>
             </Button>
           </Link>

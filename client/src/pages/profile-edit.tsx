@@ -22,7 +22,10 @@ import { ProfileImageManager } from "@/components/ProfileImageManager";
 import { LanguageSelector } from "@/components/language-selector";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +75,36 @@ export default function ProfileEdit() {
     availability: 'full-time',
     skills: [] as string[],
     languages: [] as string[]
+  });
+
+  // Portfolio state
+  const [activePortfolioTab, setActivePortfolioTab] = useState('featured-work');
+
+  // Portfolio galleries query
+  const { data: portfolioGalleries, isLoading: portfolioLoading } = useQuery({
+    queryKey: ['/api/portfolios', 'galleries'],
+    enabled: !!user,
+  });
+
+  // Portfolio upload mutation
+  const uploadPortfolioMutation = useMutation({
+    mutationFn: async (images: any[]) => {
+      return apiRequest('/api/portfolios/images', 'POST', images);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/portfolios'] });
+      toast({
+        title: "Success",
+        description: "Portfolio images uploaded successfully!",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to upload portfolio images.",
+        variant: "destructive",
+      });
+    },
   });
 
   useEffect(() => {
@@ -161,6 +194,37 @@ export default function ProfileEdit() {
       setIsSaving(false);
     }
   };
+
+  // Portfolio upload handlers
+  const handleGetUploadParameters = async () => {
+    const response = await apiRequest('/api/portfolios/images/upload', 'POST');
+    return {
+      method: 'PUT' as const,
+      url: (response as any).uploadURL,
+    };
+  };
+
+  const handlePortfolioUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    const uploadedImages = result.successful.map((file: any) => ({
+      galleryId: activePortfolioTab, // Use the active tab as gallery ID
+      imageUrl: file.uploadURL,
+      title: file.meta?.title || file.name,
+      description: file.meta?.description || '',
+      isPublic: true,
+      isPrimary: false,
+    }));
+
+    uploadPortfolioMutation.mutate(uploadedImages);
+  };
+
+  // Portfolio gallery tabs
+  const portfolioTabs = [
+    { id: 'featured-work', label: 'Featured Work', icon: ImageIcon },
+    { id: 'before-after', label: 'Before & After', icon: ImageIcon },
+    { id: 'work-samples', label: 'Work Samples', icon: ImageIcon },
+    { id: 'tools-equipment', label: 'Tools & Equipment', icon: Wrench },
+    { id: 'certifications', label: 'Certifications', icon: FileText },
+  ];
 
   const handleCancel = () => {
     if (user) {
@@ -608,6 +672,100 @@ export default function ProfileEdit() {
                       }
                     }}
                   />
+                )}
+              </div>
+
+              {/* Portfolio Section - Integrated into Profile */}
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5" />
+                  Portfolio Gallery
+                </h3>
+                
+                {/* Portfolio Tabs */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {portfolioTabs.map((tab) => {
+                    const IconComponent = tab.icon;
+                    return (
+                      <Button
+                        key={tab.id}
+                        variant={activePortfolioTab === tab.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setActivePortfolioTab(tab.id)}
+                        className={`flex items-center gap-2 ${
+                          activePortfolioTab === tab.id
+                            ? "bg-blue-600 text-white"
+                            : "bg-white/10 text-white/70 border-white/20 hover:bg-white/20"
+                        }`}
+                      >
+                        <IconComponent className="w-4 h-4" />
+                        {tab.label}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                {/* Upload Section */}
+                <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white font-medium">Upload to {portfolioTabs.find(t => t.id === activePortfolioTab)?.label}</h4>
+                    <div className="text-sm text-white/60">
+                      {portfolioGalleries?.[activePortfolioTab]?.images?.length || 0} images
+                    </div>
+                  </div>
+                  
+                  <ObjectUploader
+                    maxNumberOfFiles={10}
+                    maxFileSize={10485760}
+                    onGetUploadParameters={handleGetUploadParameters}
+                    onComplete={handlePortfolioUploadComplete}
+                    buttonClassName="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Camera className="w-4 h-4" />
+                      <span>Upload Images</span>
+                    </div>
+                  </ObjectUploader>
+                </div>
+
+                {/* Portfolio Images Display */}
+                {portfolioLoading ? (
+                  <div className="text-white/60 text-center py-8">Loading portfolio...</div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {portfolioGalleries?.[activePortfolioTab]?.images?.map((image: any) => (
+                      <div key={image.id} className="relative group">
+                        <div className="aspect-square bg-white/5 rounded-lg overflow-hidden border border-white/10">
+                          <img
+                            src={image.imageUrl}
+                            alt={image.title || 'Portfolio image'}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                          />
+                          {image.isPrimary && (
+                            <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                              Primary
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-2">
+                          <p className="text-white text-sm font-medium truncate">
+                            {image.title || 'Untitled'}
+                          </p>
+                          {image.description && (
+                            <p className="text-white/60 text-xs truncate">
+                              {image.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )) || (
+                      <div className="col-span-full text-center py-12 text-white/60">
+                        <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>No images in this gallery yet</p>
+                        <p className="text-sm mt-1">Upload your first image to get started</p>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
