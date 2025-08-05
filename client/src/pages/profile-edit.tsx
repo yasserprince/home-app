@@ -38,7 +38,8 @@ import {
   Shield,
   Edit3,
   Check,
-  X
+  X,
+  Briefcase
 } from "lucide-react";
 
 export default function ProfileEdit() {
@@ -56,7 +57,12 @@ export default function ProfileEdit() {
     phone: '',
     bio: '',
     location: '',
-    gender: ''
+    gender: '',
+    yearsExperience: '',
+    hourlyRate: '',
+    availability: 'full-time',
+    skills: [] as string[],
+    languages: [] as string[]
   });
 
   useEffect(() => {
@@ -67,14 +73,32 @@ export default function ProfileEdit() {
         phone: user.phone || '',
         bio: user.bio || '',
         location: user.wilaya || '',
-        gender: user.sex || ''
+        gender: user.sex || '',
+        yearsExperience: user.yearsExperience?.toString() || '',
+        hourlyRate: user.hourlyRate?.toString() || '',
+        availability: user.availability || 'full-time',
+        skills: user.skills || [],
+        languages: user.languages || []
       });
     }
   }, [user]);
 
-  const handleInputChange = (field: string, value: string) => {
-    if (field === 'bio' && value.length > 300) return;
+  const handleInputChange = (field: string, value: string | string[]) => {
+    if (field === 'bio' && typeof value === 'string' && value.length > 300) return;
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSkillAdd = (skill: string) => {
+    if (skill && !formData.skills.includes(skill)) {
+      setFormData(prev => ({ ...prev, skills: [...prev.skills, skill] }));
+    }
+  };
+
+  const handleSkillRemove = (skillToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.filter(skill => skill !== skillToRemove)
+    }));
   };
 
   const handleSave = async () => {
@@ -87,7 +111,12 @@ export default function ProfileEdit() {
         phone: formData.phone,
         bio: formData.bio,
         wilaya: formData.location, // Map location to wilaya
-        sex: formData.gender        // Map gender to sex
+        sex: formData.gender,       // Map gender to sex
+        yearsExperience: formData.yearsExperience ? parseInt(formData.yearsExperience) : null,
+        hourlyRate: formData.hourlyRate ? parseFloat(formData.hourlyRate) : null,
+        availability: formData.availability,
+        skills: formData.skills,
+        languages: formData.languages
       };
 
       const response = await fetch('/api/profile', {
@@ -132,7 +161,12 @@ export default function ProfileEdit() {
         phone: user.phone || '',
         bio: user.bio || '',
         location: user.wilaya || '',
-        gender: user.sex || ''
+        gender: user.sex || '',
+        yearsExperience: user.yearsExperience?.toString() || '',
+        hourlyRate: user.hourlyRate?.toString() || '',
+        availability: user.availability || 'full-time',
+        skills: user.skills || [],
+        languages: user.languages || []
       });
     }
     setIsEditing(false);
@@ -384,6 +418,137 @@ export default function ProfileEdit() {
                 </p>
               )}
             </div>
+
+            {/* Professional Information Section - Only in Edit Mode */}
+            {isEditing && (
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5" />
+                  Professional Information
+                </h3>
+                
+                {/* Years of Experience */}
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium text-white/80">
+                    Years of Experience
+                  </Label>
+                  <Input
+                    type="number"
+                    placeholder="e.g., 5"
+                    value={formData.yearsExperience}
+                    onChange={(e) => handleInputChange('yearsExperience', e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  />
+                </div>
+
+                {/* Hourly Rate */}
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium text-white/80">
+                    Hourly Rate (DZD)
+                  </Label>
+                  <Input
+                    type="number"
+                    placeholder="e.g., 2500"
+                    value={formData.hourlyRate}
+                    onChange={(e) => handleInputChange('hourlyRate', e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  />
+                </div>
+
+                {/* Availability */}
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium text-white/80">
+                    Availability
+                  </Label>
+                  <Select 
+                    value={formData.availability} 
+                    onValueChange={(value) => handleInputChange('availability', value)}
+                  >
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue placeholder="Select availability" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800/95 backdrop-blur-lg border-gray-700">
+                      <SelectItem value="full-time">Full-time</SelectItem>
+                      <SelectItem value="part-time">Part-time</SelectItem>
+                      <SelectItem value="weekends-only">Weekends only</SelectItem>
+                      <SelectItem value="evenings-only">Evenings only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Skills */}
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium text-white/80">
+                    Skills
+                  </Label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {formData.skills.map((skill, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm flex items-center gap-2"
+                      >
+                        {skill}
+                        <X 
+                          size={14} 
+                          className="cursor-pointer hover:text-red-400"
+                          onClick={() => handleSkillRemove(skill)}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                  <Input
+                    placeholder="Add a skill (press Enter)"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const skill = (e.target as HTMLInputElement).value.trim();
+                        if (skill) {
+                          handleSkillAdd(skill);
+                          (e.target as HTMLInputElement).value = '';
+                        }
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Languages */}
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium text-white/80">
+                    Languages
+                  </Label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {formData.languages.map((language, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1 bg-green-600/20 text-green-300 rounded-full text-sm flex items-center gap-2"
+                      >
+                        {language}
+                        <X 
+                          size={14} 
+                          className="cursor-pointer hover:text-red-400"
+                          onClick={() => handleInputChange('languages', formData.languages.filter(l => l !== language))}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                  <Input
+                    placeholder="Add a language (press Enter)"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const language = (e.target as HTMLInputElement).value.trim();
+                        if (language && !formData.languages.includes(language)) {
+                          handleInputChange('languages', [...formData.languages, language]);
+                          (e.target as HTMLInputElement).value = '';
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 

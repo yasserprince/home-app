@@ -67,6 +67,20 @@ export const users = pgTable("users", {
   trustScore: integer("trust_score").default(0), // 0-100 trust score
   verificationDate: timestamp("verification_date"),
   verificationProvider: varchar("verification_provider"), // didit, idenfy, etc.
+  // Professional Profile Fields (inspired by TaskRabbit/Thumbtack/Handy)
+  yearsExperience: integer("years_experience"), // Years of professional experience
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }), // Service hourly rate
+  availability: varchar("availability").default("part-time"), // full-time, part-time, weekends-only, evenings-only
+  skills: text("skills").array(), // Professional skills array
+  languages: text("languages").array(), // Spoken languages
+  serviceArea: varchar("service_area"), // Geographic service coverage
+  responseTime: varchar("response_time").default("within-24h"), // typical response time
+  completedJobs: integer("completed_jobs").default(0), // Number of completed jobs
+  rating: decimal("rating", { precision: 3, scale: 2 }).default("0"), // Average rating
+  reviewCount: integer("review_count").default(0), // Total reviews received
+  isServiceProvider: boolean("is_service_provider").default(false), // Professional service provider flag
+  licenseNumber: varchar("license_number"), // Professional license number
+  insuranceVerified: boolean("insurance_verified").default(false), // Insurance verification status
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
