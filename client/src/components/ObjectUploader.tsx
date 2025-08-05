@@ -24,13 +24,13 @@ interface ObjectUploaderProps {
 
 /**
  * A file upload component that renders as a button and provides a modal interface for
- * file management similar to TaskRabbit and Thumbtack.
+ * file management.
  * 
  * Features:
  * - Renders as a customizable button that opens a file upload modal
  * - Provides a modal interface for:
- *   - File selection with drag & drop
- *   - File preview and editing
+ *   - File selection
+ *   - File preview
  *   - Upload progress tracking
  *   - Upload status display
  * 
@@ -39,7 +39,7 @@ interface ObjectUploaderProps {
  * 
  * @param props - Component props
  * @param props.maxNumberOfFiles - Maximum number of files allowed to be uploaded
- *   (default: 10 for portfolio galleries)
+ *   (default: 1)
  * @param props.maxFileSize - Maximum file size in bytes (default: 10MB)
  * @param props.onGetUploadParameters - Function to get upload parameters (method and URL).
  *   Typically used to fetch a presigned URL from the backend server for direct-to-S3
@@ -51,7 +51,7 @@ interface ObjectUploaderProps {
  * @param props.children - Content to be rendered inside the button
  */
 export function ObjectUploader({
-  maxNumberOfFiles = 10,
+  maxNumberOfFiles = 1,
   maxFileSize = 10485760, // 10MB default
   onGetUploadParameters,
   onComplete,
@@ -93,47 +93,75 @@ export function ObjectUploader({
       };
     }
   }, [showModal]);
-  const [uppy] = useState(() =>
-    new Uppy({
-      restrictions: {
-        maxNumberOfFiles,
-        maxFileSize,
-        allowedFileTypes: ['image/*'], // Only allow images for portfolio
-      },
-      autoProceed: false,
-    })
-      .use(AwsS3, {
+
+  // Create Uppy instance only when modal opens
+  const [uppy, setUppy] = useState<Uppy | null>(null);
+
+  useEffect(() => {
+    if (showModal && !uppy) {
+      // Create Uppy instance only when needed
+      const uppyInstance = new Uppy({
+        restrictions: {
+          maxNumberOfFiles,
+          maxFileSize,
+          allowedFileTypes: ['image/*'], // Only allow images for portfolio
+        },
+        autoProceed: false,
+      });
+
+      uppyInstance.use(AwsS3, {
         shouldUseMultipart: false,
         getUploadParameters: onGetUploadParameters,
-      })
-      .on("complete", (result) => {
+      });
+
+      uppyInstance.on("complete", (result) => {
         setTimeout(() => setShowModal(false), 1000); // Close after 1 second to show completion
         onComplete?.(result);
-      })
-      .on("cancel-all", () => {
+      });
+
+      uppyInstance.on("cancel-all", () => {
         setShowModal(false);
-      })
-  );
+      });
+
+      setUppy(uppyInstance);
+    }
+
+    // Cleanup when modal closes
+    if (!showModal && uppy) {
+      uppy.close();
+      setUppy(null);
+    }
+  }, [showModal, uppy, maxNumberOfFiles, maxFileSize, onGetUploadParameters, onComplete]);
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <div>
-      <Button onClick={() => setShowModal(true)} className={buttonClassName}>
+      <Button onClick={handleOpenModal} className={buttonClassName}>
         {children}
       </Button>
 
-      <DashboardModal
-        uppy={uppy}
-        open={showModal}
-        onRequestClose={() => setShowModal(false)}
-        closeModalOnClickOutside
-        closeAfterFinish
-        showProgressDetails
-        proudlyDisplayPoweredByUppy={false}
-        metaFields={[
-          { id: 'title', name: 'Title', placeholder: 'Image title' },
-          { id: 'description', name: 'Description', placeholder: 'Describe this image' },
-        ]}
-      />
+      {showModal && uppy && (
+        <DashboardModal
+          uppy={uppy}
+          open={showModal}
+          onRequestClose={handleCloseModal}
+          closeModalOnClickOutside
+          closeAfterFinish
+          showProgressDetails
+          proudlyDisplayPoweredByUppy={false}
+          metaFields={[
+            { id: 'title', name: 'Title', placeholder: 'Image title' },
+            { id: 'description', name: 'Description', placeholder: 'Describe this image' },
+          ]}
+        />
+      )}
     </div>
   );
 }
