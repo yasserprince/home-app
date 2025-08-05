@@ -70,8 +70,6 @@
   /* Fix modal scroll lock issues */
   body.modal-open {
     overflow: hidden;
-    position: fixed;
-    width: 100%;
   }
   
   /* Ensure proper scrolling in containers */
@@ -120,12 +118,21 @@
   transform: translate(-50%, -50%) !important;
   position: fixed !important;
   border-radius: 12px !important;
-  overflow: hidden !important;
+  overflow: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .uppy-Dashboard-inner {
   background-color: #1a1a1a !important;
   border-radius: 12px !important;
+  overflow-y: auto !important;
+  max-height: 100% !important;
+}
+
+.uppy-Dashboard {
+  height: 100% !important;
+  min-height: 500px !important;
 }
 
 .uppy-Dashboard-AddFiles {
@@ -150,9 +157,15 @@
 @media (max-width: 768px) {
   .uppy-DashboardModal-inner {
     width: 95vw !important;
-    height: 70vh !important;
+    height: 85vh !important;
     max-width: 95vw !important;
-    max-height: 70vh !important;
+    max-height: 85vh !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  
+  .uppy-Dashboard {
+    min-height: 400px !important;
   }
 }
 
