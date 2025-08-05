@@ -81,6 +81,7 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Production-specific middleware for consistent behavior
   const isProduction = process.env.NODE_ENV === "production";
+  const isGitHubDeployment = Boolean(process.env.REPL_DEPLOYMENT_ID);
   console.log(`🔧 Configuring routes for ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
   
   // Add consistent headers for both environments
@@ -99,10 +100,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupEmailAuth(app);
   await setupAuth(app); // Replit Auth
   
+  // Auto-initialize data for production deployments
+  if (isProduction || isGitHubDeployment) {
+    console.log("🚀 Production deployment detected - auto-initializing data...");
+    try {
+      // Check if categories already exist to avoid duplicates
+      const existingCategories = await storage.getServiceCategories();
+      if (existingCategories.length === 0) {
+        console.log("📦 No categories found, seeding from SERVICE_CATEGORIES...");
+        const { SERVICE_CATEGORIES } = await import('./seedCategories.js');
+        
+        // Create categories using the proper format
+        for (const categoryData of SERVICE_CATEGORIES.slice(0, 25)) { // Top 25 categories for deployment
+          try {
+            await storage.createServiceCategory({
+              name: categoryData.name,
+              icon: categoryData.icon,
+              color: categoryData.color,
+              category: categoryData.category,
+              description: categoryData.description,
+              nameAr: categoryData.nameAr,
+              nameFr: categoryData.nameFr,
+              descriptionAr: categoryData.descriptionAr,
+              descriptionFr: categoryData.descriptionFr,
+              isPopular: categoryData.isPopular,
+              sortOrder: categoryData.sortOrder,
+              averagePrice: categoryData.averagePrice,
+              estimatedDuration: categoryData.estimatedDuration,
+              skillLevel: categoryData.skillLevel,
+              requiresLicense: categoryData.requiresLicense,
+              emergencyService: categoryData.emergencyService
+            });
+            console.log(`✅ Created category: ${categoryData.name}`);
+          } catch (catError) {
+            console.error(`❌ Failed to create category ${categoryData.name}:`, catError);
+          }
+        }
+        console.log("✅ Categories seeded for production");
+      } else {
+        console.log(`✅ Categories already exist in production (${existingCategories.length} found)`);
+      }
+    } catch (error) {
+      console.error("❌ Error seeding categories:", error);
+    }
+  }
+  
   // Test endpoints for debugging
   setupTestAuth(app);
   setupAuthTest(app);
   setupDebugAuth(app);
+
+  // Comprehensive deployment verification endpoint
+  app.get('/api/deployment/verify', async (req, res) => {
+    console.log("🔍 Running comprehensive deployment verification...");
+    
+    const tests = [];
+    const isProduction = process.env.NODE_ENV === "production";
+    const isGitHubDeployment = Boolean(process.env.REPL_DEPLOYMENT_ID);
+    
+    // Test 1: Categories seeded correctly
+    let categoriesTest = { name: "Categories Seeded", passed: false, details: null };
+    try {
+      const categories = await storage.getServiceCategories();
+      categoriesTest.passed = categories.length >= 20; // Should have at least 20 categories
+      categoriesTest.details = `Found ${categories.length} categories. Top 5: ${categories.slice(0, 5).map(c => c.name).join(', ')}`;
+    } catch (error) {
+      categoriesTest.details = `Error: ${(error as Error).message}`;
+    }
+    tests.push(categoriesTest);
+    
+    // Test 2: Object storage working for profile images
+    let objectStorageTest = { name: "Object Storage", passed: false, details: null };
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      objectStorageTest.passed = uploadURL && uploadURL.includes('storage.googleapis.com');
+      objectStorageTest.details = `Upload URL generated: ${uploadURL ? 'YES' : 'NO'}`;
+    } catch (error) {
+      objectStorageTest.details = `Error: ${(error as Error).message}`;
+    }
+    tests.push(objectStorageTest);
+    
+    // Test 3: Session configuration
+    let sessionTest = { name: "Session Configuration", passed: false, details: null };
+    try {
+      sessionTest.passed = Boolean(process.env.SESSION_SECRET);
+      sessionTest.details = `Session secret: ${sessionTest.passed ? 'CONFIGURED' : 'MISSING'}`;
+    } catch (error) {
+      sessionTest.details = `Error: ${(error as Error).message}`;
+    }
+    tests.push(sessionTest);
+    
+    // Test 4: Database connectivity
+    let dbTest = { name: "Database Connection", passed: false, details: null };
+    try {
+      const user = await storage.getUser('test-user-id'); // This will fail but test connectivity
+      dbTest.passed = true; // If we get here, DB is connected
+      dbTest.details = "Database connected successfully";
+    } catch (error) {
+      // DB error is expected, but connection should work
+      dbTest.passed = !(error as Error).message.includes('connect');
+      dbTest.details = `Connection test: ${dbTest.passed ? 'OK' : 'FAILED'}`;
+    }
+    tests.push(dbTest);
+    
+    const allPassed = tests.every(test => test.passed);
+    const criticalIssues = tests.filter(test => !test.passed).map(test => test.name);
+    
+    res.json({
+      status: allPassed ? "DEPLOYMENT_READY" : "NEEDS_FIXES",
+      environment: isProduction ? "PRODUCTION" : "DEVELOPMENT",
+      isGitHubDeployment,
+      tests,
+      criticalIssues,
+      summary: {
+        totalTests: tests.length,
+        passed: tests.filter(t => t.passed).length,
+        failed: tests.filter(t => !t.passed).length
+      },
+      recommendation: allPassed 
+        ? "Deployment should work identically to development" 
+        : `Fix these issues: ${criticalIssues.join(', ')}`,
+      timestamp: new Date().toISOString()
+    });
+  });
 
   // Deployment status endpoint for verifying identical behavior
   app.get('/api/deployment/status', async (req, res) => {
@@ -112,8 +233,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // GitHub deployment detection
     const isGitHubDeployment = Boolean(process.env.REPL_DEPLOYMENT_ID);
     const gitRepo = process.env.REPL_GIT_REPO || null;
+    const isProduction = process.env.NODE_ENV === "production";
+    
+    // Critical deployment checks
+    let categoriesStatus = { count: 0, seeded: false, error: null };
+    try {
+      const categories = await storage.getServiceCategories();
+      categoriesStatus = { count: categories.length, seeded: categories.length > 0, error: null };
+    } catch (error) {
+      categoriesStatus.error = error.message;
+    }
+
+    let objectStorageTest = { working: false, error: null };
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const privateDir = objectStorageService.getPrivateObjectDir();
+      const publicPaths = objectStorageService.getPublicObjectSearchPaths();
+      objectStorageTest = { working: !!(privateDir && publicPaths.length > 0), error: null };
+    } catch (error) {
+      objectStorageTest.error = error.message;
+    }
+
+    // Critical issues check
+    const criticalIssues = [];
+    if (!categoriesStatus.seeded) criticalIssues.push("CATEGORIES_NOT_SEEDED");
+    if (!objectStorageTest.working) criticalIssues.push("OBJECT_STORAGE_NOT_CONFIGURED");
+    if (!config.database.connected) criticalIssues.push("DATABASE_NOT_CONNECTED");
+    
+    const deploymentHealthy = criticalIssues.length === 0;
     
     res.json({
+      status: deploymentHealthy ? "HEALTHY" : "CRITICAL_ISSUES",
       environment: config.environment,
       timestamp: new Date().toISOString(),
       version: "1.0.0",
@@ -122,13 +272,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         repository: gitRepo,
         deploymentId: process.env.REPL_DEPLOYMENT_ID || null
       },
+      criticalChecks: {
+        categories: categoriesStatus,
+        objectStorage: objectStorageTest,
+        database: config.database,
+        issues: criticalIssues
+      },
       objectStorage: {
         configured: Boolean(config.objectStorage.bucketId),
         publicPathsCount: config.objectStorage.publicPaths.length,
         hasPrivateDir: Boolean(config.objectStorage.privateDir),
         bucketId: config.objectStorage.bucketId ? 'SET' : 'MISSING'
       },
-      database: config.database,
       auth: config.auth,
       uptime: process.uptime(),
       nodeVersion: process.version,
@@ -1519,21 +1674,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/public/profile-images/:imageId", async (req, res) => {
     const objectStorageService = new ObjectStorageService();
     const imagePath = `/objects/uploads/${req.params.imageId}`;
-    console.log("🖼️ Public profile image request:", imagePath);
+    console.log(`🖼️ [${isProduction ? 'PROD' : 'DEV'}] Public profile image request:`, imagePath);
     
     try {
       const objectFile = await objectStorageService.getObjectEntityFile(imagePath);
-      console.log("✅ Serving public profile image:", objectFile.name);
+      console.log(`✅ [${isProduction ? 'PROD' : 'DEV'}] Serving public profile image:`, objectFile.name);
       
-      // Set aggressive caching for profile images
+      // Set aggressive caching for profile images - identical in both environments
       res.set({
         'Cache-Control': 'public, max-age=86400', // 24 hours
-        'Content-Type': 'image/jpeg'
+        'Content-Type': 'image/jpeg',
+        'Access-Control-Allow-Origin': '*', // Allow cross-origin for profile images
+        'Access-Control-Allow-Methods': 'GET'
       });
       
-      objectStorageService.downloadObject(objectFile, res);
+      objectStorageService.downloadObject(objectFile, res, 86400); // 24h cache
     } catch (error) {
-      console.error("❌ Error serving profile image:", error);
+      console.error(`❌ [${isProduction ? 'PROD' : 'DEV'}] Error serving profile image:`, error);
       if (error instanceof ObjectNotFoundError) {
         return res.sendStatus(404);
       }
@@ -1589,13 +1746,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ uploadURL });
     } catch (error) {
       console.error("Error generating upload URL:", error);
-      res.status(500).json({ error: "Failed to generate upload URL", message: error.message });
+      res.status(500).json({ error: "Failed to generate upload URL", message: (error as Error).message });
     }
   });
 
   // Profile image upload endpoint
   app.put("/api/profile/image", isAuthenticated, async (req: any, res) => {
-    console.log("Profile image update request:", req.body);
+    console.log(`📸 [${isProduction ? 'PROD' : 'DEV'}] Profile image update request:`, req.body);
     
     if (!req.body.imageURL) {
       console.log("Missing imageURL in request body");
@@ -1603,11 +1760,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     const userId = ((req.user as any)?.claims || {})?.sub;
-    console.log("User ID:", userId);
+    console.log(`👤 [${isProduction ? 'PROD' : 'DEV'}] User ID:`, userId);
 
     try {
       const objectStorageService = new ObjectStorageService();
-      console.log("Raw imageURL received:", req.body.imageURL);
+      console.log(`📥 [${isProduction ? 'PROD' : 'DEV'}] Raw imageURL received:`, req.body.imageURL);
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
         req.body.imageURL,
         {
@@ -1616,11 +1773,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       );
 
-      console.log("Object path normalized:", objectPath);
+      console.log(`📁 [${isProduction ? 'PROD' : 'DEV'}] Object path normalized:`, objectPath);
 
-      // Convert to public profile image URL for faster access
+      // Convert to public profile image URL for faster access - IDENTICAL in both environments
       const imageId = objectPath.split('/').pop(); // Extract UUID from path
       const publicImageUrl = `/public/profile-images/${imageId}`;
+      console.log(`🔗 [${isProduction ? 'PROD' : 'DEV'}] Public image URL:`, publicImageUrl);
       
       // Update user profile with public image URL
       const updatedUser = await storage.updateUser(userId, { profileImageUrl: publicImageUrl });
@@ -1680,7 +1838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error adding portfolio images:", error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: "Internal server error", message: (error as Error).message });
     }
   });
 

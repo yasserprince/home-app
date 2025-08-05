@@ -35,31 +35,28 @@ Your `.replit` file is configured for:
 ### 4. Verify Deployment
 After deployment, check these endpoints:
 
-**Health Check:**
+**Comprehensive Verification (NEW):**
 ```
-GET [your-deployment-url]/api/deployment/status
+GET [your-deployment-url]/api/deployment/verify
 ```
 
 **Expected Response:**
 ```json
 {
-  "environment": "PRODUCTION",
-  "github": {
-    "isDeployment": true,
-    "repository": "yasserprince/home-app"
-  },
-  "objectStorage": {
-    "configured": true,
-    "bucketId": "SET"
-  },
-  "database": {
-    "configured": true
-  },
-  "auth": {
-    "google": true,
-    "replit": true
-  }
+  "status": "DEPLOYMENT_READY",
+  "tests": [
+    {"name": "Categories Seeded", "passed": true, "details": "Found 25 categories..."},
+    {"name": "Object Storage", "passed": true, "details": "Upload URL generated: YES"},
+    {"name": "Session Configuration", "passed": true, "details": "Session secret: CONFIGURED"},
+    {"name": "Database Connection", "passed": true, "details": "Database connected successfully"}
+  ],
+  "recommendation": "Deployment should work identically to development"
 }
+```
+
+**Legacy Status Check:**
+```
+GET [your-deployment-url]/api/deployment/status
 ```
 
 ## Differences Between Development and Production

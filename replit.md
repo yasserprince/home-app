@@ -8,6 +8,14 @@ This is a full-stack home service booking platform connecting customers with loc
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (August 2025)
+
+### Deployment Parity Fixes
+- **Auto-seeding System**: Categories now automatically seed on production startup to ensure identical content between development and deployment
+- **Profile Picture URL Consistency**: Enhanced object storage service with environment-aware logging and consistent URL handling for profile images
+- **Comprehensive Verification**: Added `/api/deployment/verify` endpoint to test all critical deployment differences
+- **Error Handling**: Fixed TypeScript errors that could cause production runtime issues
+
 ## System Architecture
 
 ### Frontend Architecture
