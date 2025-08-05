@@ -555,53 +555,159 @@ export class DatabaseStorage implements IStorage {
     return !!updatedImage;
   }
 
-  // Modern Portfolio operations - simple in-memory storage for now
-  private modernPortfolioData: Map<string, any[]> = new Map();
-
+  // Modern Portfolio operations - database-backed storage
   async getModernPortfolioGalleries(userId: string): Promise<any[]> {
-    return this.modernPortfolioData.get(userId) || [];
+    try {
+      const galleries = await db
+        .select()
+        .from(portfolioGalleries)
+        .where(eq(portfolioGalleries.userId, userId))
+        .orderBy(asc(portfolioGalleries.createdAt));
+
+      // Get images for each gallery
+      const galleriesWithImages = await Promise.all(
+        galleries.map(async (gallery) => {
+          const images = await db
+            .select()
+            .from(portfolioImages)
+            .where(eq(portfolioImages.galleryId, gallery.id))
+            .orderBy(asc(portfolioImages.createdAt));
+          
+          return {
+            ...gallery,
+            images: images
+          };
+        })
+      );
+
+      return galleriesWithImages;
+    } catch (error) {
+      console.error("Error fetching modern portfolio galleries:", error);
+      return [];
+    }
   }
 
   async createModernPortfolioGallery(gallery: any): Promise<any> {
-    const userId = gallery.userId;
-    const userGalleries = this.modernPortfolioData.get(userId) || [];
-    userGalleries.push(gallery);
-    this.modernPortfolioData.set(userId, userGalleries);
-    return gallery;
+    try {
+      const [insertedGallery] = await db
+        .insert(portfolioGalleries)
+        .values({
+          id: gallery.id,
+          userId: gallery.userId,
+          title: gallery.title,
+          description: gallery.description || '',
+          category: gallery.category,
+          serviceType: gallery.serviceType || '',
+          isPublic: gallery.isPublic ?? true,
+          sortOrder: gallery.sortOrder || 0,
+        })
+        .returning();
+
+      return {
+        ...insertedGallery,
+        images: []
+      };
+    } catch (error) {
+      console.error("Error creating modern portfolio gallery:", error);
+      throw error;
+    }
   }
 
   async addImagesToModernPortfolioGallery(userId: string, galleryId: string, images: any[]): Promise<any> {
-    const userGalleries = this.modernPortfolioData.get(userId) || [];
-    const galleryIndex = userGalleries.findIndex(g => g.id === galleryId);
-    
-    if (galleryIndex >= 0) {
-      userGalleries[galleryIndex].images = [
-        ...userGalleries[galleryIndex].images,
-        ...images
-      ];
-      userGalleries[galleryIndex].updatedAt = new Date();
-      this.modernPortfolioData.set(userId, userGalleries);
-      return userGalleries[galleryIndex];
+    try {
+      // Verify gallery exists and belongs to user
+      const [gallery] = await db
+        .select()
+        .from(portfolioGalleries)
+        .where(and(eq(portfolioGalleries.id, galleryId), eq(portfolioGalleries.userId, userId)));
+
+      if (!gallery) {
+        return null;
+      }
+
+      // Insert images into database
+      const insertedImages = await Promise.all(
+        images.map(async (image) => {
+          const [insertedImage] = await db
+            .insert(portfolioImages)
+            .values({
+              id: image.id,
+              galleryId: galleryId,
+              imageUrl: image.imageUrl,
+              title: image.title || '',
+              description: image.description || '',
+              imageType: image.imageType || 'work_sample',
+              isPublic: image.isPublic ?? true,
+              isPrimary: image.isPrimary || false,
+              sortOrder: image.sortOrder || 0,
+            })
+            .returning();
+          return insertedImage;
+        })
+      );
+
+      // Update gallery's updatedAt timestamp
+      await db
+        .update(portfolioGalleries)
+        .set({ updatedAt: new Date() })
+        .where(eq(portfolioGalleries.id, galleryId));
+
+      // Return updated gallery with images
+      const allImages = await db
+        .select()
+        .from(portfolioImages)
+        .where(eq(portfolioImages.galleryId, galleryId))
+        .orderBy(asc(portfolioImages.createdAt));
+
+      return {
+        ...gallery,
+        images: allImages
+      };
+    } catch (error) {
+      console.error("Error adding images to modern portfolio gallery:", error);
+      throw error;
     }
-    
-    return null;
   }
 
   async addImageToModernPortfolioGallery(galleryId: string, imageData: any): Promise<any> {
-    // Find which user owns this gallery
-    for (const [userId, galleries] of Array.from(this.modernPortfolioData.entries())) {
-      const galleryIndex = galleries.findIndex((g: any) => g.id === galleryId);
-      if (galleryIndex >= 0) {
-        if (!galleries[galleryIndex].images) {
-          galleries[galleryIndex].images = [];
-        }
-        galleries[galleryIndex].images.push(imageData);
-        galleries[galleryIndex].updatedAt = new Date();
-        this.modernPortfolioData.set(userId, galleries);
-        return imageData;
+    try {
+      // Check if gallery exists
+      const [gallery] = await db
+        .select()
+        .from(portfolioGalleries)
+        .where(eq(portfolioGalleries.id, galleryId));
+
+      if (!gallery) {
+        return null;
       }
+
+      // Insert image
+      const [insertedImage] = await db
+        .insert(portfolioImages)
+        .values({
+          id: imageData.id,
+          galleryId: galleryId,
+          imageUrl: imageData.imageUrl,
+          title: imageData.title || '',
+          description: imageData.description || '',
+          imageType: imageData.imageType || 'work_sample',
+          isPublic: imageData.isPublic ?? true,
+          isPrimary: imageData.isPrimary || false,
+          sortOrder: imageData.sortOrder || 0,
+        })
+        .returning();
+
+      // Update gallery's updatedAt timestamp
+      await db
+        .update(portfolioGalleries)
+        .set({ updatedAt: new Date() })
+        .where(eq(portfolioGalleries.id, galleryId));
+
+      return insertedImage;
+    } catch (error) {
+      console.error("Error adding image to modern portfolio gallery:", error);
+      throw error;
     }
-    return null;
   }
 
   async deleteModernPortfolioImage(galleryId: string, imageId: string): Promise<boolean> {
@@ -622,35 +728,96 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteModernPortfolioImageById(imageId: string): Promise<boolean> {
-    for (const [userId, galleries] of Array.from(this.modernPortfolioData.entries())) {
-      for (const gallery of galleries) {
-        const images = gallery.images || [];
-        const imageIndex = images.findIndex((img: any) => img.id === imageId);
-        if (imageIndex >= 0) {
-          images.splice(imageIndex, 1);
-          gallery.updatedAt = new Date();
-          this.modernPortfolioData.set(userId, galleries);
-          return true;
-        }
+    try {
+      // Find the image and its gallery
+      const [image] = await db
+        .select()
+        .from(portfolioImages)
+        .where(eq(portfolioImages.id, imageId));
+
+      if (!image) {
+        return false;
       }
+
+      // Delete the image
+      await db
+        .delete(portfolioImages)
+        .where(eq(portfolioImages.id, imageId));
+
+      // Update gallery's updatedAt timestamp
+      await db
+        .update(portfolioGalleries)
+        .set({ updatedAt: new Date() })
+        .where(eq(portfolioGalleries.id, image.galleryId));
+
+      return true;
+    } catch (error) {
+      console.error("Error deleting modern portfolio image:", error);
+      return false;
     }
-    return false;
   }
 
   async updateModernPortfolioImage(imageId: string, updates: any): Promise<boolean> {
-    for (const [userId, galleries] of Array.from(this.modernPortfolioData.entries())) {
-      for (const gallery of galleries) {
-        const images = gallery.images || [];
-        const imageIndex = images.findIndex((img: any) => img.id === imageId);
-        if (imageIndex >= 0) {
-          images[imageIndex] = { ...images[imageIndex], ...updates };
-          gallery.updatedAt = new Date();
-          this.modernPortfolioData.set(userId, galleries);
-          return true;
-        }
+    try {
+      // Find the image
+      const [image] = await db
+        .select()
+        .from(portfolioImages)
+        .where(eq(portfolioImages.id, imageId));
+
+      if (!image) {
+        return false;
       }
+
+      // Update the image
+      await db
+        .update(portfolioImages)
+        .set({
+          title: updates.title ?? image.title,
+          description: updates.description ?? image.description,
+          imageType: updates.imageType ?? image.imageType,
+          isPublic: updates.isPublic ?? image.isPublic,
+          isPrimary: updates.isPrimary ?? image.isPrimary,
+          sortOrder: updates.sortOrder ?? image.sortOrder,
+          updatedAt: new Date(),
+        })
+        .where(eq(portfolioImages.id, imageId));
+
+      // Update gallery's updatedAt timestamp
+      await db
+        .update(portfolioGalleries)
+        .set({ updatedAt: new Date() })
+        .where(eq(portfolioGalleries.id, image.galleryId));
+
+      return true;
+    } catch (error) {
+      console.error("Error updating modern portfolio image:", error);
+      return false;
     }
-    return false;
+  }
+
+  async deleteModernPortfolioImage(galleryId: string, imageId: string): Promise<boolean> {
+    try {
+      // Delete the image
+      const result = await db
+        .delete(portfolioImages)
+        .where(and(eq(portfolioImages.id, imageId), eq(portfolioImages.galleryId, galleryId)));
+
+      if (result.rowCount === 0) {
+        return false;
+      }
+
+      // Update gallery's updatedAt timestamp
+      await db
+        .update(portfolioGalleries)
+        .set({ updatedAt: new Date() })
+        .where(eq(portfolioGalleries.id, galleryId));
+
+      return true;
+    } catch (error) {
+      console.error("Error deleting modern portfolio image:", error);
+      return false;
+    }
   }
 }
 
