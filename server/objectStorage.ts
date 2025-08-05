@@ -40,7 +40,11 @@ export class ObjectNotFoundError extends Error {
 
 // The object storage service is used to interact with the object storage service.
 export class ObjectStorageService {
-  constructor() {}
+  constructor() {
+    const isProduction = process.env.NODE_ENV === "production";
+    console.log(`🪣 ObjectStorageService initialized for ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+    console.log(`📡 Sidecar endpoint: ${REPLIT_SIDECAR_ENDPOINT}`);
+  }
 
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {

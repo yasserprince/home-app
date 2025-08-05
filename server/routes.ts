@@ -79,6 +79,21 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Production-specific middleware for consistent behavior
+  const isProduction = process.env.NODE_ENV === "production";
+  console.log(`🔧 Configuring routes for ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+  
+  // Add consistent headers for both environments
+  app.use((_req, res, next) => {
+    // Security headers for production consistency
+    if (isProduction) {
+      res.header('X-Frame-Options', 'DENY');
+      res.header('X-Content-Type-Options', 'nosniff');
+      res.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+    }
+    next();
+  });
+
   // Auth middleware
   await setupGoogleAuth(app);
   await setupEmailAuth(app);
@@ -88,6 +103,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupTestAuth(app);
   setupAuthTest(app);
   setupDebugAuth(app);
+
+  // Deployment status endpoint for verifying identical behavior
+  app.get('/api/deployment/status', async (req, res) => {
+    const { getDeploymentConfig } = await import('./deploymentConfig.js');
+    const config = getDeploymentConfig();
+    
+    res.json({
+      environment: config.environment,
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+      objectStorage: {
+        configured: Boolean(config.objectStorage.bucketId),
+        publicPathsCount: config.objectStorage.publicPaths.length,
+        hasPrivateDir: Boolean(config.objectStorage.privateDir)
+      },
+      database: config.database,
+      auth: config.auth,
+      uptime: process.uptime(),
+      nodeVersion: process.version,
+      platform: process.platform
+    });
+  });
   
   // Serve uploaded files
   app.use('/uploads', express.static(uploadDir));

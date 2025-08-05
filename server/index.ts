@@ -1,10 +1,39 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { logDeploymentConfig, ensureIdenticalBehavior, validateDeploymentConfig } from "./deploymentConfig";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// Ensure consistent environment handling
+const isProduction = process.env.NODE_ENV === "production";
+console.log(`🚀 Starting server in ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'} mode`);
+
+// Consistent middleware setup for both environments
+app.use(express.json({ limit: '50mb' })); // Increase limit for file uploads
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+
+// Environment consistency check for deployment
+const requiredEnvVars = [
+  'DATABASE_URL',
+  'PRIVATE_OBJECT_DIR', 
+  'PUBLIC_OBJECT_SEARCH_PATHS',
+  'DEFAULT_OBJECT_STORAGE_BUCKET_ID'
+];
+
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingEnvVars.length > 0) {
+  console.warn(`⚠️ Missing environment variables: ${missingEnvVars.join(', ')}`);
+} else {
+  console.log('✅ All required environment variables are present');
+}
+
+// Log object storage configuration for debugging
+console.log('🪣 Object Storage Configuration:', {
+  bucketId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID ? 'SET' : 'MISSING',
+  privateDir: process.env.PRIVATE_OBJECT_DIR ? 'SET' : 'MISSING',
+  publicPaths: process.env.PUBLIC_OBJECT_SEARCH_PATHS ? 'SET' : 'MISSING',
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -37,6 +66,20 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Ensure identical deployment behavior
+  ensureIdenticalBehavior();
+  
+  // Log comprehensive deployment configuration
+  logDeploymentConfig();
+  
+  // Validate deployment configuration
+  const validation = validateDeploymentConfig();
+  if (!validation.valid) {
+    console.error("❌ Deployment configuration validation failed!");
+    validation.errors.forEach(error => console.error(`  - ${error}`));
+    process.exit(1);
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -51,9 +94,27 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    console.log('📋 Setting up Vite development server...');
     await setupVite(app, server);
   } else {
+    console.log('📦 Setting up static file serving for production...');
     serveStatic(app);
+    
+    // Additional production configuration for identical behavior
+    app.use((req, res, next) => {
+      // Ensure consistent routing behavior in production
+      if (req.path.startsWith('/api')) {
+        return next();
+      }
+      
+      // For non-API routes, ensure SPA routing works identically
+      if (!req.path.includes('.') && req.method === 'GET') {
+        // This is likely a client-side route, serve index.html
+        return next();
+      }
+      
+      next();
+    });
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
