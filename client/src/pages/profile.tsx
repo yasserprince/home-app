@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import BottomNavigation from "@/components/bottom-navigation";
 import { LanguageSelector } from "@/components/language-selector";
-// ProfileImageUploader moved back to Edit Profile page
+import { ProfileImageCropper } from "@/components/ProfileImageCropper";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,15 +94,26 @@ export default function Profile() {
         <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <ModernAvatar
-                key={avatarKey}
-                src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${avatarKey || Date.now()}` : null}
-                name={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || ''}
-                email={user?.email || ''}
-                size={80}
-                className="ring-4 ring-white/20"
-                showOnlineStatus={true}
-              />
+              <ProfileImageCropper
+                onSuccess={() => {
+                  setAvatarKey(prev => prev + 1);
+                }}
+              >
+                <div className="relative group cursor-pointer">
+                  <ModernAvatar
+                    key={avatarKey}
+                    src={user?.profileImageUrl ? `${user.profileImageUrl}?t=${avatarKey || Date.now()}` : null}
+                    name={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || ''}
+                    email={user?.email || ''}
+                    size={80}
+                    className="ring-4 ring-white/20 transition-all duration-200 group-hover:ring-white/40"
+                    showOnlineStatus={true}
+                  />
+                  <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                    <div className="text-white text-xs font-medium">Edit</div>
+                  </div>
+                </div>
+              </ProfileImageCropper>
               
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
