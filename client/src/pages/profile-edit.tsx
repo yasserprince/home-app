@@ -889,6 +889,30 @@ export default function ProfileEdit() {
                     >
                       Fix Images
                     </button>
+                    
+                    <button
+                      onClick={async () => {
+                        if (confirm("Are you sure you want to delete all portfolio images? This cannot be undone.")) {
+                          try {
+                            await apiRequest('/api/portfolios/images/all', 'DELETE');
+                            queryClient.invalidateQueries({ queryKey: ['/api/portfolios/galleries'] });
+                            toast({
+                              title: "Deleted",
+                              description: "All portfolio images have been deleted",
+                            });
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: "Failed to delete images",
+                              variant: "destructive",
+                            });
+                          }
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm"
+                    >
+                      Delete All
+                    </button>
                   </div>
                 </div>
 

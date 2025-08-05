@@ -80,6 +80,7 @@ export interface IStorage {
   updatePortfolioImage(id: string, updates: Partial<InsertPortfolioImage>): Promise<PortfolioImage | undefined>;
   deletePortfolioImage(id: string): Promise<boolean>;
   setPortfolioImageAsPrimary(galleryId: string, imageId: string): Promise<boolean>;
+  deleteAllPortfolioImages(providerId: string): Promise<void>;
 
   // Modern Portfolio operations
   getModernPortfolioGalleries(userId: string): Promise<any[]>;
@@ -553,6 +554,23 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return !!updatedImage;
+  }
+
+  async deleteAllPortfolioImages(providerId: string): Promise<void> {
+    // Get service provider for this user
+    const [serviceProvider] = await db
+      .select()
+      .from(serviceProviders)
+      .where(eq(serviceProviders.userId, providerId));
+
+    if (!serviceProvider) {
+      return;
+    }
+
+    // Delete all portfolio images for this provider
+    await db
+      .delete(portfolioImages)
+      .where(eq(portfolioImages.providerId, serviceProvider.id));
   }
 
   // Modern Portfolio operations - database-backed storage
