@@ -206,7 +206,7 @@ export function PortfolioUploader({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="w-[90vw] max-w-[90vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[85vh] overflow-hidden flex flex-col mx-auto my-auto">
+      <DialogContent className="w-[85vw] max-w-[85vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[80vh] overflow-hidden flex flex-col mx-2 my-4 p-4 sm:p-6">
         <DialogHeader className="pb-2">
           <DialogTitle className="text-white text-base sm:text-lg">Upload Portfolio Images</DialogTitle>
           <DialogDescription className="text-gray-300 sr-only">
@@ -214,18 +214,18 @@ export function PortfolioUploader({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto space-y-3 px-1">
+        <div className="flex-1 overflow-y-auto space-y-2">
           {/* File Drop Zone */}
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="border-2 border-dashed border-gray-600 rounded-lg p-3 sm:p-6 text-center hover:border-gray-500 transition-colors cursor-pointer min-h-[100px] flex flex-col justify-center"
+            className="border-2 border-dashed border-gray-600 rounded-lg p-2 sm:p-4 text-center hover:border-gray-500 transition-colors cursor-pointer min-h-[80px] flex flex-col justify-center"
             onClick={() => fileInputRef.current?.click()}
           >
-            <Upload className="w-6 h-6 sm:w-10 sm:h-10 mx-auto mb-1 sm:mb-3 text-gray-400" />
-            <p className="text-gray-300 mb-1 text-xs sm:text-sm">Drop images here or click to browse</p>
-            <p className="text-xs text-gray-500">
-              Max {maxNumberOfFiles} files, up to {Math.round(maxFileSize / 1024 / 1024)}MB each
+            <Upload className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1 text-gray-400" />
+            <p className="text-gray-300 mb-1 text-xs sm:text-sm">Drop images here or tap to browse</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">
+              Max {maxNumberOfFiles} files, {Math.round(maxFileSize / 1024 / 1024)}MB each
             </p>
             <input
               ref={fileInputRef}
@@ -239,15 +239,15 @@ export function PortfolioUploader({
           
           {/* File List */}
           {files.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="font-medium">Selected Images ({files.length})</h3>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium">Selected Images ({files.length})</h3>
               
-              <div className="space-y-3 max-h-60 overflow-y-auto">
+              <div className="space-y-2 max-h-40 sm:max-h-48 overflow-y-auto">
                 {files.map((fileUpload) => (
-                  <div key={fileUpload.id} className="bg-gray-800/50 rounded-lg p-3 sm:p-4">
-                    <div className="flex gap-3 sm:gap-4">
+                  <div key={fileUpload.id} className="bg-gray-800/50 rounded-lg p-2 sm:p-3">
+                    <div className="flex gap-2 sm:gap-3">
                       {/* Image Preview */}
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gray-700 rounded-md overflow-hidden flex-shrink-0">
                         <img
                           src={fileUpload.preview}
                           alt="Preview"
@@ -294,7 +294,7 @@ export function PortfolioUploader({
                           placeholder="Image title"
                           value={fileUpload.title}
                           onChange={(e) => updateFileInfo(fileUpload.id, 'title', e.target.value)}
-                          className="bg-gray-700 border-gray-600 text-white text-xs sm:text-sm h-8 sm:h-9"
+                          className="bg-gray-700 border-gray-600 text-white text-xs sm:text-sm h-7 sm:h-8"
                           disabled={isUploading}
                         />
                         
@@ -303,8 +303,8 @@ export function PortfolioUploader({
                           placeholder="Description (optional)"
                           value={fileUpload.description}
                           onChange={(e) => updateFileInfo(fileUpload.id, 'description', e.target.value)}
-                          className="bg-gray-700 border-gray-600 text-white text-xs sm:text-sm resize-none min-h-[60px] sm:min-h-[50px]"
-                          rows={2}
+                          className="bg-gray-700 border-gray-600 text-white text-xs sm:text-sm resize-none min-h-[40px] sm:min-h-[45px]"
+                          rows={1}
                           disabled={isUploading}
                         />
                       </div>
