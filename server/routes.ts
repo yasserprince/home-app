@@ -2038,26 +2038,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/portfolios/:providerId/galleries', async (req, res) => {
     try {
       const { providerId } = req.params;
-      console.log(`Fetching galleries for provider: ${providerId}`);
+      console.log(`=== FETCHING GALLERIES FOR PROVIDER: ${providerId} ===`);
       
       const galleries = await storage.getPortfolioGalleriesByProvider(providerId);
-      console.log(`Found ${galleries.length} galleries`);
+      console.log(`Found ${galleries.length} galleries:`, galleries.map(g => ({ id: g.id, title: g.title, category: g.category })));
       
       // Get images for each gallery
       const galleriesWithImages = await Promise.all(
         galleries.map(async (gallery) => {
           const images = await storage.getPortfolioImagesByGallery(gallery.id);
-          console.log(`Gallery ${gallery.id} has ${images.length} images`);
+          console.log(`Gallery ${gallery.id} (${gallery.title}) has ${images.length} images:`, 
+            images.map(img => ({ id: img.id, objectPath: img.objectPath })));
           return { ...gallery, images };
         })
       );
       
-      console.log(`Returning ${galleriesWithImages.length} galleries with images`);
+      console.log(`=== RETURNING ${galleriesWithImages.length} GALLERIES WITH IMAGES ===`);
       res.json(galleriesWithImages);
     } catch (error) {
       console.error("Error fetching portfolio galleries:", error);
       res.status(500).json({ message: "Failed to fetch portfolio galleries" });
     }
+  });
+
+  // Catch-all GET endpoint for debugging
+  app.get('/api/portfolios/galleries', async (req, res) => {
+    console.log("WARNING: GET /api/portfolios/galleries called without provider ID!");
+    res.status(400).json({ message: "Provider ID is required. Use /api/portfolios/{providerId}/galleries" });
   });
 
   app.post('/api/portfolios/galleries', isAuthenticated, async (req, res) => {

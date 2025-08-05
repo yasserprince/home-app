@@ -100,14 +100,30 @@ export default function PortfolioGallery() {
   });
 
   // Get provider ID from URL params or current user's service provider
-  // Temporary: hardcode the provider ID we know exists from database
-  const providerId = params?.providerId || (isAuthenticated ? '3e1a818f-e219-47e6-814f-75076fd78c3f' : serviceProvider?.id);
+  const providerId = params?.providerId || serviceProvider?.id;
   const isOwner = !params?.providerId && isAuthenticated;
+
+  // Debug logging
+  console.log('Portfolio Gallery Debug:', {
+    'params.providerId': params?.providerId,
+    'serviceProvider': serviceProvider,
+    'serviceProvider.id': serviceProvider?.id,
+    'final providerId': providerId,
+    'isAuthenticated': isAuthenticated,
+    'user.id': user?.id
+  });
 
   const { data: galleries, isLoading } = useQuery({
     queryKey: ['/api/portfolios', providerId, 'galleries'],
-    queryFn: () => apiRequest(`/api/portfolios/${providerId}/galleries`, 'GET'),
+    queryFn: async () => {
+      console.log(`Frontend: Fetching galleries for provider ${providerId}`);
+      const result = await apiRequest(`/api/portfolios/${providerId}/galleries`, 'GET');
+      console.log('Frontend: Received galleries:', result);
+      return result;
+    },
     enabled: !!providerId,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache
   });
 
   const createGalleryMutation = useMutation({
@@ -382,9 +398,13 @@ export default function PortfolioGallery() {
                     <div className="relative h-48 bg-gray-100 rounded-t-lg overflow-hidden">
                       {primaryImage ? (
                         <img
-                          src={primaryImage.imageUrl}
+                          src={primaryImage.objectPath || primaryImage.imageUrl}
                           alt={gallery.title}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error('Failed to load image:', primaryImage.objectPath || primaryImage.imageUrl);
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
