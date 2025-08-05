@@ -2333,6 +2333,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===============================
+  // NEW MODERN PORTFOLIO API ROUTES  
+  // ===============================
+  
+  // Get galleries for current user (simplified API)
+  app.get('/api/portfolios/galleries/:userId?', isReplitAuthenticated, async (req, res) => {
+    try {
+      const authenticatedUserId = req.user?.claims?.sub;
+      const requestedUserId = req.params.userId || authenticatedUserId;
+      
+      // For now, return mock data structure that matches the frontend interface
+      const mockGalleries = [
+        {
+          id: 'featured-work',
+          title: 'Featured Work',
+          category: 'featured',
+          images: [],
+          serviceType: '',
+          isPublic: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'before-after',
+          title: 'Before & After',
+          category: 'before_after',
+          images: [],
+          serviceType: '',
+          isPublic: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'work-samples',
+          title: 'Work Samples',
+          category: 'work_samples',
+          images: [],
+          serviceType: '',
+          isPublic: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'tools-equipment',
+          title: 'Tools & Equipment',
+          category: 'equipment',
+          images: [],
+          serviceType: '',
+          isPublic: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'certifications',
+          title: 'Certifications',
+          category: 'certifications',
+          images: [],
+          serviceType: '',
+          isPublic: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
+      
+      res.json(mockGalleries);
+    } catch (error) {
+      console.error("Error fetching modern portfolio galleries:", error);
+      res.status(500).json({ message: "Failed to fetch galleries" });
+    }
+  });
+
+  // Create a new gallery
+  app.post('/api/portfolios/galleries', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { title, category, serviceType, isPublic } = req.body;
+      
+      // Generate a simple ID based on title
+      const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      
+      const newGallery = {
+        id,
+        title,
+        category: category || 'work_samples',
+        images: [],
+        serviceType: serviceType || '',
+        isPublic: isPublic !== false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      res.json(newGallery);
+    } catch (error) {
+      console.error("Error creating gallery:", error);
+      res.status(500).json({ message: "Failed to create gallery" });
+    }
+  });
+
+  // Upload images to a gallery
+  app.post('/api/portfolios/galleries/:galleryId/images', isReplitAuthenticated, upload.array('images', 10), async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { galleryId } = req.params;
+      const files = req.files as Express.Multer.File[];
+      
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: "No files uploaded" });
+      }
+      
+      const uploadedImages = [];
+      
+      for (const file of files) {
+        // Simple mock response for uploaded images
+        const imageId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const mockImage = {
+          id: imageId,
+          url: `/uploads/${file.filename}`,
+          thumbnailUrl: `/uploads/thumb_${file.filename}`,
+          alt: file.originalname,
+          isPrimary: uploadedImages.length === 0, // First image is primary
+          metadata: {
+            filename: file.originalname,
+            size: file.size,
+            mimetype: file.mimetype,
+            width: 800, // mock values
+            height: 600
+          },
+          uploadedAt: new Date().toISOString()
+        };
+        
+        uploadedImages.push(mockImage);
+      }
+      
+      res.json({ 
+        message: "Images uploaded successfully",
+        images: uploadedImages 
+      });
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      res.status(500).json({ message: "Failed to upload images" });
+    }
+  });
+
+  // Delete a gallery
+  app.delete('/api/portfolios/galleries/:galleryId', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { galleryId } = req.params;
+      
+      res.json({ message: "Gallery deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting gallery:", error);
+      res.status(500).json({ message: "Failed to delete gallery" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

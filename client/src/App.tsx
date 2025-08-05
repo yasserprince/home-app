@@ -34,6 +34,7 @@ import EmailSignin from "@/pages/email-signin";
 import IconTest from "@/pages/icon-test";
 import PortfolioGallery from "@/pages/portfolio-gallery";
 import GalleryDetail from "@/pages/gallery-detail";
+import ModernPortfolio from "@/pages/modern-portfolio";
 import { AdminNav } from "@/components/admin-nav";
 
 function Router() {
@@ -60,6 +61,7 @@ function Router() {
           <Route path="/provider/:id" component={ProviderDetail} />
           <Route path="/booking" component={Booking} />
           <Route path="/bookings" component={Bookings} />
+          <Route path="/portfolio-modern" component={ModernPortfolio} />
           <Route path="/portfolio/:providerId?" component={PortfolioGallery} />
           <Route path="/portfolio/:providerId/gallery/:galleryId" component={GalleryDetail} />
           <Route path="/account" component={Profile} />
