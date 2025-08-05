@@ -206,7 +206,7 @@ export function PortfolioUploader({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[90vh] overflow-hidden flex flex-col mx-auto">
         <DialogHeader>
           <DialogTitle className="text-white">Upload Portfolio Images</DialogTitle>
           <DialogDescription className="text-gray-300 sr-only">
@@ -219,12 +219,12 @@ export function PortfolioUploader({
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-gray-500 transition-colors cursor-pointer"
+            className="border-2 border-dashed border-gray-600 rounded-lg p-4 sm:p-8 text-center hover:border-gray-500 transition-colors cursor-pointer min-h-[120px] flex flex-col justify-center"
             onClick={() => fileInputRef.current?.click()}
           >
-            <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-300 mb-2">Drop images here or click to browse</p>
-            <p className="text-sm text-gray-500">
+            <Upload className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-4 text-gray-400" />
+            <p className="text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Drop images here or click to browse</p>
+            <p className="text-xs sm:text-sm text-gray-500">
               Max {maxNumberOfFiles} files, up to {Math.round(maxFileSize / 1024 / 1024)}MB each
             </p>
             <input
@@ -244,10 +244,10 @@ export function PortfolioUploader({
               
               <div className="space-y-3 max-h-60 overflow-y-auto">
                 {files.map((fileUpload) => (
-                  <div key={fileUpload.id} className="bg-gray-800/50 rounded-lg p-4">
-                    <div className="flex gap-4">
+                  <div key={fileUpload.id} className="bg-gray-800/50 rounded-lg p-3 sm:p-4">
+                    <div className="flex gap-3 sm:gap-4">
                       {/* Image Preview */}
-                      <div className="w-16 h-16 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
                         <img
                           src={fileUpload.preview}
                           alt="Preview"
@@ -256,23 +256,23 @@ export function PortfolioUploader({
                       </div>
                       
                       {/* File Info */}
-                      <div className="flex-1 space-y-2">
+                      <div className="flex-1 space-y-2 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium truncate">
+                          <span className="text-xs sm:text-sm font-medium truncate pr-2">
                             {fileUpload.file.name}
                           </span>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                             {fileUpload.status === 'success' && (
-                              <Check className="w-4 h-4 text-green-400" />
+                              <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
                             )}
                             {fileUpload.status === 'error' && (
-                              <X className="w-4 h-4 text-red-400" />
+                              <X className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
                             )}
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => removeFile(fileUpload.id)}
-                              className="h-6 w-6 p-0 hover:bg-gray-700"
+                              className="h-7 w-7 sm:h-6 sm:w-6 p-0 hover:bg-gray-700 flex-shrink-0"
                             >
                               <X className="w-3 h-3" />
                             </Button>
@@ -294,7 +294,7 @@ export function PortfolioUploader({
                           placeholder="Image title"
                           value={fileUpload.title}
                           onChange={(e) => updateFileInfo(fileUpload.id, 'title', e.target.value)}
-                          className="bg-gray-700 border-gray-600 text-white text-sm"
+                          className="bg-gray-700 border-gray-600 text-white text-xs sm:text-sm h-8 sm:h-9"
                           disabled={isUploading}
                         />
                         
@@ -303,7 +303,7 @@ export function PortfolioUploader({
                           placeholder="Description (optional)"
                           value={fileUpload.description}
                           onChange={(e) => updateFileInfo(fileUpload.id, 'description', e.target.value)}
-                          className="bg-gray-700 border-gray-600 text-white text-sm resize-none"
+                          className="bg-gray-700 border-gray-600 text-white text-xs sm:text-sm resize-none min-h-[60px] sm:min-h-[50px]"
                           rows={2}
                           disabled={isUploading}
                         />
@@ -317,27 +317,31 @@ export function PortfolioUploader({
         </div>
         
         {/* Upload Button */}
-        <div className="flex justify-end gap-2 pt-4 border-t border-gray-700">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-2 pt-4 border-t border-gray-700">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={isUploading}
-            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+            className="border-gray-600 text-gray-300 hover:bg-gray-800 h-10 sm:h-9 text-sm order-2 sm:order-1"
           >
             Cancel
           </Button>
           <Button
             onClick={uploadFiles}
             disabled={files.length === 0 || isUploading}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 h-10 sm:h-9 text-sm order-1 sm:order-2"
           >
             {isUploading ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Uploading...
+                <span className="hidden sm:inline">Uploading...</span>
+                <span className="sm:hidden">Upload...</span>
               </div>
             ) : (
-              <>Upload {files.length} Image{files.length !== 1 ? 's' : ''}</>
+              <>
+                <span className="hidden sm:inline">Upload {files.length} Image{files.length !== 1 ? 's' : ''}</span>
+                <span className="sm:hidden">Upload ({files.length})</span>
+              </>
             )}
           </Button>
         </div>
