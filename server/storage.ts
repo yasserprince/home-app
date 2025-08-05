@@ -80,6 +80,11 @@ export interface IStorage {
   updatePortfolioImage(id: string, updates: Partial<InsertPortfolioImage>): Promise<PortfolioImage | undefined>;
   deletePortfolioImage(id: string): Promise<boolean>;
   setPortfolioImageAsPrimary(galleryId: string, imageId: string): Promise<boolean>;
+
+  // Modern Portfolio operations
+  getModernPortfolioGalleries(userId: string): Promise<any[]>;
+  createModernPortfolioGallery(gallery: any): Promise<any>;
+  addImagesToModernPortfolioGallery(userId: string, galleryId: string, images: any[]): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -548,6 +553,38 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return !!updatedImage;
+  }
+
+  // Modern Portfolio operations - simple in-memory storage for now
+  private modernPortfolioData: Map<string, any[]> = new Map();
+
+  async getModernPortfolioGalleries(userId: string): Promise<any[]> {
+    return this.modernPortfolioData.get(userId) || [];
+  }
+
+  async createModernPortfolioGallery(gallery: any): Promise<any> {
+    const userId = gallery.userId;
+    const userGalleries = this.modernPortfolioData.get(userId) || [];
+    userGalleries.push(gallery);
+    this.modernPortfolioData.set(userId, userGalleries);
+    return gallery;
+  }
+
+  async addImagesToModernPortfolioGallery(userId: string, galleryId: string, images: any[]): Promise<any> {
+    const userGalleries = this.modernPortfolioData.get(userId) || [];
+    const galleryIndex = userGalleries.findIndex(g => g.id === galleryId);
+    
+    if (galleryIndex >= 0) {
+      userGalleries[galleryIndex].images = [
+        ...userGalleries[galleryIndex].images,
+        ...images
+      ];
+      userGalleries[galleryIndex].updatedAt = new Date();
+      this.modernPortfolioData.set(userId, userGalleries);
+      return userGalleries[galleryIndex];
+    }
+    
+    return null;
   }
 }
 

@@ -2336,64 +2336,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get galleries for current user (simplified API)
   app.get('/api/portfolios/galleries/:userId?', isReplitAuthenticated, async (req, res) => {
     try {
-      const authenticatedUserId = req.user?.claims?.sub;
+      const authenticatedUserId = (req as any).user?.claims?.sub;
       const requestedUserId = req.params.userId || authenticatedUserId;
       
-      // For now, return mock data structure that matches the frontend interface
-      const mockGalleries = [
-        {
-          id: 'featured-work',
-          title: 'Featured Work',
-          category: 'featured',
-          images: [],
-          serviceType: '',
-          isPublic: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'before-after',
-          title: 'Before & After',
-          category: 'before_after',
-          images: [],
-          serviceType: '',
-          isPublic: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'work-samples',
-          title: 'Work Samples',
-          category: 'work_samples',
-          images: [],
-          serviceType: '',
-          isPublic: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'tools-equipment',
-          title: 'Tools & Equipment',
-          category: 'equipment',
-          images: [],
-          serviceType: '',
-          isPublic: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: 'certifications',
-          title: 'Certifications',
-          category: 'certifications',
-          images: [],
-          serviceType: '',
-          isPublic: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
+      // Get galleries from storage - if none exist, create default galleries
+      let galleries = await storage.getModernPortfolioGalleries(requestedUserId);
       
-      res.json(mockGalleries);
+      if (!galleries || galleries.length === 0) {
+        // Create default galleries
+        const defaultGalleries = [
+          {
+            id: 'featured-work',
+            title: 'Featured Work',
+            category: 'featured',
+            userId: requestedUserId,
+            images: [],
+            serviceType: '',
+            isPublic: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          },
+          {
+            id: 'before-after',
+            title: 'Before & After',
+            category: 'before_after',
+            userId: requestedUserId,
+            images: [],
+            serviceType: '',
+            isPublic: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          },
+          {
+            id: 'work-samples',
+            title: 'Work Samples',
+            category: 'work_samples',
+            userId: requestedUserId,
+            images: [],
+            serviceType: '',
+            isPublic: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          },
+          {
+            id: 'tools-equipment',
+            title: 'Tools & Equipment',
+            category: 'equipment',
+            userId: requestedUserId,
+            images: [],
+            serviceType: '',
+            isPublic: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          },
+          {
+            id: 'certifications',
+            title: 'Certifications',
+            category: 'certifications',
+            userId: requestedUserId,
+            images: [],
+            serviceType: '',
+            isPublic: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        ];
+        
+        // Store default galleries
+        for (const gallery of defaultGalleries) {
+          await storage.createModernPortfolioGallery(gallery);
+        }
+        
+        galleries = defaultGalleries;
+      }
+      
+      res.json(galleries);
     } catch (error) {
       console.error("Error fetching modern portfolio galleries:", error);
       res.status(500).json({ message: "Failed to fetch galleries" });
@@ -2459,6 +2476,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         processedImages.push(processedImage);
       }
+      
+      // Add images to the gallery
+      await storage.addImagesToModernPortfolioGallery(userId, galleryId, processedImages);
       
       res.json({ 
         message: "Images processed successfully",
