@@ -110,7 +110,8 @@ export default function PortfolioGallery() {
     'serviceProvider.id': serviceProvider?.id,
     'final providerId': providerId,
     'isAuthenticated': isAuthenticated,
-    'user.id': user?.id
+    'user.id': user?.id,
+    'galleries': galleries
   });
 
   const { data: galleries, isLoading } = useQuery({
@@ -131,13 +132,18 @@ export default function PortfolioGallery() {
 
   const createGalleryMutation = useMutation({
     mutationFn: async (galleryData: any) => {
-      return apiRequest('/api/portfolios/galleries', {
+      if (!providerId) {
+        throw new Error('Provider ID is required');
+      }
+      return apiRequest(`/api/portfolios/${providerId}/galleries`, {
         method: 'POST',
         body: JSON.stringify(galleryData),
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/portfolios', providerId, 'galleries'] });
+      if (providerId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/portfolios', providerId, 'galleries'] });
+      }
       setShowCreateGallery(false);
       setNewGalleryData({
         title: '',
@@ -164,7 +170,10 @@ export default function PortfolioGallery() {
       return apiRequest('/api/portfolios/images', 'POST', images);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/portfolios', providerId, 'galleries'] });
+      // Only invalidate if we have a valid providerId
+      if (providerId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/portfolios', providerId, 'galleries'] });
+      }
       toast({
         title: "Success",
         description: "Images uploaded successfully",
@@ -406,7 +415,13 @@ export default function PortfolioGallery() {
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             console.error('Failed to load image:', primaryImage.objectPath || primaryImage.imageUrl);
-                            e.currentTarget.style.display = 'none';
+                            // Try with a timestamp to bypass cache
+                            const currentSrc = e.currentTarget.src;
+                            if (!currentSrc.includes('?t=')) {
+                              e.currentTarget.src = `${currentSrc}?t=${Date.now()}`;
+                            } else {
+                              e.currentTarget.style.display = 'none';
+                            }
                           }}
                         />
                       ) : (
