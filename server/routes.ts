@@ -71,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Verification endpoints
   app.post('/api/verification/email', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       
       // Generate verification token
       const verificationToken = Math.random().toString(36).substring(2, 15);
@@ -102,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/verification/phone', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       
       // Generate verification code
       const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -135,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/verification/verify-email', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       const { token } = req.body;
       
       const user = await storage.getUser(userId);
@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/verification/verify-phone', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       const { code } = req.body;
       
       const user = await storage.getUser(userId);
@@ -195,9 +195,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', isAnyAuthenticated, async (req: any, res) => {
     try {
       // Handle different auth types
-      if (req.user?.claims?.sub) {
+      if (((req.user as any)?.claims || {})?.sub) {
         // Replit Auth user - get full user data from database
-        const userId = req.user.claims.sub;
+        const userId = ((req.user as any)?.claims || {}).sub;
         const dbUser = await storage.getUser(userId);
         
         if (dbUser) {
@@ -207,10 +207,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // User not in database yet, create from claims
           const newUser = {
             id: userId,
-            email: req.user.claims.email,
-            firstName: req.user.claims.first_name,
-            lastName: req.user.claims.last_name,
-            profileImageUrl: req.user.claims.profile_image_url || null,
+            email: ((req.user as any)?.claims || {}).email,
+            firstName: ((req.user as any)?.claims || {}).first_name,
+            lastName: ((req.user as any)?.claims || {}).last_name,
+            profileImageUrl: ((req.user as any)?.claims || {}).profile_image_url || null,
             authProvider: 'replit',
             role: 'service_seeker',
             accountType: 'individual',
@@ -252,7 +252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/profile', isAnyAuthenticated, async (req: any, res) => {
     try {
       // Handle different auth types
-      const userId = req.user?.claims?.sub || req.user?.id;
+      const userId = ((req.user as any)?.claims || {})?.sub || req.user?.id;
       
       if (!userId) {
         return res.status(401).json({ message: 'User ID not found in session' });
@@ -287,7 +287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/location', isAnyAuthenticated, async (req: any, res) => {
     try {
       // Handle different auth types
-      const userId = req.user?.claims?.sub || req.user?.id;
+      const userId = ((req.user as any)?.claims || {})?.sub || req.user?.id;
       
       if (!userId) {
         return res.status(401).json({ message: 'User ID not found in session' });
@@ -333,8 +333,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin middleware - restrict to specific email only
   const isAdmin: RequestHandler = async (req: any, res, next) => {
     try {
-      const userId = req.user?.claims?.sub;
-      const userEmail = req.user?.claims?.email;
+      const userId = ((req.user as any)?.claims || {})?.sub;
+      const userEmail = ((req.user as any)?.claims || {})?.email;
       const user = await storage.getUser(userId);
       
       // Only allow admin access for katiflam1@gmail.com
@@ -351,7 +351,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Support middleware - limited permissions
   const isSupport: RequestHandler = async (req: any, res, next) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = ((req.user as any)?.claims || {})?.sub;
       const user = await storage.getUser(userId);
       
       if (!user || (user.role !== 'admin' && user.role !== 'support')) {
@@ -496,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Serve private objects with ACL check
   app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
-    const userId = req.user?.claims?.sub;
+    const userId = ((req.user as any)?.claims || {})?.sub;
     const objectStorageService = new ObjectStorageService();
     try {
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
@@ -537,7 +537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Profile update endpoint
   app.put('/api/profile', isAuthenticated, upload.single('profileImage'), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       const updateData = { ...req.body };
       
       // Handle profile image upload
@@ -566,7 +566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Location update endpoint
   app.put('/api/location', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       const { locationEnabled, latitude, longitude } = req.body;
       
       const updateData: any = {
@@ -633,7 +633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bookings
   app.post('/api/bookings', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       const bookingData = insertBookingSchema.parse({
         ...req.body,
         userId,
@@ -652,7 +652,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bookings', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       const bookings = await storage.getUserBookings(userId);
       res.json(bookings);
     } catch (error) {
@@ -671,7 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user owns this booking
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       if (booking.userId !== userId) {
         return res.status(403).json({ message: "Access denied" });
       }
@@ -694,7 +694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user owns this booking
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       if (booking.userId !== userId) {
         return res.status(403).json({ message: "Access denied" });
       }
@@ -710,7 +710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reviews
   app.post('/api/reviews', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = ((req.user as any)?.claims || {}).sub;
       const reviewData = insertReviewSchema.parse({
         ...req.body,
         userId,
@@ -1322,7 +1322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📁 Object file found:", objectFile.name);
       
       // Check if user is authenticated for private access
-      const userId = req.user?.claims?.sub;
+      const userId = ((req.user as any)?.claims || {})?.sub;
       console.log("👤 User ID:", userId || 'anonymous');
       
       const canAccess = await objectStorageService.canAccessObjectEntity({
@@ -1350,7 +1350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
     try {
-      console.log("Upload URL request from user:", req.user?.claims?.sub);
+      console.log("Upload URL request from user:", ((req.user as any)?.claims || {})?.sub);
       const objectStorageService = new ObjectStorageService();
       console.log("About to call getObjectEntityUploadURL...");
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
@@ -1373,7 +1373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ error: "imageURL is required" });
     }
 
-    const userId = req.user?.claims?.sub;
+    const userId = ((req.user as any)?.claims || {})?.sub;
     console.log("User ID:", userId);
 
     try {
@@ -1417,7 +1417,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ error: "imageURLs array is required" });
     }
 
-    const userId = req.user?.claims?.sub;
+    const userId = ((req.user as any)?.claims || {})?.sub;
 
     try {
       const objectStorageService = new ObjectStorageService();
@@ -1490,12 +1490,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Get user email from different auth types
     let userEmail = null;
-    if (req.user?.claims?.email) {
+    const user = req.user as any;
+    if (user?.claims?.email) {
       // Replit Auth
-      userEmail = req.user.claims.email;
-    } else if (req.user?.email) {
+      userEmail = user.claims.email;
+    } else if (user?.email) {
       // Google/Email Auth
-      userEmail = req.user.email;
+      userEmail = user.email;
     }
     
     console.log("Super admin check - User email:", userEmail);
@@ -1523,7 +1524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     if (email === adminEmail && password === adminPassword) {
       // Create a simple admin session
-      req.session.adminAuth = {
+      (req.session as any).adminAuth = {
         email: adminEmail,
         isAdmin: true,
         loginTime: new Date().toISOString()
@@ -1531,7 +1532,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("✅ Admin login successful, session data:", {
         sessionId: req.sessionID,
-        adminAuth: req.session.adminAuth
+        adminAuth: ((req.session as any)?.adminAuth)
       });
       res.json({ success: true, message: "Admin login successful" });
     } else {
@@ -1542,7 +1543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin logout
   app.post('/api/admin/logout', async (req, res) => {
-    req.session.adminAuth = null;
+    (req.session as any).adminAuth = null;
     console.log("🔓 Admin logged out");
     res.json({ success: true, message: "Admin logged out" });
   });
@@ -1569,7 +1570,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const correctPassword = "SuperAdmin2025!Secure#Platform";
     
     if (password === correctPassword) {
-      req.session.adminAuth = {
+      (req.session as any).adminAuth = {
         email: "katiflam1@gmail.com",
         isAdmin: true,
         loginTime: new Date().toISOString()
@@ -1593,7 +1594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Check admin session first
-      if (req.session?.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+      if (req.session?.adminAuth?.isAdmin && ((req.session as any)?.adminAuth)?.email === "katiflam1@gmail.com") {
         console.log("✅ Admin access via session auth");
         const users = await storage.getAllUsers();
         console.log("📊 Fetched users count:", users.length);
@@ -1608,8 +1609,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get user email from different auth types
       let userEmail = null;
-      if (req.user?.claims?.email) {
-        userEmail = req.user.claims.email;
+      if (((req.user as any)?.claims || {})?.email) {
+        userEmail = ((req.user as any)?.claims || {}).email;
       } else if (req.user?.email) {
         userEmail = req.user.email;
       }
@@ -1636,15 +1637,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/stats', async (req, res) => {
     try {
       // Check admin session first
-      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+      if (((req.session as any)?.adminAuth)?.isAdmin && ((req.session as any)?.adminAuth)?.email === "katiflam1@gmail.com") {
         // Admin session is valid, proceed
       } else if (!req.isAuthenticated() || !req.user) {
         return res.status(401).json({ message: "Unauthorized" });
       } else {
         // Check regular authentication
         let userEmail = null;
-        if (req.user?.claims?.email) {
-          userEmail = req.user.claims.email;
+        if (((req.user as any)?.claims || {})?.email) {
+          userEmail = ((req.user as any)?.claims || {}).email;
         } else if (req.user?.email) {
           userEmail = req.user.email;
         }
@@ -1685,15 +1686,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/admin/users/:userId', async (req, res) => {
     try {
       // Check admin session first
-      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+      if (((req.session as any)?.adminAuth)?.isAdmin && ((req.session as any)?.adminAuth)?.email === "katiflam1@gmail.com") {
         // Admin session is valid, proceed
       } else if (!req.isAuthenticated() || !req.user) {
         return res.status(401).json({ message: "Unauthorized" });
       } else {
         // Check regular authentication
         let userEmail = null;
-        if (req.user?.claims?.email) {
-          userEmail = req.user.claims.email;
+        if (((req.user as any)?.claims || {})?.email) {
+          userEmail = ((req.user as any)?.claims || {}).email;
         } else if (req.user?.email) {
           userEmail = req.user.email;
         }
@@ -1728,14 +1729,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let currentUserEmail = "katiflam1@gmail.com"; // Default for session auth
       
       // Check admin session first
-      if (req.session.adminAuth?.isAdmin && req.session.adminAuth?.email === "katiflam1@gmail.com") {
+      if (((req.session as any)?.adminAuth)?.isAdmin && ((req.session as any)?.adminAuth)?.email === "katiflam1@gmail.com") {
         // Admin session is valid, proceed
       } else if (!req.isAuthenticated() || !req.user) {
         return res.status(401).json({ message: "Unauthorized" });
       } else {
         // Check regular authentication
-        if (req.user?.claims?.email) {
-          currentUserEmail = req.user.claims.email;
+        if (((req.user as any)?.claims || {})?.email) {
+          currentUserEmail = ((req.user as any)?.claims || {}).email;
         } else if (req.user?.email) {
           currentUserEmail = req.user.email;
         }

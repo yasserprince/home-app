@@ -33,7 +33,7 @@ export function getSession() {
     tableName: "sessions",
   });
   return session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || 'dev-secret-key-for-replit',
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
@@ -103,7 +103,15 @@ export async function setupAuth(app: Express) {
     passport.use(strategy);
   }
 
-  // Serialization is handled by Google Auth setup
+  // Serialize user for the session
+  passport.serializeUser((user: any, done) => {
+    done(null, user);
+  });
+
+  // Deserialize user from the session
+  passport.deserializeUser((user: any, done) => {
+    done(null, user);
+  });
 
   app.get("/api/login", (req, res, next) => {
     passport.authenticate(`replitauth:${req.hostname}`, {
