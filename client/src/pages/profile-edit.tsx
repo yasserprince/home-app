@@ -25,6 +25,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { PortfolioUploader } from "@/components/PortfolioUploader";
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,6 +88,7 @@ export default function ProfileEdit() {
 
   // Portfolio state
   const [activePortfolioTab, setActivePortfolioTab] = useState('featured-work');
+  const [lightboxIndex, setLightboxIndex] = useState(-1);
 
   // Portfolio galleries query - using new modern portfolio API
   const { data: portfolioGalleries, isLoading: portfolioLoading } = useQuery({
@@ -881,11 +884,12 @@ export default function ProfileEdit() {
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                           {images.map((image: any, index: number) => (
                             <div key={image.id} className="relative group">
-                              <div className="aspect-square bg-white/5 rounded-lg overflow-hidden border border-white/10 hover:border-white/30 transition-colors">
+                              <div className="aspect-square bg-white/5 rounded-lg overflow-hidden border border-white/10 hover:border-white/30 transition-colors cursor-pointer">
                                 <img
                                   src={image.url}
                                   alt={image.alt || `Portfolio image ${index + 1}`}
                                   className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
+                                  onClick={() => setLightboxIndex(index)}
                                 />
                                 
                                 {/* Image Overlay */}
@@ -970,6 +974,30 @@ export default function ProfileEdit() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Portfolio Lightbox */}
+        {(() => {
+          const activeGallery = (portfolioGalleries as any)?.find((gallery: any) => gallery.id === activePortfolioTab);
+          const images = activeGallery?.images || [];
+          const lightboxSlides = images.map((image: any) => ({
+            src: image.url,
+            alt: image.alt || 'Portfolio image'
+          }));
+          
+          return (
+            <Lightbox
+              open={lightboxIndex >= 0}
+              index={lightboxIndex}
+              close={() => setLightboxIndex(-1)}
+              slides={lightboxSlides}
+              carousel={{ finite: true }}
+              render={{
+                buttonPrev: images.length <= 1 ? () => null : undefined,
+                buttonNext: images.length <= 1 ? () => null : undefined,
+              }}
+            />
+          );
+        })()}
 
         {/* Account Management */}
         <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
