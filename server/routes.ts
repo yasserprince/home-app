@@ -2686,6 +2686,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fix ACL policies for existing images
+  app.post('/api/portfolios/fix-acl', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = (req as any).user?.claims?.sub;
+      const { ObjectStorageService } = await import('./objectStorage');
+      const objectStorageService = new ObjectStorageService();
+      
+      const galleries = await storage.getModernPortfolioGalleries(userId);
+      let fixedCount = 0;
+      
+      for (const gallery of galleries) {
+        const images = gallery.images || [];
+        for (const image of images) {
+          try {
+            // Only process images with object paths (not signed URLs)
+            if (image.objectPath && image.objectPath.startsWith('/objects/')) {
+              await objectStorageService.trySetObjectEntityAclPolicy(
+                image.objectPath,
+                {
+                  owner: userId,
+                  visibility: 'public',
+                  aclRules: []
+                }
+              );
+              fixedCount++;
+              console.log(`Set ACL policy for image: ${image.id}`);
+            }
+          } catch (error) {
+            console.log(`Failed to set ACL for image ${image.id}: ${error.message}`);
+          }
+        }
+      }
+      
+      res.json({ 
+        message: `Fixed ACL policies for ${fixedCount} images`,
+        fixedCount 
+      });
+    } catch (error) {
+      console.error("Error fixing ACL policies:", error);
+      res.status(500).json({ message: "Failed to fix ACL policies" });
+    }
+  });
+
+  // Serve protected objects with ACL policy checking
+  app.get('/objects/:objectPath(*)', isReplitAuthenticated, async (req, res) => {
+    try {
+      const userId = (req as any).user?.claims?.sub;
+      const { ObjectStorageService, ObjectNotFoundError } = await import('./objectStorage');
+      const { ObjectPermission } = await import('./objectAcl');
+      
+      const objectStorageService = new ObjectStorageService();
+      
+      try {
+        const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+        const canAccess = await objectStorageService.canAccessObjectEntity({
+          objectFile,
+          userId: userId,
+          requestedPermission: ObjectPermission.READ,
+        });
+        
+        if (!canAccess) {
+          return res.sendStatus(401);
+        }
+        
+        objectStorageService.downloadObject(objectFile, res);
+      } catch (error) {
+        console.error("Error checking object access:", error);
+        if (error instanceof ObjectNotFoundError) {
+          return res.sendStatus(404);
+        }
+        return res.sendStatus(500);
+      }
+    } catch (error) {
+      console.error("Error serving protected object:", error);
+      return res.sendStatus(500);
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

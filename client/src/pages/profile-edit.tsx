@@ -854,18 +854,42 @@ export default function ProfileEdit() {
                     </div>
                   </div>
                   
-                  <PortfolioUploader
-                    maxNumberOfFiles={10}
-                    maxFileSize={10485760}
-                    onGetUploadParameters={handleGetUploadParameters}
-                    onComplete={handlePortfolioUploadComplete}
-                    buttonClassName="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Camera className="w-4 h-4" />
-                      <span>Upload Images</span>
-                    </div>
-                  </PortfolioUploader>
+                  <div className="flex gap-2">
+                    <PortfolioUploader
+                      maxNumberOfFiles={10}
+                      maxFileSize={10485760}
+                      onGetUploadParameters={handleGetUploadParameters}
+                      onComplete={handlePortfolioUploadComplete}
+                      buttonClassName="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Camera className="w-4 h-4" />
+                        <span>Upload Images</span>
+                      </div>
+                    </PortfolioUploader>
+                    
+                    <button
+                      onClick={async () => {
+                        try {
+                          await apiRequest('/api/portfolios/fix-acl', 'POST');
+                          queryClient.invalidateQueries({ queryKey: ['/api/portfolios/galleries'] });
+                          toast({
+                            title: "Fixed",
+                            description: "Image access permissions updated",
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description: "Failed to fix image permissions",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm"
+                    >
+                      Fix Images
+                    </button>
+                  </div>
                 </div>
 
                 {/* Modern Portfolio Gallery Display */}
