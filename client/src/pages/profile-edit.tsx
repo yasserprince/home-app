@@ -213,11 +213,21 @@ export default function ProfileEdit() {
       imageUrl: file.uploadURL,
       title: file.meta?.title || file.name,
       description: file.meta?.description || '',
+      imageType: getImageTypeForCategory(activePortfolioTab),
       isPublic: true,
       isPrimary: false,
     }));
 
     uploadPortfolioMutation.mutate(uploadedImages);
+  };
+
+  const getImageTypeForCategory = (category: string) => {
+    switch (category) {
+      case 'before-after': return 'before';
+      case 'tools-equipment': return 'equipment';
+      case 'certifications': return 'certificate';
+      default: return 'work_sample';
+    }
   };
 
   // Portfolio gallery tabs
