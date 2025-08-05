@@ -2459,10 +2459,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       for (const imageData of images) {
         const imageId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        // Process the URL to convert from object storage URL to serving URL
+        const objectStorageService = new ObjectStorageService();
+        const servingUrl = objectStorageService.normalizeObjectEntityPath(imageData.imageUrl || imageData.url);
+        
         const processedImage: any = {
           id: imageId,
-          url: imageData.imageUrl || imageData.url,
-          thumbnailUrl: imageData.imageUrl || imageData.url, // Use same URL for thumbnail for now
+          url: servingUrl,
+          thumbnailUrl: servingUrl, // Use same URL for thumbnail for now
           alt: imageData.title || imageData.alt || 'Portfolio image',
           isPrimary: imageData.isPrimary || processedImages.length === 0,
           metadata: {

@@ -197,6 +197,17 @@ export class ObjectStorageService {
       objectEntityDir = `${objectEntityDir}/`;
     }
   
+    // Handle the specific case where uploads are stored in uploads/uploads/ structure
+    // Extract the file ID after the bucket and private directory
+    const bucketPattern = /\/[^\/]+\/.private\/(.+)$/;
+    const match = rawObjectPath.match(bucketPattern);
+    
+    if (match) {
+      const entityId = match[1]; // This will be something like "uploads/8369e7fa-beb8-409f-86c4-1d1739ff0e22"
+      return `/objects/${entityId}`;
+    }
+  
+    // Fallback to original logic
     if (!rawObjectPath.startsWith(objectEntityDir)) {
       return rawObjectPath;
     }
