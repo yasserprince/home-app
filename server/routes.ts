@@ -2038,16 +2038,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/portfolios/:providerId/galleries', async (req, res) => {
     try {
       const { providerId } = req.params;
+      console.log(`Fetching galleries for provider: ${providerId}`);
+      
       const galleries = await storage.getPortfolioGalleriesByProvider(providerId);
+      console.log(`Found ${galleries.length} galleries`);
       
       // Get images for each gallery
       const galleriesWithImages = await Promise.all(
         galleries.map(async (gallery) => {
           const images = await storage.getPortfolioImagesByGallery(gallery.id);
+          console.log(`Gallery ${gallery.id} has ${images.length} images`);
           return { ...gallery, images };
         })
       );
       
+      console.log(`Returning ${galleriesWithImages.length} galleries with images`);
       res.json(galleriesWithImages);
     } catch (error) {
       console.error("Error fetching portfolio galleries:", error);
