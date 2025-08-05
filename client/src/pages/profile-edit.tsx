@@ -419,19 +419,19 @@ export default function ProfileEdit() {
               )}
             </div>
 
-            {/* Professional Information Section - Only in Edit Mode */}
-            {isEditing && (
-              <div className="mt-8 pt-6 border-t border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Briefcase className="w-5 h-5" />
-                  Professional Information
-                </h3>
+            {/* Professional Information Section - Always Visible */}
+            <div className="mt-8 pt-6 border-t border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Briefcase className="w-5 h-5" />
+                Professional Information
+              </h3>
                 
-                {/* Years of Experience */}
-                <div className="space-y-2 mb-4">
-                  <Label className="text-sm font-medium text-white/80">
-                    Years of Experience
-                  </Label>
+              {/* Years of Experience */}
+              <div className="space-y-2 mb-4">
+                <Label className="text-sm font-medium text-white/80">
+                  Years of Experience
+                </Label>
+                {isEditing ? (
                   <Input
                     type="number"
                     placeholder="e.g., 5"
@@ -439,13 +439,19 @@ export default function ProfileEdit() {
                     onChange={(e) => handleInputChange('yearsExperience', e.target.value)}
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                   />
-                </div>
+                ) : (
+                  <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                    {user?.yearsExperience ? `${user.yearsExperience} years` : 'Not set'}
+                  </p>
+                )}
+              </div>
 
-                {/* Hourly Rate */}
-                <div className="space-y-2 mb-4">
-                  <Label className="text-sm font-medium text-white/80">
-                    Hourly Rate (DZD)
-                  </Label>
+              {/* Hourly Rate */}
+              <div className="space-y-2 mb-4">
+                <Label className="text-sm font-medium text-white/80">
+                  Hourly Rate (DZD)
+                </Label>
+                {isEditing ? (
                   <Input
                     type="number"
                     placeholder="e.g., 2500"
@@ -453,13 +459,19 @@ export default function ProfileEdit() {
                     onChange={(e) => handleInputChange('hourlyRate', e.target.value)}
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                   />
-                </div>
+                ) : (
+                  <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10">
+                    {user?.hourlyRate ? `${user.hourlyRate} DZD/hour` : 'Not set'}
+                  </p>
+                )}
+              </div>
 
-                {/* Availability */}
-                <div className="space-y-2 mb-4">
-                  <Label className="text-sm font-medium text-white/80">
-                    Availability
-                  </Label>
+              {/* Availability */}
+              <div className="space-y-2 mb-4">
+                <Label className="text-sm font-medium text-white/80">
+                  Availability
+                </Label>
+                {isEditing ? (
                   <Select 
                     value={formData.availability} 
                     onValueChange={(value) => handleInputChange('availability', value)}
@@ -474,28 +486,39 @@ export default function ProfileEdit() {
                       <SelectItem value="evenings-only">Evenings only</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                ) : (
+                  <p className="text-white bg-white/5 rounded-md px-3 py-2 border border-white/10 capitalize">
+                    {user?.availability?.replace('-', ' ') || 'Not set'}
+                  </p>
+                )}
+              </div>
 
-                {/* Skills */}
-                <div className="space-y-2 mb-4">
-                  <Label className="text-sm font-medium text-white/80">
-                    Skills
-                  </Label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {formData.skills.map((skill, index) => (
-                      <span 
-                        key={index}
-                        className="px-3 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm flex items-center gap-2"
-                      >
-                        {skill}
+              {/* Skills */}
+              <div className="space-y-2 mb-4">
+                <Label className="text-sm font-medium text-white/80">
+                  Skills
+                </Label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {(isEditing ? formData.skills : (user?.skills || [])).map((skill, index) => (
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm flex items-center gap-2"
+                    >
+                      {skill}
+                      {isEditing && (
                         <X 
                           size={14} 
                           className="cursor-pointer hover:text-red-400"
                           onClick={() => handleSkillRemove(skill)}
                         />
-                      </span>
-                    ))}
-                  </div>
+                      )}
+                    </span>
+                  ))}
+                  {(isEditing ? formData.skills : (user?.skills || [])).length === 0 && (
+                    <p className="text-white/50 text-sm">No skills added yet</p>
+                  )}
+                </div>
+                {isEditing && (
                   <Input
                     placeholder="Add a skill (press Enter)"
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
@@ -510,28 +533,35 @@ export default function ProfileEdit() {
                       }
                     }}
                   />
-                </div>
+                )}
+              </div>
 
-                {/* Languages */}
-                <div className="space-y-2 mb-4">
-                  <Label className="text-sm font-medium text-white/80">
-                    Languages
-                  </Label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {formData.languages.map((language, index) => (
-                      <span 
-                        key={index}
-                        className="px-3 py-1 bg-green-600/20 text-green-300 rounded-full text-sm flex items-center gap-2"
-                      >
-                        {language}
+              {/* Languages */}
+              <div className="space-y-2 mb-4">
+                <Label className="text-sm font-medium text-white/80">
+                  Languages
+                </Label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {(isEditing ? formData.languages : (user?.languages || [])).map((language, index) => (
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-green-600/20 text-green-300 rounded-full text-sm flex items-center gap-2"
+                    >
+                      {language}
+                      {isEditing && (
                         <X 
                           size={14} 
                           className="cursor-pointer hover:text-red-400"
                           onClick={() => handleInputChange('languages', formData.languages.filter(l => l !== language))}
                         />
-                      </span>
-                    ))}
-                  </div>
+                      )}
+                    </span>
+                  ))}
+                  {(isEditing ? formData.languages : (user?.languages || [])).length === 0 && (
+                    <p className="text-white/50 text-sm">No languages added yet</p>
+                  )}
+                </div>
+                {isEditing && (
                   <Input
                     placeholder="Add a language (press Enter)"
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
@@ -546,9 +576,9 @@ export default function ProfileEdit() {
                       }
                     }}
                   />
-                </div>
+                )}
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
 
