@@ -78,12 +78,22 @@ export default function ProfileEdit() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // Map frontend field names to backend field names
+      const backendData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        bio: formData.bio,
+        wilaya: formData.location, // Map location to wilaya
+        sex: formData.gender        // Map gender to sex
+      };
+
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(backendData),
       });
 
       if (response.ok) {
@@ -92,6 +102,9 @@ export default function ProfileEdit() {
           description: "Your profile has been successfully updated.",
         });
         setIsEditing(false);
+        
+        // Refresh user data to show updated values
+        window.location.reload();
       } else {
         throw new Error('Failed to update profile');
       }
@@ -380,7 +393,7 @@ export default function ProfileEdit() {
                 <p className="text-white font-medium">Account Type</p>
                 <p className="text-white/70 text-sm capitalize">Currently signed up as {user?.role || 'user'}</p>
               </div>
-              <Button variant="outline" size="sm" className="border-white/30 text-white hover:bg-white/10">
+              <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg">
                 Change
               </Button>
             </div>
