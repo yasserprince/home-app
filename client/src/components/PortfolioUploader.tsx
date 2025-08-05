@@ -206,25 +206,25 @@ export function PortfolioUploader({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[90vh] overflow-hidden flex flex-col mx-auto">
-        <DialogHeader>
-          <DialogTitle className="text-white">Upload Portfolio Images</DialogTitle>
+      <DialogContent className="w-[90vw] max-w-[90vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[85vh] overflow-hidden flex flex-col mx-auto my-auto">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-white text-base sm:text-lg">Upload Portfolio Images</DialogTitle>
           <DialogDescription className="text-gray-300 sr-only">
             Upload and manage your portfolio images with drag and drop functionality
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto space-y-4">
+        <div className="flex-1 overflow-y-auto space-y-3 px-1">
           {/* File Drop Zone */}
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="border-2 border-dashed border-gray-600 rounded-lg p-4 sm:p-8 text-center hover:border-gray-500 transition-colors cursor-pointer min-h-[120px] flex flex-col justify-center"
+            className="border-2 border-dashed border-gray-600 rounded-lg p-3 sm:p-6 text-center hover:border-gray-500 transition-colors cursor-pointer min-h-[100px] flex flex-col justify-center"
             onClick={() => fileInputRef.current?.click()}
           >
-            <Upload className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-4 text-gray-400" />
-            <p className="text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Drop images here or click to browse</p>
-            <p className="text-xs sm:text-sm text-gray-500">
+            <Upload className="w-6 h-6 sm:w-10 sm:h-10 mx-auto mb-1 sm:mb-3 text-gray-400" />
+            <p className="text-gray-300 mb-1 text-xs sm:text-sm">Drop images here or click to browse</p>
+            <p className="text-xs text-gray-500">
               Max {maxNumberOfFiles} files, up to {Math.round(maxFileSize / 1024 / 1024)}MB each
             </p>
             <input
@@ -317,23 +317,23 @@ export function PortfolioUploader({
         </div>
         
         {/* Upload Button */}
-        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-2 pt-4 border-t border-gray-700">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-gray-700 mt-2">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={isUploading}
-            className="border-gray-600 text-gray-300 hover:bg-gray-800 h-10 sm:h-9 text-sm order-2 sm:order-1"
+            className="border-gray-600 text-gray-300 hover:bg-gray-800 h-9 text-xs sm:text-sm order-2 sm:order-1"
           >
             Cancel
           </Button>
           <Button
             onClick={uploadFiles}
             disabled={files.length === 0 || isUploading}
-            className="bg-blue-600 hover:bg-blue-700 h-10 sm:h-9 text-sm order-1 sm:order-2"
+            className="bg-blue-600 hover:bg-blue-700 h-9 text-xs sm:text-sm order-1 sm:order-2"
           >
             {isUploading ? (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <span className="hidden sm:inline">Uploading...</span>
                 <span className="sm:hidden">Upload...</span>
               </div>
