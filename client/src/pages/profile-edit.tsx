@@ -24,8 +24,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import type { UploadResult } from "@uppy/core";
+import { PortfolioUploader } from "@/components/PortfolioUploader";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -204,7 +203,7 @@ export default function ProfileEdit() {
     };
   };
 
-  const handlePortfolioUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+  const handlePortfolioUploadComplete = (result: { successful: Array<{ uploadURL: string; meta: any }> }) => {
     const uploadedImages = result.successful.map((file: any) => ({
       galleryId: activePortfolioTab, // Use the active tab as gallery ID
       imageUrl: file.uploadURL,
@@ -710,11 +709,11 @@ export default function ProfileEdit() {
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="text-white font-medium">Upload to {portfolioTabs.find(t => t.id === activePortfolioTab)?.label}</h4>
                     <div className="text-sm text-white/60">
-                      {portfolioGalleries?.[activePortfolioTab]?.images?.length || 0} images
+                      {(portfolioGalleries as any)?.[activePortfolioTab]?.images?.length || 0} images
                     </div>
                   </div>
                   
-                  <ObjectUploader
+                  <PortfolioUploader
                     maxNumberOfFiles={10}
                     maxFileSize={10485760}
                     onGetUploadParameters={handleGetUploadParameters}
@@ -725,7 +724,7 @@ export default function ProfileEdit() {
                       <Camera className="w-4 h-4" />
                       <span>Upload Images</span>
                     </div>
-                  </ObjectUploader>
+                  </PortfolioUploader>
                 </div>
 
                 {/* Portfolio Images Display */}
@@ -733,7 +732,7 @@ export default function ProfileEdit() {
                   <div className="text-white/60 text-center py-8">Loading portfolio...</div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {portfolioGalleries?.[activePortfolioTab]?.images?.map((image: any) => (
+                    {(portfolioGalleries as any)?.[activePortfolioTab]?.images?.map((image: any) => (
                       <div key={image.id} className="relative group">
                         <div className="aspect-square bg-white/5 rounded-lg overflow-hidden border border-white/10">
                           <img
