@@ -96,24 +96,27 @@ export default function ProfileEdit() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(backendData),
+        credentials: 'include', // Ensure cookies are included
       });
 
       if (response.ok) {
+        // Invalidate and refetch user data without page refresh
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        
         toast({
           title: "Profile Updated",
           description: "Your profile has been successfully updated.",
         });
         setIsEditing(false);
-        
-        // Invalidate and refetch user data without page refresh
-        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       } else {
-        throw new Error('Failed to update profile');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || 'Failed to update profile');
       }
     } catch (error) {
+      console.error('Profile update error:', error);
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
         variant: "destructive",
       });
     } finally {
