@@ -142,7 +142,10 @@ export default function PortfolioGallery() {
     },
     onSuccess: () => {
       if (providerId) {
-        queryClient.invalidateQueries({ queryKey: ['/api/portfolios', providerId, 'galleries'] });
+        queryClient.invalidateQueries({ 
+          queryKey: ['/api/portfolios', providerId, 'galleries'],
+          exact: true 
+        });
       }
       setShowCreateGallery(false);
       setNewGalleryData({
@@ -170,9 +173,16 @@ export default function PortfolioGallery() {
       return apiRequest('/api/portfolios/images', 'POST', images);
     },
     onSuccess: () => {
+      console.log('Upload success callback - providerId:', providerId);
       // Only invalidate if we have a valid providerId
       if (providerId) {
-        queryClient.invalidateQueries({ queryKey: ['/api/portfolios', providerId, 'galleries'] });
+        console.log('Invalidating query with key:', ['/api/portfolios', providerId, 'galleries']);
+        queryClient.invalidateQueries({ 
+          queryKey: ['/api/portfolios', providerId, 'galleries'],
+          exact: true 
+        });
+      } else {
+        console.warn('Cannot invalidate queries - providerId is undefined');
       }
       toast({
         title: "Success",
