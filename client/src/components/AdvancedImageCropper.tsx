@@ -175,25 +175,24 @@ export function AdvancedImageCropper({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Image Area */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="relative bg-black rounded-lg overflow-hidden">
+            <div className="relative bg-black rounded-lg overflow-hidden flex justify-center items-center min-h-[400px]">
               <ReactCrop
                 crop={crop}
                 onChange={(_, percentCrop) => setCrop(percentCrop)}
                 onComplete={(c) => setCompletedCrop(c)}
                 aspect={aspectRatio}
                 circularCrop={aspectRatio === 1}
-                className="max-h-96"
+                className="w-full h-full flex justify-center items-center"
               >
                 <img
                   ref={imgRef}
                   alt="Crop preview"
                   src={imageSrc}
                   onLoad={onImageLoad}
+                  className="max-w-full max-h-[400px] object-contain"
                   style={{
                     transform: `scale(${scale}) rotate(${rotation}deg)`,
                     filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`,
-                    maxHeight: '400px',
-                    maxWidth: '100%',
                   }}
                 />
               </ReactCrop>
@@ -211,7 +210,7 @@ export function AdvancedImageCropper({
                 variant="outline"
                 size="sm"
                 onClick={rotateLeft}
-                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500"
               >
                 <RotateCcw className="w-4 h-4 mr-1" />
                 Rotate Left
@@ -220,7 +219,7 @@ export function AdvancedImageCropper({
                 variant="outline"
                 size="sm"
                 onClick={rotateRight}
-                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500"
               >
                 <RotateCw className="w-4 h-4 mr-1" />
                 Rotate Right
@@ -229,7 +228,7 @@ export function AdvancedImageCropper({
                 variant="outline"
                 size="sm"
                 onClick={resetFilters}
-                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500"
               >
                 Reset
               </Button>
@@ -304,7 +303,7 @@ export function AdvancedImageCropper({
             <div className="space-y-3">
               <Button
                 onClick={handleCropComplete}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0"
                 size="lg"
               >
                 <Download className="w-4 h-4 mr-2" />
@@ -313,7 +312,7 @@ export function AdvancedImageCropper({
               <Button
                 onClick={onClose}
                 variant="outline"
-                className="w-full bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="w-full bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500"
               >
                 <X className="w-4 h-4 mr-2" />
                 Cancel

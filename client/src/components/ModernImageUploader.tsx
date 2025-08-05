@@ -341,7 +341,7 @@ export function ModernImageUploader({ children, onSuccess }: ModernImageUploader
         setIsOpen(open);
         if (!open) resetState();
       }}>
-        <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700">
+        <DialogContent className="sm:max-w-lg bg-gray-900 border-gray-700">
           <DialogHeader>
             <DialogTitle className="text-white">Update Profile Picture</DialogTitle>
           </DialogHeader>
@@ -371,18 +371,19 @@ export function ModernImageUploader({ children, onSuccess }: ModernImageUploader
 
             {step === 'crop' && src && (
               <div className="space-y-4">
-                <div className="relative">
+                <div className="relative bg-black rounded-lg overflow-hidden flex justify-center items-center min-h-[300px]">
                   <ReactCrop
                     crop={crop}
                     onChange={(c) => setCrop(c)}
                     onComplete={(c) => setCompletedCrop(c)}
                     aspect={1}
+                    className="w-full h-full flex justify-center items-center"
                   >
                     <img
                       ref={imgRef}
                       alt="Crop"
                       src={src}
-                      style={{ maxHeight: '400px', maxWidth: '100%' }}
+                      className="max-w-full max-h-[300px] object-contain"
                       onLoad={onImageLoad}
                     />
                   </ReactCrop>
@@ -392,14 +393,14 @@ export function ModernImageUploader({ children, onSuccess }: ModernImageUploader
                   <Button
                     variant="outline"
                     onClick={() => setStep('select')}
-                    className="flex-1"
+                    className="flex-1 bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500"
                   >
                     Choose Different Image
                   </Button>
                   <Button
                     onClick={handleUpload}
                     disabled={!completedCrop || isProcessing}
-                    className="flex-1"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white border-0"
                   >
                     {isProcessing ? (
                       <>
