@@ -589,8 +589,8 @@ export class DatabaseStorage implements IStorage {
 
   async addImageToModernPortfolioGallery(galleryId: string, imageData: any): Promise<any> {
     // Find which user owns this gallery
-    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
-      const galleryIndex = galleries.findIndex(g => g.id === galleryId);
+    for (const [userId, galleries] of Array.from(this.modernPortfolioData.entries())) {
+      const galleryIndex = galleries.findIndex((g: any) => g.id === galleryId);
       if (galleryIndex >= 0) {
         if (!galleries[galleryIndex].images) {
           galleries[galleryIndex].images = [];
@@ -605,11 +605,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteModernPortfolioImage(galleryId: string, imageId: string): Promise<boolean> {
-    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
-      const galleryIndex = galleries.findIndex(g => g.id === galleryId);
+    for (const [userId, galleries] of Array.from(this.modernPortfolioData.entries())) {
+      const galleryIndex = galleries.findIndex((g: any) => g.id === galleryId);
       if (galleryIndex >= 0) {
         const images = galleries[galleryIndex].images || [];
-        const imageIndex = images.findIndex(img => img.id === imageId);
+        const imageIndex = images.findIndex((img: any) => img.id === imageId);
         if (imageIndex >= 0) {
           images.splice(imageIndex, 1);
           galleries[galleryIndex].updatedAt = new Date();
@@ -622,10 +622,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteModernPortfolioImageById(imageId: string): Promise<boolean> {
-    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
+    for (const [userId, galleries] of Array.from(this.modernPortfolioData.entries())) {
       for (const gallery of galleries) {
         const images = gallery.images || [];
-        const imageIndex = images.findIndex(img => img.id === imageId);
+        const imageIndex = images.findIndex((img: any) => img.id === imageId);
         if (imageIndex >= 0) {
           images.splice(imageIndex, 1);
           gallery.updatedAt = new Date();
@@ -638,10 +638,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateModernPortfolioImage(imageId: string, updates: any): Promise<boolean> {
-    for (const [userId, galleries] of this.modernPortfolioData.entries()) {
+    for (const [userId, galleries] of Array.from(this.modernPortfolioData.entries())) {
       for (const gallery of galleries) {
         const images = gallery.images || [];
-        const imageIndex = images.findIndex(img => img.id === imageId);
+        const imageIndex = images.findIndex((img: any) => img.id === imageId);
         if (imageIndex >= 0) {
           images[imageIndex] = { ...images[imageIndex], ...updates };
           gallery.updatedAt = new Date();
