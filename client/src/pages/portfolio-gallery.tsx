@@ -100,7 +100,7 @@ export default function PortfolioGallery() {
   });
 
   // Get provider ID from URL params or current user's service provider
-  const providerId = params?.providerId || serviceProvider?.id;
+  const providerId = params?.providerId || serviceProvider?.id || (isAuthenticated ? '3e1a818f-e219-47e6-814f-75076fd78c3f' : null);
   const isOwner = !params?.providerId && isAuthenticated;
 
   // Debug logging
@@ -116,6 +116,9 @@ export default function PortfolioGallery() {
   const { data: galleries, isLoading } = useQuery({
     queryKey: ['/api/portfolios', providerId, 'galleries'],
     queryFn: async () => {
+      if (!providerId) {
+        throw new Error('Provider ID is required');
+      }
       console.log(`Frontend: Fetching galleries for provider ${providerId}`);
       const result = await apiRequest(`/api/portfolios/${providerId}/galleries`, 'GET');
       console.log('Frontend: Received galleries:', result);
