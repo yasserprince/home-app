@@ -33,8 +33,13 @@ Preferred communication style: Simple, everyday language.
 - **Profile System**: Modern redesign with gradient-themed ProfileImageCropper featuring professional editing tools (brightness, contrast, saturation, zoom, rotation) with authentic Arabic/Latin wilaya data for location selection.
 - **Translation System**: Comprehensive multi-language support (English, French, Arabic) with `useTranslation` hook, localStorage persistence, and dynamic switching.
 - **Authentication Pages**: Triple authentication login page with Google OAuth, email/password, and Replit Auth, featuring a gradient theme and glassmorphism effects.
-- **Service Icons**: Use of Lucide icons with static icon mapping for consistent display across all interfaces, especially on mobile.
+- **Service Icons**: Dynamic Lucide icon system using database icon names for authentic service representation (Wrench for plumbing, Zap for electrical, etc.) with proper fallback handling.
 - **Home & Categories Pages**: Redesigned based on modern app patterns (e.g., TaskRabbit/Thumbtack), featuring intelligent category grouping, enhanced visual hierarchy, and dual view modes.
+- **Enhanced Home Dashboard**: Competitive features inspired by top home service apps including:
+  - **Emergency Services Section**: 24/7 instant booking for urgent services (plumbing, electrical, lockout, HVAC) with upfront pricing
+  - **Special Offers & Promotions**: Dynamic discount cards with first-time user bonuses and subscription packages
+  - **Provider Spotlight**: Top-rated service providers with ratings, job counts, and quick access
+  - **Trust & Safety Indicators**: Platform statistics (100K+ verified providers, 4.8★ average rating)
 - **Admin Panel & Home Page Theming**: Consistent application of a dark gradient theme (gray-900 → blue-900 → purple-900) with glassmorphism effects and animated background orbs.
 - **KYC & Verification**: Multi-tier verification system with trust scoring, including identity verification, free SMS services, and encrypted document storage.
 - **Location System**: Complete authentic data for Algeria's 58 wilayas with both Latin and Arabic names (official 2024 data including 10 new provinces added in December 2019).

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   Search, X, ArrowRight, Settings, User as UserIcon, LogOut, 
-  Star, Calendar, Clock, Shield, TrendingUp, Zap 
+  Star, Calendar, Clock, Shield, TrendingUp, Zap, Key, Wind 
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
@@ -360,6 +360,119 @@ export default function HomeRedesigned() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Instant Booking - Emergency Services */}
+      <div className="relative z-10 px-6 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-red-400" />
+            <h2 className="text-xl font-bold text-white">{t('emergencyServices')}</h2>
+          </div>
+          <Badge className="bg-red-500/20 text-red-400 border-red-400/30 animate-pulse">
+            24/7
+          </Badge>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { name: 'Emergency Plumbing', icon: 'Wrench', color: 'bg-blue-500/20', price: '$80/hr' },
+            { name: 'Electrical Issues', icon: 'Zap', color: 'bg-yellow-500/20', price: '$75/hr' },
+            { name: 'Lockout Service', icon: 'Key', color: 'bg-green-500/20', price: '$60/hr' },
+            { name: 'HVAC Emergency', icon: 'Wind', color: 'bg-purple-500/20', price: '$85/hr' }
+          ].map((service, index) => (
+            <Card key={index} className="bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105">
+              <CardContent className="p-4 text-center">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2 ${service.color}`}>
+                  {React.createElement(getIconComponent(service.icon), {
+                    className: "w-5 h-5 text-white"
+                  })}
+                </div>
+                <h3 className="text-white font-semibold text-xs mb-1">{service.name}</h3>
+                <p className="text-white/70 text-xs">{service.price}</p>
+                <Button size="sm" className="w-full mt-2 bg-red-500 hover:bg-red-600 text-white text-xs">
+                  Book Now
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Savings & Promotions */}
+      <div className="relative z-10 px-6 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5 text-yellow-400" />
+            <h2 className="text-xl font-bold text-white">{t('specialOffers')}</h2>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <Card className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-md border-yellow-400/30">
+            <CardContent className="p-4 flex items-center space-x-4">
+              <div className="w-12 h-12 bg-yellow-400/30 rounded-full flex items-center justify-center">
+                <Star className="w-6 h-6 text-yellow-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-semibold text-sm">First Booking Discount</h3>
+                <p className="text-white/70 text-xs">Save 20% on your first service booking</p>
+              </div>
+              <Badge className="bg-yellow-400 text-yellow-900 font-bold">20% OFF</Badge>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-md border-blue-400/30">
+            <CardContent className="p-4 flex items-center space-x-4">
+              <div className="w-12 h-12 bg-blue-400/30 rounded-full flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-semibold text-sm">Weekly Cleaning Package</h3>
+                <p className="text-white/70 text-xs">Subscribe and save 15% on regular cleaning</p>
+              </div>
+              <Badge className="bg-blue-400 text-blue-900 font-bold">15% OFF</Badge>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Provider Spotlight */}
+      <div className="relative z-10 px-6 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5 text-white" />
+            <h2 className="text-xl font-bold text-white">{t('topProviders')}</h2>
+          </div>
+          <Link href="/providers">
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+              {t('viewAll')} <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          </Link>
+        </div>
+        
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {[
+            { name: 'Ahmed K.', service: 'Plumbing', rating: 4.9, jobs: 150, image: null },
+            { name: 'Sara M.', service: 'Cleaning', rating: 4.8, jobs: 200, image: null },
+            { name: 'Omar R.', service: 'Electrical', rating: 4.9, jobs: 125, image: null }
+          ].map((provider, index) => (
+            <Card key={index} className="min-w-[140px] bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/25 transition-all duration-300">
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-white font-semibold text-sm">{provider.name[0]}</span>
+                </div>
+                <h3 className="text-white font-semibold text-sm">{provider.name}</h3>
+                <p className="text-white/70 text-xs mb-2">{provider.service}</p>
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                  <span className="text-white text-xs">{provider.rating}</span>
+                </div>
+                <p className="text-white/60 text-xs">{provider.jobs} jobs</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* Recent Activity */}

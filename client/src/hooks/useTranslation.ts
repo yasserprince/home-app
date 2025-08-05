@@ -181,6 +181,21 @@ const translations: Translations = {
     fr: 'Commencez par réserver votre premier service',
     ar: 'ابدأ بحجز خدمتك الأولى'
   },
+  'emergencyServices': {
+    en: 'Emergency Services',
+    fr: 'Services d\'urgence',
+    ar: 'خدمات الطوارئ'
+  },
+  'specialOffers': {
+    en: 'Special Offers',
+    fr: 'Offres spéciales',
+    ar: 'عروض خاصة'
+  },
+  'topProviders': {
+    en: 'Top Providers',
+    fr: 'Meilleurs prestataires',
+    ar: 'أفضل مقدمي الخدمات'
+  },
   'browseServices': {
     en: 'Browse Services',
     fr: 'Parcourir les services',
