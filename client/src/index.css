@@ -67,9 +67,9 @@
     scroll-behavior: smooth;
   }
   
-  /* Fix modal scroll lock issues */
-  body.modal-open {
-    overflow: hidden;
+  /* iOS Safari viewport height fix */
+  html {
+    height: -webkit-fill-available;
   }
   
   /* Ensure proper scrolling in containers */
@@ -95,54 +95,71 @@
   }
 }
 
-/* Uppy Modal Fixes - Prevent fullscreen and add proper sizing */
+/* Uppy Modal Fixes - Research-based solution for mobile scrolling */
 .uppy-DashboardModal-overlay {
   background-color: rgba(0, 0, 0, 0.7) !important;
-  z-index: 9999;
+  z-index: 9999 !important;
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  overflow: auto !important;
+  overflow: hidden !important;
+  /* Prevent touch scrolling through modal */
+  touch-action: none !important;
+  /* Use device height instead of viewport height for iOS */
+  height: 100% !important;
+  min-height: -webkit-fill-available !important;
 }
 
 .uppy-DashboardModal-inner {
-  max-width: 90vw !important;
-  max-height: 90vh !important;
-  width: 800px !important;
-  height: auto !important;
-  min-height: 600px !important;
-  margin: 20px auto !important;
-  top: 5vh !important;
+  position: absolute !important;
+  top: 50% !important;
   left: 50% !important;
-  transform: translateX(-50%) !important;
-  position: fixed !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(90vw, 800px) !important;
+  max-height: min(90vh, calc(100vh - 40px)) !important;
+  height: auto !important;
   border-radius: 12px !important;
-  overflow: visible !important;
-  display: block !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  /* Ensure proper sizing on iOS */
+  max-width: 90vw !important;
 }
 
 .uppy-Dashboard-inner {
   background-color: #1a1a1a !important;
   border-radius: 12px !important;
-  overflow: visible !important;
-  max-height: none !important;
-  height: auto !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .uppy-Dashboard {
-  height: auto !important;
-  min-height: 600px !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .uppy-Dashboard-files {
-  max-height: 300px !important;
+  flex: 1 !important;
   overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-height: calc(100vh - 200px) !important;
 }
 
 .uppy-Dashboard-AddFiles {
-  min-height: 150px !important;
+  flex-shrink: 0 !important;
+  min-height: 120px !important;
+}
+
+.uppy-Dashboard-actions {
+  flex-shrink: 0 !important;
+  padding: 16px !important;
+  border-top: 1px solid #333 !important;
 }
 
 .uppy-Dashboard-AddFiles {
@@ -163,25 +180,41 @@
   height: 32px !important;
 }
 
-/* Mobile responsive */
+/* Mobile responsive - iOS Safari optimized */
 @media (max-width: 768px) {
-  .uppy-DashboardModal-inner {
-    width: 95vw !important;
-    height: auto !important;
-    max-width: 95vw !important;
-    max-height: 85vh !important;
-    min-height: 500px !important;
-    top: 5vh !important;
-    transform: translateX(-50%) !important;
-    margin: 20px auto !important;
+  .uppy-DashboardModal-overlay {
+    /* Use full device height on mobile */
+    height: 100% !important;
+    min-height: 100% !important;
   }
   
-  .uppy-Dashboard {
-    min-height: 500px !important;
+  .uppy-DashboardModal-inner {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: min(85vh, calc(100% - 40px)) !important;
+    height: auto !important;
+    /* Center vertically with safe margins */
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
   }
   
   .uppy-Dashboard-files {
-    max-height: 250px !important;
+    max-height: 40vh !important;
+  }
+  
+  .uppy-Dashboard-AddFiles {
+    min-height: 100px !important;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .uppy-DashboardModal-overlay {
+    height: -webkit-fill-available !important;
+  }
+  
+  .uppy-Dashboard-files {
+    -webkit-overflow-scrolling: touch !important;
   }
 }
 

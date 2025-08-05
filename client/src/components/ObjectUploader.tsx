@@ -60,18 +60,38 @@ export function ObjectUploader({
 }: ObjectUploaderProps) {
   const [showModal, setShowModal] = useState(false);
 
-  // Handle body scroll lock when modal is open
+  // Handle body scroll lock when modal is open - iOS Safari compatible
   useEffect(() => {
     if (showModal) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
+      // Store current scroll position
+      const scrollY = window.scrollY;
+      
+      // Lock body scroll using position fixed method (most reliable for iOS)
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      // Store scroll position for restore
+      document.body.setAttribute('data-scroll-lock', scrollY.toString());
+      
+      return () => {
+        // Restore scroll position
+        const scrollPosition = parseInt(document.body.getAttribute('data-scroll-lock') || '0');
+        
+        document.body.style.removeProperty('position');
+        document.body.style.removeProperty('top');
+        document.body.style.removeProperty('left');
+        document.body.style.removeProperty('right');
+        document.body.style.removeProperty('width');
+        document.body.style.removeProperty('overflow');
+        document.body.removeAttribute('data-scroll-lock');
+        
+        window.scrollTo(0, scrollPosition);
+      };
     }
-
-    // Cleanup on unmount
-    return () => {
-      document.body.classList.remove('modal-open');
-    };
   }, [showModal]);
   const [uppy] = useState(() =>
     new Uppy({
