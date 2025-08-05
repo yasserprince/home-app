@@ -184,32 +184,26 @@ export class ObjectStorageService {
   normalizeObjectEntityPath(
     rawPath: string,
   ): string {
-    console.log("🔍 Normalizing path:", rawPath);
-    
     if (!rawPath.startsWith("https://storage.googleapis.com/")) {
-      console.log("❌ Not a Google Storage URL, returning as-is:", rawPath);
       return rawPath;
     }
   
     // Extract the path from the URL by removing query parameters and domain
     const url = new URL(rawPath);
     const rawObjectPath = url.pathname;
-    console.log("📍 Raw object path:", rawObjectPath);
   
-    // Extract the file ID after the bucket and private directory
-    // Expected pattern: /bucket-name/.private/uploads/file-id
-    const bucketPattern = /\/[^\/]+\/.private\/uploads\/(.+)$/;
-    const match = rawObjectPath.match(bucketPattern);
-    
-    if (match) {
-      const fileId = match[1]; // This will be just the UUID like "8369e7fa-beb8-409f-86c4-1d1739ff0e22"
-      const normalizedPath = `/objects/uploads/${fileId}`;
-      console.log("✅ Normalized to:", normalizedPath);
-      return normalizedPath;
+    let objectEntityDir = this.getPrivateObjectDir();
+    if (!objectEntityDir.endsWith("/")) {
+      objectEntityDir = `${objectEntityDir}/`;
     }
   
-    console.log("❌ Could not match expected pattern, returning original");
-    return rawPath;
+    if (!rawObjectPath.startsWith(objectEntityDir)) {
+      return rawObjectPath;
+    }
+  
+    // Extract the entity ID from the path
+    const entityId = rawObjectPath.slice(objectEntityDir.length);
+    return `/objects/${entityId}`;
   }
 
   // Tries to set the ACL policy for the object entity and return the normalized path.
@@ -217,17 +211,13 @@ export class ObjectStorageService {
     rawPath: string,
     aclPolicy: ObjectAclPolicy
   ): Promise<string> {
-    console.log("Setting ACL policy for rawPath:", rawPath, "Policy:", aclPolicy);
     const normalizedPath = this.normalizeObjectEntityPath(rawPath);
-    console.log("Normalized path:", normalizedPath);
     if (!normalizedPath.startsWith("/")) {
       return normalizedPath;
     }
 
     const objectFile = await this.getObjectEntityFile(normalizedPath);
-    console.log("Got object file:", objectFile.name, "Setting ACL policy...");
     await setObjectAclPolicy(objectFile, aclPolicy);
-    console.log("ACL policy set successfully for:", normalizedPath);
     return normalizedPath;
   }
 
@@ -281,18 +271,12 @@ async function signObjectURL({
   method: "GET" | "PUT" | "DELETE" | "HEAD";
   ttlSec: number;
 }): Promise<string> {
-  console.log("signObjectURL called with:", { bucketName, objectName, method, ttlSec });
-  
   const request = {
     bucket_name: bucketName,
     object_name: objectName,
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
-  
-  console.log("Signing request:", request);
-  console.log("Endpoint:", `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`);
-  
   const response = await fetch(
     `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
     {
@@ -303,21 +287,13 @@ async function signObjectURL({
       body: JSON.stringify(request),
     }
   );
-  
-  console.log("Sidecar response status:", response.status, response.statusText);
-  
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Sidecar error response:", errorText);
     throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, response: ${errorText}, ` +
+      `Failed to sign object URL, errorcode: ${response.status}, ` +
         `make sure you're running on Replit`
     );
   }
 
-  const responseJson = await response.json();
-  console.log("Sidecar response JSON:", responseJson);
-  const { signed_url: signedURL } = responseJson;
-  console.log("Extracted signed URL:", signedURL);
+  const { signed_url: signedURL } = await response.json();
   return signedURL;
 }
