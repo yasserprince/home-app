@@ -117,7 +117,8 @@ export function PortfolioUploader({
         setFiles(prev => prev.map(f => f.id === fileUpload.id ? { ...f, status: 'uploading' as const } : f));
         
         // Get upload parameters
-        const { url } = await onGetUploadParameters();
+        const response = await onGetUploadParameters();
+        const { uploadURL: url } = response;
         
         // Upload file with progress tracking
         const xhr = new XMLHttpRequest();

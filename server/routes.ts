@@ -2112,10 +2112,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
-      // Get user's service provider profile
-      const provider = await storage.getServiceProviderByUserId(userId);
+      // Get user's service provider profile, or create one if doesn't exist
+      let provider = await storage.getServiceProviderByUserId(userId);
       if (!provider) {
-        return res.status(403).json({ message: "User is not a service provider" });
+        // Auto-create a basic service provider profile for portfolio uploads
+        const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        // Get a default category (first available category)
+        const categories = await storage.getServiceCategories();
+        const defaultCategory = categories[0];
+        
+        if (!defaultCategory) {
+          return res.status(500).json({ message: "No service categories available" });
+        }
+
+        // Create basic service provider profile
+        provider = await storage.createServiceProvider({
+          userId: userId,
+          businessName: `${user.firstName || 'Professional'} ${user.lastName || 'Services'}`.trim() || 'Professional Services',
+          description: 'Professional service provider',
+          categoryId: defaultCategory.id,
+          hourlyRate: '50.00', // Default rate
+          experienceYears: 1,
+          location: user.wilaya || 'Algeria',
+          services: ['General Services'],
+        });
+
+        console.log(`Auto-created service provider profile for user ${userId}`);
       }
 
       const { ObjectStorageService } = await import('./objectStorage');
@@ -2136,10 +2162,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
-      // Get user's service provider profile
-      const provider = await storage.getServiceProviderByUserId(userId);
+      // Get user's service provider profile, or create one if doesn't exist
+      let provider = await storage.getServiceProviderByUserId(userId);
       if (!provider) {
-        return res.status(403).json({ message: "User is not a service provider" });
+        // Auto-create a basic service provider profile for portfolio uploads
+        const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        // Get a default category (first available category)
+        const categories = await storage.getServiceCategories();
+        const defaultCategory = categories[0];
+        
+        if (!defaultCategory) {
+          return res.status(500).json({ message: "No service categories available" });
+        }
+
+        // Create basic service provider profile
+        provider = await storage.createServiceProvider({
+          userId: userId,
+          businessName: `${user.firstName || 'Professional'} ${user.lastName || 'Services'}`.trim() || 'Professional Services',
+          description: 'Professional service provider',
+          categoryId: defaultCategory.id,
+          hourlyRate: '50.00', // Default rate
+          experienceYears: 1,
+          location: user.wilaya || 'Algeria',
+          services: ['General Services'],
+        });
+
+        console.log(`Auto-created service provider profile for user ${userId}`);
       }
 
       const images = Array.isArray(req.body) ? req.body : [req.body];
