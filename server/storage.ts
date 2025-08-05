@@ -745,29 +745,18 @@ export class DatabaseStorage implements IStorage {
         return null;
       }
 
-      // Get or create service provider for this user
+      console.log("Gallery found:", gallery);
+      console.log("Gallery providerId:", gallery.providerId);
+
+      // Get service provider for this gallery
       let [serviceProvider] = await db
         .select()
         .from(serviceProviders)
-        .where(eq(serviceProviders.userId, gallery.userId));
+        .where(eq(serviceProviders.id, gallery.providerId));
 
       if (!serviceProvider) {
-        // Create a default service provider for portfolio management
-        const [newProvider] = await db
-          .insert(serviceProviders)
-          .values({
-            userId: gallery.userId,
-            businessName: 'Portfolio Provider',
-            description: 'Default provider for portfolio management',
-            categoryId: 'cb8aeab6-3fb4-44ba-9efe-00fe3217e549', // Default to first category
-            hourlyRate: '50.00',
-            isAvailable: true,
-            experienceYears: 1,
-            location: 'Algeria',
-            services: ['General Services']
-          })
-          .returning();
-        serviceProvider = newProvider;
+        console.error("Service provider not found for gallery.providerId:", gallery.providerId);
+        throw new Error("Service provider not found for gallery");
       }
 
       // Extract object path from image URL

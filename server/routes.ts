@@ -2433,17 +2433,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add image to the gallery
       const imageData = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        url: normalizedPath,
-        thumbnailUrl: normalizedPath,
-        alt: filename,
+        imageUrl: normalizedPath,
+        objectPath: normalizedPath,
+        title: filename,
+        description: description || '',
+        imageType: imageType || 'work_sample',
         isPrimary: false,
-        metadata: {
-          filename,
-          imageType: imageType || 'work_sample',
-          description: description || '',
-          isPublic: true
-        },
-        uploadedAt: new Date()
+        sortOrder: 0
       };
 
       await storage.addImageToModernPortfolioGallery(galleryId, imageData);
