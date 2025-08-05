@@ -206,7 +206,7 @@ export function PortfolioUploader({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="w-[85vw] max-w-[85vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[80vh] overflow-hidden flex flex-col mx-2 my-4 p-4 sm:p-6">
+      <DialogContent className="w-[80vw] max-w-[80vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[75vh] overflow-hidden flex flex-col p-3 sm:p-4" style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', margin: 0 }}>
         <DialogHeader className="pb-2">
           <DialogTitle className="text-white text-base sm:text-lg">Upload Portfolio Images</DialogTitle>
           <DialogDescription className="text-gray-300 sr-only">
