@@ -24,6 +24,12 @@ import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ArrowLeft,
   Camera,
   Save,
@@ -41,7 +47,8 @@ import {
   X,
   Briefcase,
   Image as ImageIcon,
-  Wrench
+  Wrench,
+  MoreVertical
 } from "lucide-react";
 
 export default function ProfileEdit() {
@@ -210,7 +217,7 @@ export default function ProfileEdit() {
           </div>
           <div className="flex items-center gap-2">
             <LanguageSelector variant="compact" />
-            {isEditing && (
+            {isEditing ? (
               <div className="flex gap-2">
                 <Button
                   variant="ghost"
@@ -234,6 +241,29 @@ export default function ProfileEdit() {
                   )}
                 </Button>
               </div>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                    <MoreVertical className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-gray-800/95 backdrop-blur-lg border-gray-700">
+                  <DropdownMenuItem 
+                    onClick={() => setIsEditing(true)}
+                    className="text-white hover:bg-white/10 focus:bg-white/10"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </DropdownMenuItem>
+                  <Link href="/profile">
+                    <DropdownMenuItem className="text-white hover:bg-white/10 focus:bg-white/10">
+                      <User className="w-4 h-4 mr-2" />
+                      Account
+                    </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>

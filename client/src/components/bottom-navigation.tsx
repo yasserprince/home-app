@@ -57,7 +57,7 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
             >
               <User className={`w-6 h-6 ${activeTab === 'profile' ? 'text-blue-400' : 'text-white/70'}`} strokeWidth={2} />
               <span className={`text-xs font-medium ${activeTab === 'profile' ? 'text-blue-400' : 'text-white/70'}`}>
-                {t('profile')}
+                Account
               </span>
             </Button>
           </Link>
