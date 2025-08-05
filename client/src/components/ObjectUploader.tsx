@@ -91,15 +91,10 @@ export function ObjectUploader({
         uppy={uppy}
         open={showModal}
         onRequestClose={() => setShowModal(false)}
-        closeModalOnClickOutside={true}
-        closeAfterFinish={true}
-        showProgressDetails={true}
+        closeModalOnClickOutside
+        closeAfterFinish
+        showProgressDetails
         proudlyDisplayPoweredByUppy={false}
-        height={500}
-        width="90%"
-        theme="dark"
-        browserBackButtonClose={true}
-        plugins={['Dashboard']}
         metaFields={[
           { id: 'title', name: 'Title', placeholder: 'Image title' },
           { id: 'description', name: 'Description', placeholder: 'Describe this image' },

@@ -74,6 +74,59 @@
   }
 }
 
+/* Uppy Modal Fixes - Prevent fullscreen and add proper sizing */
+.uppy-DashboardModal-overlay {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  z-index: 9999;
+}
+
+.uppy-DashboardModal-inner {
+  max-width: 90vw !important;
+  max-height: 80vh !important;
+  width: 800px !important;
+  height: 600px !important;
+  margin: auto !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  position: fixed !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.uppy-Dashboard-inner {
+  background-color: #1a1a1a !important;
+  border-radius: 12px !important;
+}
+
+.uppy-Dashboard-AddFiles {
+  background-color: #2a2a2a !important;
+  border: 2px dashed #666 !important;
+  border-radius: 8px !important;
+}
+
+.uppy-Dashboard-AddFiles-title {
+  color: #fff !important;
+}
+
+.uppy-DashboardModal-close {
+  color: #fff !important;
+  background-color: #333 !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .uppy-DashboardModal-inner {
+    width: 95vw !important;
+    height: 70vh !important;
+    max-width: 95vw !important;
+    max-height: 70vh !important;
+  }
+}
+
 /* Mobile-first SVG icon rendering fixes */
 svg {
   display: inline-block !important;
