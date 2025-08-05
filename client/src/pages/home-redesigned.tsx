@@ -22,6 +22,14 @@ import {
   Search, X, ArrowRight, Settings, User as UserIcon, LogOut, 
   Star, Calendar, Clock, Shield, TrendingUp, Zap 
 } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+
+// Helper function to get Lucide icon component by name
+const getIconComponent = (iconName: string) => {
+  // @ts-ignore - Dynamic icon access
+  const IconComponent = LucideIcons[iconName];
+  return IconComponent || LucideIcons.Square; // Fallback to Square if icon not found
+};
 
 export default function HomeRedesigned() {
   const { user, isLoading: userLoading } = useAuth();
@@ -50,8 +58,8 @@ export default function HomeRedesigned() {
     .map(category => ({
       text: category.name,
       description: category.description || '',
-      icon: getCategoryIcon(category.name),
-      color: getCategoryColor(category),
+      icon: category.icon,
+      color: category.color,
       type: 'category' as const
     }));
 
@@ -184,15 +192,11 @@ export default function HomeRedesigned() {
                   data-testid={`suggestion-${index}`}
                 >
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: `${suggestion.color}20` }}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${suggestion.color}`}
                   >
-                    <ModernServiceIcon 
-                      iconName={suggestion.icon} 
-                      className="w-5 h-5" 
-                      style={{ color: suggestion.color }} 
-                      size={20}
-                    />
+                    {React.createElement(getIconComponent(suggestion.icon), {
+                      className: "w-5 h-5 text-white"
+                    })}
                   </div>
                   <div className="flex-1 text-left">
                     <div className="font-semibold text-gray-900 text-sm">{suggestion.text}</div>
@@ -267,15 +271,11 @@ export default function HomeRedesigned() {
                 <Card className="bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 h-32">
                   <CardContent className="p-4 flex flex-col items-center justify-center h-full text-center">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-2"
-                      style={{ backgroundColor: `${getCategoryColor(category)}30` }}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center mb-2 ${category.color}`}
                     >
-                      <ModernServiceIcon 
-                        iconName={getCategoryIcon(category.name)} 
-                        className="w-6 h-6" 
-                        style={{ color: '#ffffff' }} 
-                        size={24}
-                      />
+                      {React.createElement(getIconComponent(category.icon), {
+                        className: "w-6 h-6 text-white"
+                      })}
                     </div>
                     <h3 className="text-white text-xs font-semibold line-clamp-2">
                       {getTranslatedName(category.name)}
@@ -318,15 +318,11 @@ export default function HomeRedesigned() {
                 <Card className="bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105">
                   <CardContent className="p-4 flex items-center space-x-3">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: `${getCategoryColor(category)}30` }}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${category.color}`}
                     >
-                      <ModernServiceIcon 
-                        iconName={getCategoryIcon(category.name)} 
-                        className="w-6 h-6" 
-                        style={{ color: '#ffffff' }} 
-                        size={24}
-                      />
+                      {React.createElement(getIconComponent(category.icon), {
+                        className: "w-6 h-6 text-white"
+                      })}
                     </div>
                     <div>
                       <h3 className="text-white font-semibold text-sm line-clamp-1">
