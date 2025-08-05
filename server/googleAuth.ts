@@ -22,7 +22,7 @@ export function getSession() {
   });
   
   return session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || 'dev-secret-key-for-replit',
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
@@ -40,6 +40,12 @@ export async function setupGoogleAuth(app: Express) {
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
+  
+  // Only setup Google OAuth if credentials are available
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    console.log("Google OAuth credentials not found - skipping Google OAuth setup");
+    return;
+  }
   
   // Use production URL for all environments since Google Cloud Console is configured for it
   const callbackURL = "https://home-serve-katiflam1.replit.app/api/auth/google/callback";
