@@ -47,8 +47,9 @@ export async function setupGoogleAuth(app: Express) {
     return;
   }
   
-  // Use production URL for all environments since Google Cloud Console is configured for it
-  const callbackURL = "https://home-serve-katiflam1.replit.app/api/auth/google/callback";
+  // Use the current Replit domain
+  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000';
+  const callbackURL = `https://${domain}/api/auth/google/callback`;
     
   console.log("Setting up Google OAuth with:", {
     clientId: process.env.GOOGLE_CLIENT_ID?.substring(0, 10) + "...",
