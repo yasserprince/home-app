@@ -22,6 +22,7 @@ import { ProfileImageManager } from "@/components/ProfileImageManager";
 import { LanguageSelector } from "@/components/language-selector";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Camera,
@@ -44,6 +45,7 @@ export default function ProfileEdit() {
   const { user, isLoading } = useAuth();
   const { t } = useTranslation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -103,8 +105,8 @@ export default function ProfileEdit() {
         });
         setIsEditing(false);
         
-        // Refresh user data to show updated values
-        window.location.reload();
+        // Invalidate and refetch user data without page refresh
+        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       } else {
         throw new Error('Failed to update profile');
       }
