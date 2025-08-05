@@ -208,15 +208,34 @@ export default function ProfileEdit() {
   };
 
   const handlePortfolioUploadComplete = (result: { successful: Array<{ uploadURL: string; meta: any }> }) => {
-    const uploadedImages = result.successful.map((file: any) => ({
-      galleryId: activePortfolioTab, // Use the active tab as gallery ID
-      imageUrl: file.uploadURL,
-      title: file.meta?.title || file.name,
-      description: file.meta?.description || '',
-      imageType: getImageTypeForCategory(activePortfolioTab),
-      isPublic: true,
-      isPrimary: false,
-    }));
+    const uploadedImages = result.successful.map((file: any) => {
+      // Convert the upload URL to a serving URL
+      // The uploadURL is a presigned URL like: https://storage.googleapis.com/bucket/.private/uploads/id?signature...
+      // We need to extract the object path and convert it to our serving URL
+      let imageUrl = file.uploadURL;
+      try {
+        const url = new URL(file.uploadURL);
+        const pathParts = url.pathname.split('/');
+        if (pathParts.length >= 3 && pathParts[2] === '.private') {
+          // Extract the object path after .private/
+          const objectPath = pathParts.slice(3).join('/');
+          imageUrl = `/objects/uploads/${objectPath}`;
+        }
+      } catch (error) {
+        console.error('Error parsing upload URL:', error);
+        // Fallback to using the upload URL directly
+      }
+      
+      return {
+        galleryId: activePortfolioTab, // Use the active tab as gallery ID
+        imageUrl: imageUrl,
+        title: file.meta?.title || file.name,
+        description: file.meta?.description || '',
+        imageType: getImageTypeForCategory(activePortfolioTab),
+        isPublic: true,
+        isPrimary: false,
+      };
+    });
 
     uploadPortfolioMutation.mutate(uploadedImages);
   };
