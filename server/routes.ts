@@ -16,6 +16,7 @@ import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
 import sharp from "sharp";
 import { z } from "zod";
+import { seedServiceCategories } from "./seedCategories";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), 'uploads');
@@ -471,6 +472,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Support can only activate/deactivate users, not change roles or delete
+  // Service Categories API
+  app.get('/api/categories', async (req, res) => {
+    try {
+      const categories = await storage.getAllServiceCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  app.get('/api/categories/popular', async (req, res) => {
+    try {
+      const categories = await storage.getPopularServiceCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching popular categories:", error);
+      res.status(500).json({ message: "Failed to fetch popular categories" });
+    }
+  });
+
+  app.get('/api/categories/by-group/:group', async (req, res) => {
+    try {
+      const { group } = req.params;
+      const categories = await storage.getServiceCategoriesByGroup(group);
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories by group:", error);
+      res.status(500).json({ message: "Failed to fetch categories by group" });
+    }
+  });
+
+  // Seed categories endpoint (development only)
+  app.post('/api/seed/categories', async (req, res) => {
+    try {
+      if (process.env.NODE_ENV !== 'development') {
+        return res.status(403).json({ message: "Only available in development" });
+      }
+      
+      await seedServiceCategories();
+      res.json({ message: "Service categories seeded successfully" });
+    } catch (error) {
+      console.error("Error seeding categories:", error);
+      res.status(500).json({ message: "Failed to seed categories" });
+    }
+  });
+
   app.put('/api/support/users/:id/status', isAuthenticated, isSupport, async (req, res) => {
     try {
       const { id } = req.params;

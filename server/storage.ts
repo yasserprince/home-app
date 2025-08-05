@@ -16,7 +16,7 @@ import {
   type InsertReview,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, ilike, sql, or } from "drizzle-orm";
+import { eq, desc, and, ilike, sql, or, asc } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -34,6 +34,9 @@ export interface IStorage {
   getAllBookings(): Promise<Booking[]>;
   
   // Service Category operations
+  getAllServiceCategories(): Promise<ServiceCategory[]>;
+  getPopularServiceCategories(): Promise<ServiceCategory[]>;
+  getServiceCategoriesByGroup(group: string): Promise<ServiceCategory[]>;
   getServiceCategories(): Promise<ServiceCategory[]>;
   createServiceCategory(category: InsertServiceCategory): Promise<ServiceCategory>;
   updateServiceCategory(id: string, categoryData: Partial<ServiceCategory>): Promise<ServiceCategory | undefined>;
@@ -138,6 +141,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Service Category operations
+  async getAllServiceCategories(): Promise<ServiceCategory[]> {
+    return await db.select().from(serviceCategories)
+      .where(eq(serviceCategories.isActive, true))
+      .orderBy(asc(serviceCategories.sortOrder), asc(serviceCategories.name));
+  }
+
+  async getPopularServiceCategories(): Promise<ServiceCategory[]> {
+    return await db.select().from(serviceCategories)
+      .where(and(eq(serviceCategories.isActive, true), eq(serviceCategories.isPopular, true)))
+      .orderBy(asc(serviceCategories.sortOrder));
+  }
+
+  async getServiceCategoriesByGroup(group: string): Promise<ServiceCategory[]> {
+    return await db.select().from(serviceCategories)
+      .where(and(eq(serviceCategories.isActive, true), eq(serviceCategories.category, group)))
+      .orderBy(asc(serviceCategories.sortOrder));
+  }
+
   async getServiceCategories(): Promise<ServiceCategory[]> {
     return await db.select().from(serviceCategories);
   }

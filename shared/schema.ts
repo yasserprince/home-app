@@ -88,10 +88,24 @@ export const users = pgTable("users", {
 export const serviceCategories = pgTable("service_categories", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
+  nameAr: varchar("name_ar"), // Arabic name
+  nameFr: varchar("name_fr"), // French name
   description: text("description"),
-  icon: varchar("icon").notNull(),
-  color: varchar("color").notNull(),
+  descriptionAr: text("description_ar"), // Arabic description
+  descriptionFr: text("description_fr"), // French description
+  icon: varchar("icon").notNull(), // Lucide icon name
+  color: varchar("color").notNull(), // Tailwind color class
+  category: varchar("category").notNull(), // Main category group
+  isPopular: boolean("is_popular").default(false),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").default(true),
+  averagePrice: decimal("average_price", { precision: 10, scale: 2 }), // Average hourly rate
+  estimatedDuration: varchar("estimated_duration"), // Typical duration
+  skillLevel: varchar("skill_level").default("intermediate"), // beginner, intermediate, expert
+  requiresLicense: boolean("requires_license").default(false),
+  emergencyService: boolean("emergency_service").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const serviceProviders = pgTable("service_providers", {

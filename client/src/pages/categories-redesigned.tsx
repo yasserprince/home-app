@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from "react";
 import { Link } from "wouter";
-import { useCategories } from "@/hooks/useCategories";
+import { useCategories, usePopularCategories, type ServiceCategory } from "@/hooks/useCategories";
 import { useTranslation } from "@/hooks/useTranslation";
-import { ModernServiceIcon } from "@/components/modern-service-icon";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNavigation from "@/components/bottom-navigation";
+import * as LucideIcons from "lucide-react";
 import {
   ArrowLeft,
   Search,
@@ -26,54 +26,85 @@ import {
   Calculator
 } from "lucide-react";
 
-// Category groups for better organization - will be translated
+// Category groups mapping database categories to display groups
 const getCategoryGroups = (t: (key: string) => string) => ({
-  trending: {
-    name: t('trending'),
-    icon: TrendingUp,
-    color: "hsl(39, 96%, 49%)",
-    categories: ["House Cleaning", "Handyman", "TV Mounting", "Furniture Assembly", "Plumbing", "Electrical"]
-  },
-  home: {
-    name: t('homeInfrastructure'), 
+  home_maintenance: {
+    name: t('homeMaintenanceRepairs'),
     icon: HomeIcon,
     color: "hsl(207, 90%, 54%)",
-    categories: ["Plumbing", "Electrical", "HVAC", "Roofing", "Security Systems"]
-  },
-  improvement: {
-    name: t('homeImprovement'),
-    icon: Zap,
-    color: "hsl(25, 85%, 55%)",
-    categories: ["Kitchen Remodeling", "Bathroom Remodeling", "Painting", "Flooring", "Carpentry", "Handyman"]
   },
   cleaning: {
-    name: t('cleaningMaintenance'),
-    icon: Zap,
-    color: "hsl(142, 71%, 45%)",
-    categories: ["House Cleaning", "Carpet Cleaning", "Window Cleaning", "Pressure Washing", "Junk Removal"]
-  },
-  personal: {
-    name: t('personalServices'),
-    icon: User,
+    name: t('cleaningServices'),
+    icon: LucideIcons.Sparkles,
     color: "hsl(291, 64%, 58%)",
-    categories: ["Pet Services", "Personal Training", "Tutoring", "Photography", "Massage Therapy", "Elder Care"]
   },
-  professional: {
-    name: t('professionalServices'),
-    icon: Calculator,
+  painting: {
+    name: t('paintingDecoration'),
+    icon: LucideIcons.Paintbrush,
+    color: "hsl(25, 85%, 55%)",
+  },
+  outdoor: {
+    name: t('outdoorLandscaping'),
+    icon: LucideIcons.Trees,
+    color: "hsl(142, 71%, 45%)",
+  },
+  moving: {
+    name: t('movingDelivery'),
+    icon: LucideIcons.Truck,
+    color: "hsl(39, 96%, 49%)",
+  },
+  tech: {
+    name: t('techElectronics'),
+    icon: Laptop,
     color: "hsl(217, 91%, 60%)",
-    categories: ["Accounting", "Legal Services", "Web Design"]
+  },
+  pets: {
+    name: t('petServices'),
+    icon: LucideIcons.Dog,
+    color: "hsl(39, 96%, 49%)",
   },
   automotive: {
-    name: t('automotiveTransport'),
+    name: t('automotiveServices'),
     icon: Car,
     color: "hsl(0, 84%, 60%)",
-    categories: ["Auto Repair", "Car Detailing"]
+  },
+  business: {
+    name: t('businessServices'),
+    icon: Calculator,
+    color: "hsl(217, 91%, 60%)",
+  },
+  education: {
+    name: t('educationTutoring'),
+    icon: LucideIcons.GraduationCap,
+    color: "hsl(142, 71%, 45%)",
+  },
+  events: {
+    name: t('eventsParty'),
+    icon: LucideIcons.Calendar,
+    color: "hsl(291, 64%, 58%)",
+  },
+  beauty: {
+    name: t('beautyWellness'),
+    icon: Heart,
+    color: "hsl(0, 84%, 60%)",
+  },
+  creative: {
+    name: t('creativeServices'),
+    icon: LucideIcons.Palette,
+    color: "hsl(25, 85%, 55%)",
   }
 });
 
+// Helper function to get Lucide icon component by name
+const getIconComponent = (iconName: string) => {
+  // @ts-ignore - Dynamic icon access
+  const IconComponent = LucideIcons[iconName];
+  return IconComponent || LucideIcons.Square; // Fallback to Square if icon not found
+};
+
 export default function CategoriesRedesigned() {
-  const { categories, isLoading, getCategoryIcon, getCategoryColor, getTranslatedName } = useCategories();
+  const { data: categories, isLoading, error } = useCategories();
+  const { data: popularCategories } = usePopularCategories();
   const { t, language, changeLanguage, isRTL } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -95,9 +126,8 @@ export default function CategoriesRedesigned() {
 
     // Filter by selected group
     if (selectedGroup && selectedGroup !== 'all') {
-      const groupCategories = CATEGORY_GROUPS[selectedGroup as keyof typeof CATEGORY_GROUPS]?.categories || [];
       filtered = filtered.filter(category => 
-        groupCategories.includes(category.name)
+        category.category === selectedGroup
       );
     }
 
@@ -110,24 +140,15 @@ export default function CategoriesRedesigned() {
       return { [selectedGroup]: filteredCategories };
     }
 
-    const grouped: Record<string, any[]> = {};
-    Object.entries(CATEGORY_GROUPS).forEach(([groupKey, group]) => {
+    const grouped: Record<string, ServiceCategory[]> = {};
+    Object.keys(CATEGORY_GROUPS).forEach(groupKey => {
       grouped[groupKey] = filteredCategories.filter(category =>
-        group.categories.includes(category.name)
+        category.category === groupKey
       );
     });
 
-    // Add uncategorized services
-    const categorizedNames = Object.values(CATEGORY_GROUPS).flatMap(g => g.categories);
-    const uncategorized = filteredCategories.filter(category => 
-      !categorizedNames.includes(category.name)
-    );
-    if (uncategorized.length > 0) {
-      grouped.other = uncategorized;
-    }
-
     return grouped;
-  }, [filteredCategories, selectedGroup]);
+  }, [filteredCategories, selectedGroup, CATEGORY_GROUPS]);
 
   if (isLoading) {
     return (
@@ -216,7 +237,7 @@ export default function CategoriesRedesigned() {
             </Button>
             {Object.entries(CATEGORY_GROUPS).map(([key, group]) => {
               const IconComponent = group.icon;
-              const categoryCount = categories?.filter(cat => group.categories.includes(cat.name)).length || 0;
+              const categoryCount = categories?.filter(cat => cat.category === key).length || 0;
               return (
                 <Button
                   key={key}
@@ -281,18 +302,14 @@ export default function CategoriesRedesigned() {
                       <Card className="bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105">
                         <CardContent className="p-4 flex flex-col items-center text-center h-32">
                           <div
-                            className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-lg"
-                            style={{ backgroundColor: `${getCategoryColor(category)}30` }}
+                            className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-lg ${category.color}`}
                           >
-                            <ModernServiceIcon 
-                              iconName={getCategoryIcon(category.name)} 
-                              className="w-8 h-8" 
-                              style={{ color: '#ffffff' }} 
-                              size={32}
-                            />
+                            {React.createElement(getIconComponent(category.icon), {
+                              className: "w-8 h-8 text-white"
+                            })}
                           </div>
                           <h3 className="text-white font-semibold text-sm line-clamp-2">
-                            {getTranslatedName(category.name)}
+                            {category.name}
                           </h3>
                         </CardContent>
                       </Card>
@@ -306,23 +323,31 @@ export default function CategoriesRedesigned() {
                       <Card className="bg-white/15 backdrop-blur-md border-white/30 hover:bg-white/25 transition-all duration-300">
                         <CardContent className="p-4 flex items-center space-x-4">
                           <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
-                            style={{ backgroundColor: `${getCategoryColor(category)}30` }}
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg ${category.color}`}
                           >
-                            <ModernServiceIcon 
-                              iconName={getCategoryIcon(category.name)} 
-                              className="w-6 h-6" 
-                              style={{ color: '#ffffff' }} 
-                              size={24}
-                            />
+                            {React.createElement(getIconComponent(category.icon), {
+                              className: "w-6 h-6 text-white"
+                            })}
                           </div>
                           <div className="flex-1">
                             <h3 className="text-white font-semibold line-clamp-1">
-                              {getTranslatedName(category.name)}
+                              {category.name}
                             </h3>
                             <p className="text-white/70 text-sm line-clamp-2">
                               {category.description}
                             </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              {category.averagePrice && (
+                                <Badge variant="outline" className="text-xs bg-white/10 text-white border-white/20">
+                                  ${category.averagePrice}/hr
+                                </Badge>
+                              )}
+                              {category.emergencyService && (
+                                <Badge variant="outline" className="text-xs bg-red-500/20 text-red-200 border-red-300/20">
+                                  24/7
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
