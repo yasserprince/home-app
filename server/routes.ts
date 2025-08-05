@@ -586,6 +586,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userId = ((req.user as any)?.claims || {})?.sub;
     const objectStorageService = new ObjectStorageService();
     try {
+      console.log("🖼️ Portfolio image request:", req.path);
+      console.log("🔍 Object path param:", req.params.objectPath);
+      
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
       const canAccess = await objectStorageService.canAccessObjectEntity({
         objectFile,
@@ -2410,6 +2413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         galleries = defaultGalleries;
       }
       
+      console.log("📊 Portfolio galleries for user", requestedUserId, ":", JSON.stringify(galleries, null, 2));
       res.json(galleries);
     } catch (error) {
       console.error("Error fetching modern portfolio galleries:", error);

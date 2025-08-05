@@ -184,37 +184,32 @@ export class ObjectStorageService {
   normalizeObjectEntityPath(
     rawPath: string,
   ): string {
+    console.log("🔍 Normalizing path:", rawPath);
+    
     if (!rawPath.startsWith("https://storage.googleapis.com/")) {
+      console.log("❌ Not a Google Storage URL, returning as-is:", rawPath);
       return rawPath;
     }
   
     // Extract the path from the URL by removing query parameters and domain
     const url = new URL(rawPath);
     const rawObjectPath = url.pathname;
+    console.log("📍 Raw object path:", rawObjectPath);
   
-    let objectEntityDir = this.getPrivateObjectDir();
-    if (!objectEntityDir.endsWith("/")) {
-      objectEntityDir = `${objectEntityDir}/`;
-    }
-  
-    // Handle the specific case where uploads are stored in uploads/uploads/ structure
     // Extract the file ID after the bucket and private directory
-    const bucketPattern = /\/[^\/]+\/.private\/(.+)$/;
+    // Expected pattern: /bucket-name/.private/uploads/file-id
+    const bucketPattern = /\/[^\/]+\/.private\/uploads\/(.+)$/;
     const match = rawObjectPath.match(bucketPattern);
     
     if (match) {
-      const entityId = match[1]; // This will be something like "uploads/8369e7fa-beb8-409f-86c4-1d1739ff0e22"
-      return `/objects/${entityId}`;
+      const fileId = match[1]; // This will be just the UUID like "8369e7fa-beb8-409f-86c4-1d1739ff0e22"
+      const normalizedPath = `/objects/uploads/${fileId}`;
+      console.log("✅ Normalized to:", normalizedPath);
+      return normalizedPath;
     }
   
-    // Fallback to original logic
-    if (!rawObjectPath.startsWith(objectEntityDir)) {
-      return rawObjectPath;
-    }
-  
-    // Extract the entity ID from the path
-    const entityId = rawObjectPath.slice(objectEntityDir.length);
-    return `/objects/${entityId}`;
+    console.log("❌ Could not match expected pattern, returning original");
+    return rawPath;
   }
 
   // Tries to set the ACL policy for the object entity and return the normalized path.
