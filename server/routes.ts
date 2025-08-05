@@ -2011,6 +2011,219 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Portfolio Gallery routes
+  app.get('/api/portfolios/:providerId/galleries', async (req, res) => {
+    try {
+      const { providerId } = req.params;
+      const galleries = await storage.getPortfolioGalleriesByProvider(providerId);
+      
+      // Get images for each gallery
+      const galleriesWithImages = await Promise.all(
+        galleries.map(async (gallery) => {
+          const images = await storage.getPortfolioImagesByGallery(gallery.id);
+          return { ...gallery, images };
+        })
+      );
+      
+      res.json(galleriesWithImages);
+    } catch (error) {
+      console.error("Error fetching portfolio galleries:", error);
+      res.status(500).json({ message: "Failed to fetch portfolio galleries" });
+    }
+  });
+
+  app.post('/api/portfolios/galleries', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get user's service provider profile
+      const provider = await storage.getServiceProviderByUserId(userId);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const galleryData = {
+        ...req.body,
+        providerId: provider.id,
+      };
+
+      const newGallery = await storage.createPortfolioGallery(galleryData);
+      res.json(newGallery);
+    } catch (error) {
+      console.error("Error creating portfolio gallery:", error);
+      res.status(500).json({ message: "Failed to create portfolio gallery" });
+    }
+  });
+
+  app.put('/api/portfolios/galleries/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { id } = req.params;
+      
+      // Verify ownership (get gallery and check provider belongs to user)
+      const provider = await storage.getServiceProviderByUserId(userId!);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const updatedGallery = await storage.updatePortfolioGallery(id, req.body);
+      if (!updatedGallery) {
+        return res.status(404).json({ message: "Gallery not found" });
+      }
+
+      res.json(updatedGallery);
+    } catch (error) {
+      console.error("Error updating portfolio gallery:", error);
+      res.status(500).json({ message: "Failed to update portfolio gallery" });
+    }
+  });
+
+  app.delete('/api/portfolios/galleries/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { id } = req.params;
+      
+      // Verify ownership
+      const provider = await storage.getServiceProviderByUserId(userId!);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const deleted = await storage.deletePortfolioGallery(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Gallery not found" });
+      }
+
+      res.json({ message: "Gallery deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting portfolio gallery:", error);
+      res.status(500).json({ message: "Failed to delete portfolio gallery" });
+    }
+  });
+
+  // Portfolio Image routes
+  app.post('/api/portfolios/images/upload', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get user's service provider profile
+      const provider = await storage.getServiceProviderByUserId(userId);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const { ObjectStorageService } = await import('./objectStorage');
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  app.post('/api/portfolios/images', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get user's service provider profile
+      const provider = await storage.getServiceProviderByUserId(userId);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const images = Array.isArray(req.body) ? req.body : [req.body];
+      const imageData = images.map(img => ({
+        ...img,
+        providerId: provider.id,
+      }));
+
+      // Process object storage paths
+      const { ObjectStorageService } = await import('./objectStorage');
+      const objectStorageService = new ObjectStorageService();
+      
+      const processedImages = await Promise.all(
+        imageData.map(async (img) => {
+          const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+            img.imageUrl,
+            {
+              owner: userId,
+              visibility: "public", // Portfolio images are public
+            }
+          );
+          
+          return {
+            ...img,
+            objectPath,
+          };
+        })
+      );
+
+      const newImages = await storage.createPortfolioImages(processedImages);
+      res.json(newImages);
+    } catch (error) {
+      console.error("Error creating portfolio images:", error);
+      res.status(500).json({ message: "Failed to create portfolio images" });
+    }
+  });
+
+  app.put('/api/portfolios/images/:id/primary', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { id } = req.params;
+      const { galleryId } = req.body;
+      
+      // Verify ownership
+      const provider = await storage.getServiceProviderByUserId(userId!);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const updated = await storage.setPortfolioImageAsPrimary(galleryId, id);
+      if (!updated) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      res.json({ message: "Primary image updated successfully" });
+    } catch (error) {
+      console.error("Error updating primary image:", error);
+      res.status(500).json({ message: "Failed to update primary image" });
+    }
+  });
+
+  app.delete('/api/portfolios/images/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { id } = req.params;
+      
+      // Verify ownership
+      const provider = await storage.getServiceProviderByUserId(userId!);
+      if (!provider) {
+        return res.status(403).json({ message: "User is not a service provider" });
+      }
+
+      const deleted = await storage.deletePortfolioImage(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      res.json({ message: "Image deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting portfolio image:", error);
+      res.status(500).json({ message: "Failed to delete portfolio image" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

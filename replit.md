@@ -40,6 +40,11 @@ Preferred communication style: Simple, everyday language.
   - **Special Offers & Promotions**: Dynamic discount cards with first-time user bonuses and subscription packages
   - **Provider Spotlight**: Top-rated service providers with ratings, job counts, and quick access
   - **Trust & Safety Indicators**: Platform statistics (100K+ verified providers, 4.8★ average rating)
+- **Portfolio Gallery System**: Complete multi-section photo organization system inspired by TaskRabbit and Thumbtack featuring:
+  - **Multi-Category Galleries**: Featured Work, Before & After, Work Samples, Tools & Equipment, Certifications
+  - **Object Storage Integration**: Professional file upload system with Uppy dashboard and Google Cloud Storage
+  - **Advanced Photo Management**: Primary image selection, drag & drop uploads, grid/list view modes, detailed image modal
+  - **Service Provider Focus**: Dedicated portfolio pages for showcasing professional work with authentic project documentation
 - **Admin Panel & Home Page Theming**: Consistent application of a dark gradient theme (gray-900 → blue-900 → purple-900) with glassmorphism effects and animated background orbs.
 - **KYC & Verification**: Multi-tier verification system with trust scoring, including identity verification, free SMS services, and encrypted document storage.
 - **Location System**: Complete authentic data for Algeria's 58 wilayas with both Latin and Arabic names (official 2024 data including 10 new provinces added in December 2019).
@@ -62,5 +67,6 @@ Preferred communication style: Simple, everyday language.
 - **connect-pg-simple**: PostgreSQL session store.
 
 ### Other Integrations
-- **Google Cloud Storage**: Used for profile picture storage.
+- **Google Cloud Storage**: Used for profile picture storage and portfolio image management with object storage bucket `replit-objstore-c163bb61-ba68-4bf2-8adf-62b0128c5bfa`.
 - **Google Maps JavaScript API**: Integrated for location services and interactive maps.
+- **Uppy File Upload**: Advanced file upload system with dashboard modal, progress tracking, and metadata collection for portfolio galleries.

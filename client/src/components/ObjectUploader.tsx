@@ -24,13 +24,13 @@ interface ObjectUploaderProps {
 
 /**
  * A file upload component that renders as a button and provides a modal interface for
- * file management.
+ * file management similar to TaskRabbit and Thumbtack.
  * 
  * Features:
  * - Renders as a customizable button that opens a file upload modal
  * - Provides a modal interface for:
- *   - File selection
- *   - File preview
+ *   - File selection with drag & drop
+ *   - File preview and editing
  *   - Upload progress tracking
  *   - Upload status display
  * 
@@ -39,7 +39,7 @@ interface ObjectUploaderProps {
  * 
  * @param props - Component props
  * @param props.maxNumberOfFiles - Maximum number of files allowed to be uploaded
- *   (default: 1)
+ *   (default: 10 for portfolio galleries)
  * @param props.maxFileSize - Maximum file size in bytes (default: 10MB)
  * @param props.onGetUploadParameters - Function to get upload parameters (method and URL).
  *   Typically used to fetch a presigned URL from the backend server for direct-to-S3
@@ -51,7 +51,7 @@ interface ObjectUploaderProps {
  * @param props.children - Content to be rendered inside the button
  */
 export function ObjectUploader({
-  maxNumberOfFiles = 1,
+  maxNumberOfFiles = 10,
   maxFileSize = 10485760, // 10MB default
   onGetUploadParameters,
   onComplete,
@@ -64,7 +64,7 @@ export function ObjectUploader({
       restrictions: {
         maxNumberOfFiles,
         maxFileSize,
-        allowedFileTypes: ['image/*'], // Only allow images
+        allowedFileTypes: ['image/*'], // Only allow images for portfolio
       },
       autoProceed: false,
     })
@@ -73,8 +73,8 @@ export function ObjectUploader({
         getUploadParameters: onGetUploadParameters,
       })
       .on("complete", (result) => {
-        onComplete?.(result);
         setShowModal(false);
+        onComplete?.(result);
       })
   );
 
@@ -89,10 +89,11 @@ export function ObjectUploader({
         open={showModal}
         onRequestClose={() => setShowModal(false)}
         proudlyDisplayPoweredByUppy={false}
-        metaFields={[]}
-        showProgressDetails={true}
-        showRemoveButtonAfterComplete={true}
-        note="Images only, up to 10MB"
+        plugins={['Dashboard']}
+        metaFields={[
+          { id: 'title', name: 'Title', placeholder: 'Image title' },
+          { id: 'description', name: 'Description', placeholder: 'Describe this image' },
+        ]}
       />
     </div>
   );

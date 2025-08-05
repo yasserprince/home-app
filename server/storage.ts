@@ -4,6 +4,8 @@ import {
   serviceProviders,
   bookings,
   reviews,
+  portfolioGalleries,
+  portfolioImages,
   type User,
   type UpsertUser,
   type ServiceCategory,
@@ -14,6 +16,10 @@ import {
   type InsertBooking,
   type Review,
   type InsertReview,
+  type PortfolioGallery,
+  type InsertPortfolioGallery,
+  type PortfolioImage,
+  type InsertPortfolioImage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, ilike, sql, or, asc } from "drizzle-orm";
@@ -59,6 +65,21 @@ export interface IStorage {
   // Review operations
   createReview(review: InsertReview): Promise<Review>;
   getProviderReviews(providerId: string): Promise<(Review & { user: User })[]>;
+
+  // Portfolio Gallery operations
+  createPortfolioGallery(gallery: InsertPortfolioGallery): Promise<PortfolioGallery>;
+  getPortfolioGalleriesByProvider(providerId: string): Promise<PortfolioGallery[]>;
+  updatePortfolioGallery(id: string, updates: Partial<InsertPortfolioGallery>): Promise<PortfolioGallery | undefined>;
+  deletePortfolioGallery(id: string): Promise<boolean>;
+
+  // Portfolio Image operations
+  createPortfolioImage(image: InsertPortfolioImage): Promise<PortfolioImage>;
+  createPortfolioImages(images: InsertPortfolioImage[]): Promise<PortfolioImage[]>;
+  getPortfolioImagesByGallery(galleryId: string): Promise<PortfolioImage[]>;
+  getPortfolioImagesByProvider(providerId: string): Promise<PortfolioImage[]>;
+  updatePortfolioImage(id: string, updates: Partial<InsertPortfolioImage>): Promise<PortfolioImage | undefined>;
+  deletePortfolioImage(id: string): Promise<boolean>;
+  setPortfolioImageAsPrimary(galleryId: string, imageId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -411,6 +432,114 @@ export class DatabaseStorage implements IStorage {
       ...result.reviews,
       user: result.users,
     }));
+  }
+
+  // Portfolio Gallery operations
+  async createPortfolioGallery(gallery: InsertPortfolioGallery): Promise<PortfolioGallery> {
+    const [newGallery] = await db
+      .insert(portfolioGalleries)
+      .values(gallery)
+      .returning();
+    return newGallery;
+  }
+
+  async getPortfolioGalleriesByProvider(providerId: string): Promise<PortfolioGallery[]> {
+    const galleries = await db
+      .select()
+      .from(portfolioGalleries)
+      .where(and(eq(portfolioGalleries.providerId, providerId), eq(portfolioGalleries.isActive, true)))
+      .orderBy(asc(portfolioGalleries.sortOrder));
+    return galleries;
+  }
+
+  async updatePortfolioGallery(id: string, updates: Partial<InsertPortfolioGallery>): Promise<PortfolioGallery | undefined> {
+    const [updatedGallery] = await db
+      .update(portfolioGalleries)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(portfolioGalleries.id, id))
+      .returning();
+    return updatedGallery;
+  }
+
+  async deletePortfolioGallery(id: string): Promise<boolean> {
+    // First delete associated images
+    await db.delete(portfolioImages).where(eq(portfolioImages.galleryId, id));
+    
+    // Then delete the gallery
+    const [deletedGallery] = await db
+      .delete(portfolioGalleries)
+      .where(eq(portfolioGalleries.id, id))
+      .returning();
+    return !!deletedGallery;
+  }
+
+  // Portfolio Image operations
+  async createPortfolioImage(image: InsertPortfolioImage): Promise<PortfolioImage> {
+    const [newImage] = await db
+      .insert(portfolioImages)
+      .values(image)
+      .returning();
+    return newImage;
+  }
+
+  async createPortfolioImages(images: InsertPortfolioImage[]): Promise<PortfolioImage[]> {
+    const newImages = await db
+      .insert(portfolioImages)
+      .values(images)
+      .returning();
+    return newImages;
+  }
+
+  async getPortfolioImagesByGallery(galleryId: string): Promise<PortfolioImage[]> {
+    const images = await db
+      .select()
+      .from(portfolioImages)
+      .where(eq(portfolioImages.galleryId, galleryId))
+      .orderBy(asc(portfolioImages.sortOrder));
+    return images;
+  }
+
+  async getPortfolioImagesByProvider(providerId: string): Promise<PortfolioImage[]> {
+    const images = await db
+      .select()
+      .from(portfolioImages)
+      .where(eq(portfolioImages.providerId, providerId))
+      .orderBy(asc(portfolioImages.sortOrder));
+    return images;
+  }
+
+  async updatePortfolioImage(id: string, updates: Partial<InsertPortfolioImage>): Promise<PortfolioImage | undefined> {
+    const [updatedImage] = await db
+      .update(portfolioImages)
+      .set(updates)
+      .where(eq(portfolioImages.id, id))
+      .returning();
+    return updatedImage;
+  }
+
+  async deletePortfolioImage(id: string): Promise<boolean> {
+    const [deletedImage] = await db
+      .delete(portfolioImages)
+      .where(eq(portfolioImages.id, id))
+      .returning();
+    return !!deletedImage;
+  }
+
+  async setPortfolioImageAsPrimary(galleryId: string, imageId: string): Promise<boolean> {
+    // First, remove primary status from all images in the gallery
+    await db
+      .update(portfolioImages)
+      .set({ isPrimary: false })
+      .where(eq(portfolioImages.galleryId, galleryId));
+
+    // Then set the specified image as primary
+    const [updatedImage] = await db
+      .update(portfolioImages)
+      .set({ isPrimary: true })
+      .where(eq(portfolioImages.id, imageId))
+      .returning();
+    
+    return !!updatedImage;
   }
 }
 

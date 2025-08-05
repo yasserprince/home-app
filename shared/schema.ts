@@ -122,7 +122,7 @@ export const serviceProviders = pgTable("service_providers", {
   location: varchar("location"),
   services: text("services").array(),
   profileImageUrl: varchar("profile_image_url"),
-  portfolioImages: text("portfolio_images").array(), // Array of image URLs
+  portfolioImages: text("portfolio_images").array(), // Deprecated - use portfolioGalleries instead
   achievements: text("achievements"), // Professional achievements and qualifications
   workExperience: jsonb("work_experience"), // Detailed work experience as JSON
   certifications: text("certifications").array(), // Professional certifications
@@ -162,6 +162,37 @@ export const reviews = pgTable("reviews", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Portfolio Gallery system for service providers
+export const portfolioGalleries = pgTable("portfolio_galleries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  providerId: varchar("provider_id").references(() => serviceProviders.id).notNull(),
+  title: varchar("title").notNull(), // e.g., "Kitchen Renovation", "Before/After Shots"
+  description: text("description"),
+  category: varchar("category").notNull(), // "featured", "before_after", "work_samples", "equipment", "certifications"
+  serviceType: varchar("service_type"), // Link to specific service category if applicable
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const portfolioImages = pgTable("portfolio_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  galleryId: varchar("gallery_id").references(() => portfolioGalleries.id, { onDelete: "cascade" }).notNull(),
+  providerId: varchar("provider_id").references(() => serviceProviders.id).notNull(),
+  imageUrl: varchar("image_url").notNull(), // Object storage URL
+  objectPath: varchar("object_path").notNull(), // Object storage path for access control
+  title: varchar("title"),
+  description: text("description"),
+  imageType: varchar("image_type").notNull(), // "before", "after", "work_sample", "equipment", "certificate"
+  isPrimary: boolean("is_primary").default(false), // Primary image for the gallery
+  sortOrder: integer("sort_order").default(0),
+  dimensions: jsonb("dimensions"), // {width: 1920, height: 1080}
+  fileSize: integer("file_size"), // in bytes
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   bookings: many(bookings),
@@ -184,6 +215,27 @@ export const serviceProvidersRelations = relations(serviceProviders, ({ one, man
   }),
   bookings: many(bookings),
   reviews: many(reviews),
+  portfolioGalleries: many(portfolioGalleries),
+  portfolioImages: many(portfolioImages),
+}));
+
+export const portfolioGalleryRelations = relations(portfolioGalleries, ({ one, many }) => ({
+  provider: one(serviceProviders, {
+    fields: [portfolioGalleries.providerId],
+    references: [serviceProviders.id],
+  }),
+  images: many(portfolioImages),
+}));
+
+export const portfolioImageRelations = relations(portfolioImages, ({ one }) => ({
+  gallery: one(portfolioGalleries, {
+    fields: [portfolioImages.galleryId],
+    references: [portfolioGalleries.id],
+  }),
+  provider: one(serviceProviders, {
+    fields: [portfolioImages.providerId],
+    references: [serviceProviders.id],
+  }),
 }));
 
 export const bookingsRelations = relations(bookings, ({ one, many }) => ({
@@ -255,6 +307,12 @@ export type InsertServiceCategory = typeof serviceCategories.$inferInsert;
 
 export type ServiceProvider = typeof serviceProviders.$inferSelect;
 export type InsertServiceProvider = typeof serviceProviders.$inferInsert;
+
+export type PortfolioGallery = typeof portfolioGalleries.$inferSelect;
+export type InsertPortfolioGallery = typeof portfolioGalleries.$inferInsert;
+
+export type PortfolioImage = typeof portfolioImages.$inferSelect;
+export type InsertPortfolioImage = typeof portfolioImages.$inferInsert;
 
 export type Booking = typeof bookings.$inferSelect;
 export type InsertBooking = typeof bookings.$inferInsert;
