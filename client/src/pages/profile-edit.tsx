@@ -39,7 +39,9 @@ import {
   Edit3,
   Check,
   X,
-  Briefcase
+  Briefcase,
+  Image as ImageIcon,
+  Wrench
 } from "lucide-react";
 
 export default function ProfileEdit() {
@@ -585,9 +587,10 @@ export default function ProfileEdit() {
         {/* Account Management */}
         <Card className="mb-6 bg-white/10 backdrop-blur-lg border-white/20">
           <CardHeader className="pb-3">
-            <h3 className="text-lg font-semibold text-white">Account Management</h3>
+            <h3 className="text-lg font-semibold text-white">Account</h3>
           </CardHeader>
           <CardContent className="pt-0 space-y-3">
+            {/* Account Type */}
             <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
               <div>
                 <p className="text-white font-medium">Account Type</p>
@@ -595,6 +598,68 @@ export default function ProfileEdit() {
               </div>
               <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg">
                 Change
+              </Button>
+            </div>
+
+            {/* Background Verification - Inspired by TaskRabbit */}
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">Background Check</p>
+                  <p className="text-white/70 text-sm">Identity verified</p>
+                </div>
+              </div>
+              <div className="text-green-400 text-sm font-medium">Verified</div>
+            </div>
+
+            {/* Portfolio & Work Samples - Inspired by Thumbtack */}
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                  <ImageIcon className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">Portfolio Gallery</p>
+                  <p className="text-white/70 text-sm">Showcase your work samples</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="text-white/70 border-white/20 hover:bg-white/10">
+                Manage
+              </Button>
+            </div>
+
+            {/* Service Area - Inspired by TaskRabbit */}
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">Service Area</p>
+                  <p className="text-white/70 text-sm">Define your work radius</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="text-white/70 border-white/20 hover:bg-white/10">
+                Set Area
+              </Button>
+            </div>
+
+            {/* Tools & Equipment - TaskRabbit Feature */}
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                  <Wrench className="w-5 h-5 text-orange-400" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">Tools & Equipment</p>
+                  <p className="text-white/70 text-sm">List your professional tools</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="text-white/70 border-white/20 hover:bg-white/10">
+                Add Tools
               </Button>
             </div>
           </CardContent>

@@ -55,28 +55,22 @@ export function ModernAvatar({
     return colors[hash % colors.length];
   };
 
-  // Test image loading
+  // Test image loading with improved caching
   useEffect(() => {
-    console.log("ModernAvatar: src changed to:", src);
     if (src) {
-      setStatus(AvatarStatus.Loading);
-      
+      // Check if this is a new src or just a re-render
       const img = new Image();
       img.onload = () => {
-        console.log("ModernAvatar: Image loaded successfully:", src);
         setStatus(AvatarStatus.Success);
       };
-      img.onerror = (error) => {
-        console.error("ModernAvatar: Image failed to load:", src, error);
+      img.onerror = () => {
         setStatus(AvatarStatus.Error);
       };
       
-      // Add cache busting for immediate refreshes
-      const cacheBustingSrc = src.includes('?') ? `${src}&t=${Date.now()}` : `${src}?t=${Date.now()}`;
-      img.src = cacheBustingSrc;
-      console.log("ModernAvatar: Testing image with cache busting:", cacheBustingSrc);
+      // Only set loading if it's actually a new image
+      setStatus(AvatarStatus.Loading);
+      img.src = src;
     } else {
-      console.log("ModernAvatar: No src provided, using fallback");
       setStatus(AvatarStatus.Fallback);
     }
   }, [src]);
