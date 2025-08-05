@@ -133,10 +133,7 @@ export default function PortfolioGallery() {
 
   const uploadImagesMutation = useMutation({
     mutationFn: async (images: any[]) => {
-      return apiRequest('/api/portfolios/images', {
-        method: 'POST',
-        body: JSON.stringify(images),
-      });
+      return apiRequest('/api/portfolios/images', 'POST', images);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/portfolios', providerId, 'galleries'] });
@@ -155,12 +152,11 @@ export default function PortfolioGallery() {
   });
 
   const handleGetUploadParameters = async () => {
-    const response = await apiRequest('/api/portfolios/images/upload', {
-      method: 'POST',
-    });
+    const response = await apiRequest('/api/portfolios/images/upload', 'POST');
+    const data = await response.json();
     return {
       method: 'PUT' as const,
-      url: response.uploadURL,
+      url: data.uploadURL,
     };
   };
 

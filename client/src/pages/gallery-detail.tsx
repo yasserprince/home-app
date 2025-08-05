@@ -107,14 +107,14 @@ export default function GalleryDetail() {
   };
 
   const handleUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-    const uploadedImages = result.successful.map((file: any, index: number) => ({
+    const uploadedImages = result.successful?.map((file: any, index: number) => ({
       galleryId: galleryId!,
       imageUrl: file.uploadURL,
       title: file.meta?.title || file.name,
       description: file.meta?.description || '',
       imageType: getImageTypeForCategory(gallery?.category || 'work_samples'),
       sortOrder: (gallery?.images?.length || 0) + index,
-    }));
+    })) || [];
 
     uploadImagesMutation.mutate(uploadedImages);
   };

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -206,14 +206,13 @@ export function PortfolioUploader({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[90vh] overflow-hidden flex flex-col" aria-describedby="upload-description">
+      <DialogContent className="sm:max-w-md md:max-w-2xl lg:max-w-4xl bg-gray-900/95 backdrop-blur-lg border-gray-700 text-white max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-white">Upload Portfolio Images</DialogTitle>
+          <DialogDescription className="text-gray-300 sr-only">
+            Upload and manage your portfolio images with drag and drop functionality
+          </DialogDescription>
         </DialogHeader>
-        
-        <div id="upload-description" className="sr-only">
-          Upload and manage your portfolio images with drag and drop functionality
-        </div>
         
         <div className="flex-1 overflow-y-auto space-y-4">
           {/* File Drop Zone */}
