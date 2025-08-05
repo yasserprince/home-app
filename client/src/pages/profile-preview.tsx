@@ -25,8 +25,7 @@ export default function ProfilePreview() {
     enabled: !!user,
   });
 
-  // Debug portfolio data
-  console.log("Portfolio data in preview:", portfolioData);
+
 
   if (isLoading) {
     return (
@@ -43,7 +42,7 @@ export default function ProfilePreview() {
           <CardContent className="p-6 text-center">
             <p className="text-gray-300">Profile not found</p>
             <Button 
-              onClick={() => setLocation("/profile-edit")}
+              onClick={() => setLocation("/account/edit")}
               className="mt-4"
             >
               Back to Profile Edit
@@ -73,7 +72,7 @@ export default function ProfilePreview() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setLocation("/profile-edit")}
+                onClick={() => setLocation("/account/edit")}
                 className="text-gray-300 hover:text-white hover:bg-gray-700"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
