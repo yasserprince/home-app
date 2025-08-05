@@ -92,12 +92,19 @@ export default function PortfolioGallery() {
     serviceType: ''
   });
 
-  // Get provider ID from URL params or current user
-  const providerId = params?.providerId || user?.serviceProviderId;
+  // Get current user's service provider profile
+  const { data: serviceProvider } = useQuery({
+    queryKey: ['/api/service-providers/current'],
+    enabled: isAuthenticated && !params?.providerId,
+  });
+
+  // Get provider ID from URL params or current user's service provider
+  const providerId = params?.providerId || serviceProvider?.id;
   const isOwner = !params?.providerId && isAuthenticated;
 
   const { data: galleries, isLoading } = useQuery({
     queryKey: ['/api/portfolios', providerId, 'galleries'],
+    queryFn: () => apiRequest(`/api/portfolios/${providerId}/galleries`, 'GET'),
     enabled: !!providerId,
   });
 
