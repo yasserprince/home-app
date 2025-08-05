@@ -589,10 +589,36 @@ export class DatabaseStorage implements IStorage {
 
   async createModernPortfolioGallery(gallery: any): Promise<any> {
     try {
+      // Get or create service provider for this user
+      let [serviceProvider] = await db
+        .select()
+        .from(serviceProviders)
+        .where(eq(serviceProviders.userId, gallery.userId));
+
+      if (!serviceProvider) {
+        // Create a default service provider for portfolio management
+        const [newProvider] = await db
+          .insert(serviceProviders)
+          .values({
+            userId: gallery.userId,
+            businessName: 'Portfolio Provider',
+            description: 'Default provider for portfolio management',
+            categoryId: 'cb8aeab6-3fb4-44ba-9efe-00fe3217e549', // Default to first category
+            hourlyRate: '50.00',
+            isAvailable: true,
+            experienceYears: 1,
+            location: 'Algeria',
+            services: ['General Services']
+          })
+          .returning();
+        serviceProvider = newProvider;
+      }
+
       const [insertedGallery] = await db
         .insert(portfolioGalleries)
         .values({
           id: gallery.id,
+          providerId: serviceProvider.id,
           userId: gallery.userId,
           title: gallery.title,
           description: gallery.description || '',
@@ -625,19 +651,57 @@ export class DatabaseStorage implements IStorage {
         return null;
       }
 
+      // Get or create service provider for this user
+      let [serviceProvider] = await db
+        .select()
+        .from(serviceProviders)
+        .where(eq(serviceProviders.userId, userId));
+
+      if (!serviceProvider) {
+        // Create a default service provider for portfolio management
+        const [newProvider] = await db
+          .insert(serviceProviders)
+          .values({
+            userId: userId,
+            businessName: 'Portfolio Provider',
+            description: 'Default provider for portfolio management',
+            categoryId: 'cb8aeab6-3fb4-44ba-9efe-00fe3217e549', // Default to first category
+            hourlyRate: '50.00',
+            isAvailable: true,
+            experienceYears: 1,
+            location: 'Algeria',
+            services: ['General Services']
+          })
+          .returning();
+        serviceProvider = newProvider;
+      }
+
       // Insert images into database
       const insertedImages = await Promise.all(
         images.map(async (image) => {
+          // Extract object path from image URL
+          let objectPath = image.imageUrl;
+          if (image.imageUrl.startsWith('/objects/')) {
+            objectPath = image.imageUrl;
+          } else if (image.imageUrl.includes('/.private/')) {
+            // Convert from storage URL to object path
+            const urlParts = image.imageUrl.split('/.private/');
+            if (urlParts.length > 1) {
+              objectPath = `/objects/${urlParts[1].split('?')[0]}`;
+            }
+          }
+
           const [insertedImage] = await db
             .insert(portfolioImages)
             .values({
               id: image.id,
               galleryId: galleryId,
+              providerId: serviceProvider.id,
               imageUrl: image.imageUrl,
+              objectPath: objectPath,
               title: image.title || '',
               description: image.description || '',
               imageType: image.imageType || 'work_sample',
-              isPublic: image.isPublic ?? true,
               isPrimary: image.isPrimary || false,
               sortOrder: image.sortOrder || 0,
             })
@@ -671,7 +735,7 @@ export class DatabaseStorage implements IStorage {
 
   async addImageToModernPortfolioGallery(galleryId: string, imageData: any): Promise<any> {
     try {
-      // Check if gallery exists
+      // Check if gallery exists and get user info
       const [gallery] = await db
         .select()
         .from(portfolioGalleries)
@@ -681,17 +745,55 @@ export class DatabaseStorage implements IStorage {
         return null;
       }
 
+      // Get or create service provider for this user
+      let [serviceProvider] = await db
+        .select()
+        .from(serviceProviders)
+        .where(eq(serviceProviders.userId, gallery.userId));
+
+      if (!serviceProvider) {
+        // Create a default service provider for portfolio management
+        const [newProvider] = await db
+          .insert(serviceProviders)
+          .values({
+            userId: gallery.userId,
+            businessName: 'Portfolio Provider',
+            description: 'Default provider for portfolio management',
+            categoryId: 'cb8aeab6-3fb4-44ba-9efe-00fe3217e549', // Default to first category
+            hourlyRate: '50.00',
+            isAvailable: true,
+            experienceYears: 1,
+            location: 'Algeria',
+            services: ['General Services']
+          })
+          .returning();
+        serviceProvider = newProvider;
+      }
+
+      // Extract object path from image URL
+      let objectPath = imageData.imageUrl;
+      if (imageData.imageUrl.startsWith('/objects/')) {
+        objectPath = imageData.imageUrl;
+      } else if (imageData.imageUrl.includes('/.private/')) {
+        // Convert from storage URL to object path
+        const urlParts = imageData.imageUrl.split('/.private/');
+        if (urlParts.length > 1) {
+          objectPath = `/objects/${urlParts[1].split('?')[0]}`;
+        }
+      }
+
       // Insert image
       const [insertedImage] = await db
         .insert(portfolioImages)
         .values({
           id: imageData.id,
           galleryId: galleryId,
+          providerId: serviceProvider.id,
           imageUrl: imageData.imageUrl,
+          objectPath: objectPath,
           title: imageData.title || '',
           description: imageData.description || '',
           imageType: imageData.imageType || 'work_sample',
-          isPublic: imageData.isPublic ?? true,
           isPrimary: imageData.isPrimary || false,
           sortOrder: imageData.sortOrder || 0,
         })
