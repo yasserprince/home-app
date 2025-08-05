@@ -36,7 +36,7 @@ export default function Booking() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [searchParams] = useState(() => new URLSearchParams(location.split('?')[1] || ''));
+  const searchParams = new URLSearchParams(location.split('?')[1] || '');
   const providerId = searchParams.get('provider');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -99,7 +99,7 @@ export default function Booking() {
   };
 
   const calculateTotalCost = (serviceType: string, duration: number) => {
-    const baseRate = parseFloat(provider?.hourlyRate || '85');
+    const baseRate = provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()) : 85;
     let hourlyRate = baseRate;
     
     if (serviceType === 'Emergency Repair') {
@@ -108,7 +108,7 @@ export default function Booking() {
       hourlyRate = baseRate * 0.75; // 25% discount
     }
     
-    return (hourlyRate * duration + 15).toFixed(2); // Add $15 service fee
+    return parseFloat((hourlyRate * duration + 15).toFixed(2)); // Add $15 service fee
   };
 
   const generateDates = () => {
@@ -218,10 +218,10 @@ export default function Booking() {
               )}
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {provider.user.firstName} {provider.user.lastName}
+                  {provider?.user?.firstName} {provider?.user?.lastName}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {provider.businessName} • ${provider.hourlyRate}/hour
+                  {provider?.businessName} • ${provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()).toFixed(0) : '85'}/hour
                 </p>
               </div>
             </div>
@@ -246,19 +246,19 @@ export default function Booking() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="Emergency Repair" id="emergency" />
                         <Label htmlFor="emergency">
-                          Emergency Repair - ${Math.round(parseFloat(provider.hourlyRate) * 1.4)}/hour
+                          Emergency Repair - ${Math.round((provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()) : 85) * 1.4)}/hour
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="Standard Service" id="standard" />
                         <Label htmlFor="standard">
-                          Standard Service - ${provider.hourlyRate}/hour
+                          Standard Service - ${provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()).toFixed(0) : '85'}/hour
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="Maintenance Check" id="maintenance" />
                         <Label htmlFor="maintenance">
-                          Maintenance Check - ${Math.round(parseFloat(provider.hourlyRate) * 0.75)}/hour
+                          Maintenance Check - ${Math.round((provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()) : 85) * 0.75)}/hour
                         </Label>
                       </div>
                     </RadioGroup>
@@ -364,10 +364,10 @@ export default function Booking() {
                     <span className="text-gray-600">Service Rate</span>
                     <span className="text-gray-900">
                       ${form.watch('serviceType') === 'Emergency Repair' 
-                        ? Math.round(parseFloat(provider.hourlyRate) * 1.4)
+                        ? Math.round((provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()) : 85) * 1.4)
                         : form.watch('serviceType') === 'Maintenance Check'
-                        ? Math.round(parseFloat(provider.hourlyRate) * 0.75)
-                        : provider.hourlyRate}/hour
+                        ? Math.round((provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()) : 85) * 0.75)
+                        : (provider?.hourlyRate ? parseFloat(provider.hourlyRate.toString()).toFixed(0) : '85')}/hour
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -427,7 +427,7 @@ export default function Booking() {
               <div className="flex justify-between">
                 <span className="text-gray-600">Provider:</span>
                 <span className="font-medium">
-                  {provider.user.firstName} {provider.user.lastName}
+                  {provider?.user?.firstName} {provider?.user?.lastName}
                 </span>
               </div>
               <div className="flex justify-between">

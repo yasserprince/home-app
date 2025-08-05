@@ -1,111 +1,86 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiRequest } from "@/lib/queryClient";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import BottomNavigation from "@/components/bottom-navigation";
+// Badge component inline since it's not available
+const Badge = ({ className, children }: { className?: string; children: React.ReactNode }) => (
+  <span className={className}>{children}</span>
+);
+
+type Booking = {
+  id: string;
+  serviceType: string;
+  description: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  address: string;
+  status: string;
+  estimatedCost: string;
+  provider: {
+    businessName: string;
+    user: {
+      firstName: string;
+      lastName: string;
+    };
+  };
+};
 
 export default function Bookings() {
-  const { user, isLoading: userLoading } = useAuth();
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const queryClient = useQueryClient();
+  const { user, isLoading: authLoading } = useAuth();
+  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed'>('all');
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["/api/bookings"],
     enabled: !!user,
   });
 
-  const cancelBookingMutation = useMutation({
-    mutationFn: async (bookingId: string) => {
-      await apiRequest("PATCH", `/api/bookings/${bookingId}/status`, {
-        status: "cancelled",
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: t('success'),
-        description: t('bookingCancelledSuccess'),
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-    },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: t('unauthorized'),
-          description: t('loggedOutRedirecting'),
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: t('error'),
-        description: t('failedToCancelBooking'),
-        variant: "destructive",
-      });
-    },
-  });
-
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-        return 'bg-blue-100 text-blue-800';
-      case 'in_progress':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    switch (status.toLowerCase()) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'confirmed': return 'bg-blue-100 text-blue-800';
+      case 'in_progress': return 'bg-purple-100 text-purple-800';
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ');
+  const formatStatus = (status: string) => {
+    return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
-  const filterBookings = (status: string) => {
-    if (!bookings) return [];
-    
-    switch (status) {
-      case 'upcoming':
-        return bookings.filter((booking: any) => 
-          ['pending', 'confirmed'].includes(booking.status)
-        );
-      case 'completed':
-        return bookings.filter((booking: any) => booking.status === 'completed');
-      case 'cancelled':
-        return bookings.filter((booking: any) => booking.status === 'cancelled');
-      default:
-        return bookings;
-    }
-  };
+  const filteredBookings = bookings?.filter((booking: Booking) => 
+    filter === 'all' || booking.status === filter
+  ) || [];
 
-  if (userLoading || isLoading) {
+  if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-white p-4 pt-12 border-b border-gray-200">
-          <Skeleton className="h-6 w-32" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
         </div>
-        <div className="bg-white px-4 pb-4">
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <div className="p-4 space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-40" />
-          ))}
-        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="p-8 text-center">
+            <h3 className="font-medium text-gray-900 mb-2">Sign in required</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Please sign in to view your bookings
+            </p>
+            <Button asChild>
+              <Link href="/api/login">Sign In</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -114,307 +89,147 @@ export default function Bookings() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
       <div className="bg-white p-4 pt-12 border-b border-gray-200">
-        <h1 className="text-xl font-semibold text-gray-900">{t('myBookings')}</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="p-2">
+                <i className="fas fa-arrow-left text-gray-600"></i>
+              </Button>
+            </Link>
+            <h1 className="text-xl font-semibold text-gray-900">My Bookings</h1>
+          </div>
+        </div>
       </div>
 
-      {/* Booking Tabs */}
-      <Tabs defaultValue="upcoming" className="w-full">
-        <div className="bg-white px-4 pb-4">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100 h-10">
-            <TabsTrigger value="upcoming" className="text-sm font-medium">
-              {t('upcoming')}
-            </TabsTrigger>
-            <TabsTrigger value="completed" className="text-sm font-medium">
-              {t('completed')}
-            </TabsTrigger>
-            <TabsTrigger value="cancelled" className="text-sm font-medium">
-              {t('cancelled')}
-            </TabsTrigger>
-          </TabsList>
+      <div className="p-6">
+        {/* Filter Tabs */}
+        <div className="flex space-x-2 mb-6 overflow-x-auto">
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'pending', label: 'Pending' },
+            { key: 'confirmed', label: 'Confirmed' },
+            { key: 'completed', label: 'Completed' }
+          ].map((tab) => (
+            <Button
+              key={tab.key}
+              variant={filter === tab.key ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilter(tab.key as any)}
+              className="whitespace-nowrap"
+            >
+              {tab.label}
+            </Button>
+          ))}
         </div>
 
-        <TabsContent value="upcoming" className="p-4 space-y-4 mt-0">
-          {filterBookings('upcoming').length > 0 ? (
-            filterBookings('upcoming').map((booking: any) => (
-              <Card key={booking.id}>
+        {/* Bookings List */}
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Card key={i}>
                 <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{booking.serviceType}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-1">{booking.description}</p>
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="w-12 h-12 rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
                     </div>
-                    <Badge className={getStatusColor(booking.status)}>
-                      {getStatusLabel(booking.status)}
+                    <Skeleton className="w-16 h-6 rounded-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : filteredBookings.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="fas fa-calendar-alt text-gray-400 text-xl"></i>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {filter === 'all' ? 'No bookings yet' : `No ${filter} bookings`}
+            </h3>
+            <p className="text-gray-600 mb-4">
+              {filter === 'all' 
+                ? 'Start by browsing our services and booking your first appointment.'
+                : `You don't have any ${filter} bookings at the moment.`
+              }
+            </p>
+            {filter === 'all' && (
+              <Button asChild>
+                <Link href="/">Browse Services</Link>
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredBookings.map((booking: Booking) => (
+              <Card key={booking.id} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i className="fas fa-tools text-blue-600"></i>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {booking.serviceType}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {booking.provider.businessName}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge className={`px-2 py-1 text-xs font-medium ${getStatusColor(booking.status)}`}>
+                      {formatStatus(booking.status)}
                     </Badge>
                   </div>
 
-                  <div className="flex items-center space-x-3 mb-3">
-                    {booking.provider.user.profileImageUrl ? (
-                      <img
-                        src={booking.provider.user.profileImageUrl}
-                        alt="Provider"
-                        className="w-10 h-10 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <i className="fas fa-user text-gray-500"></i>
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {booking.provider.user.firstName} {booking.provider.user.lastName}
-                      </p>
-                      <div className="flex items-center">
-                        <div className="flex space-x-1 mr-1">
-                          {[...Array(5)].map((_, i) => (
-                            <i
-                              key={i}
-                              className={`fas fa-star text-xs ${
-                                i < Math.floor(parseFloat(booking.provider.rating) || 0)
-                                  ? "text-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                            ></i>
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-600">
-                          {booking.provider.rating || "4.8"}
-                        </span>
-                      </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <i className="fas fa-calendar w-4 text-center mr-2"></i>
+                      {new Date(booking.scheduledDate).toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                      })} at {booking.scheduledTime}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <i className="fas fa-map-marker-alt w-4 text-center mr-2"></i>
+                      {booking.address}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <i className="fas fa-dollar-sign w-4 text-center mr-2"></i>
+                      Estimated: ${booking.estimatedCost}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-xs text-gray-600">{t('dateTime')}</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        {new Date(booking.scheduledDate).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}, {booking.scheduledTime}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600">{t('totalCost')}</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        ${booking.estimatedCost}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-3">
-                    <Button variant="secondary" className="flex-1" size="sm" disabled>
-                      <i className="fas fa-phone mr-1 text-xs"></i>
-                      {t('call')}
-                    </Button>
-                    <Button variant="secondary" className="flex-1" size="sm" disabled>
-                      <i className="fas fa-comment mr-1 text-xs"></i>
-                      {t('message')}
-                    </Button>
+                  <div className="flex items-center justify-between">
                     <Button
-                      variant="destructive"
-                      className="flex-1"
+                      variant="outline"
                       size="sm"
-                      onClick={() => cancelBookingMutation.mutate(booking.id)}
-                      disabled={cancelBookingMutation.isPending}
+                      asChild
                     >
-                      {t('cancel')}
+                      <Link href={`/booking/${booking.id}`}>
+                        View Details
+                      </Link>
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-calendar text-gray-400 text-2xl"></i>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">{t('noUpcomingBookings')}</h3>
-                <p className="text-sm text-gray-600">
-                  {t('bookServiceToSeeAppointments')}
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="completed" className="p-4 space-y-4 mt-0">
-          {filterBookings('completed').length > 0 ? (
-            filterBookings('completed').map((booking: any) => (
-              <Card key={booking.id}>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{booking.serviceType}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-1">{booking.description}</p>
-                    </div>
-                    <Badge className={getStatusColor(booking.status)}>
-                      {getStatusLabel(booking.status)}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center space-x-3 mb-3">
-                    {booking.provider.user.profileImageUrl ? (
-                      <img
-                        src={booking.provider.user.profileImageUrl}
-                        alt="Provider"
-                        className="w-10 h-10 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <i className="fas fa-user text-gray-500"></i>
-                      </div>
+                    
+                    {booking.status === 'pending' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        Cancel
+                      </Button>
                     )}
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {booking.provider.user.firstName} {booking.provider.user.lastName}
-                      </p>
-                      <div className="flex items-center">
-                        <div className="flex space-x-1 mr-1">
-                          {[...Array(5)].map((_, i) => (
-                            <i
-                              key={i}
-                              className={`fas fa-star text-xs ${
-                                i < Math.floor(parseFloat(booking.provider.rating) || 0)
-                                  ? "text-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                            ></i>
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-600">
-                          {booking.provider.rating || "4.8"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-xs text-gray-600">Date & Time</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        {new Date(booking.scheduledDate).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}, {booking.scheduledTime}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Final Cost</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        ${booking.finalCost || booking.estimatedCost}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-3">
-                    <Button className="flex-1" size="sm" disabled>
-                      <i className="fas fa-star mr-1 text-xs"></i>
-                      Rate Service
-                    </Button>
-                    <Button variant="secondary" className="flex-1" size="sm" disabled>
-                      <i className="fas fa-redo mr-1 text-xs"></i>
-                      Book Again
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
-            ))
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-check-circle text-gray-400 text-2xl"></i>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">No completed services</h3>
-                <p className="text-sm text-gray-600">
-                  Your completed services will appear here
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="cancelled" className="p-4 space-y-4 mt-0">
-          {filterBookings('cancelled').length > 0 ? (
-            filterBookings('cancelled').map((booking: any) => (
-              <Card key={booking.id}>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{booking.serviceType}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-1">{booking.description}</p>
-                    </div>
-                    <Badge className={getStatusColor(booking.status)}>
-                      {getStatusLabel(booking.status)}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center space-x-3 mb-3">
-                    {booking.provider.user.profileImageUrl ? (
-                      <img
-                        src={booking.provider.user.profileImageUrl}
-                        alt="Provider"
-                        className="w-10 h-10 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <i className="fas fa-user text-gray-500"></i>
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {booking.provider.user.firstName} {booking.provider.user.lastName}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-xs text-gray-600">Date & Time</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        {new Date(booking.scheduledDate).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}, {booking.scheduledTime}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Cancelled</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        {new Date(booking.updatedAt).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <Button className="w-full" size="sm" disabled>
-                    <i className="fas fa-redo mr-1 text-xs"></i>
-                    Book Again
-                  </Button>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-times-circle text-gray-400 text-2xl"></i>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">No cancelled bookings</h3>
-                <p className="text-sm text-gray-600">
-                  Cancelled services will appear here
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      <BottomNavigation activeTab="bookings" />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

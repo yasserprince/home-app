@@ -519,6 +519,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Seed providers endpoint (development only)
+  app.post('/api/seed/providers', async (req, res) => {
+    try {
+      if (process.env.NODE_ENV !== 'development') {
+        return res.status(403).json({ message: "Only available in development" });
+      }
+      
+      const { seedServiceProviders } = await import('./seedProviders');
+      await seedServiceProviders();
+      res.json({ message: "Service providers seeded successfully" });
+    } catch (error) {
+      console.error("Error seeding providers:", error);
+      res.status(500).json({ message: "Failed to seed providers" });
+    }
+  });
+
   app.put('/api/support/users/:id/status', isAuthenticated, isSupport, async (req, res) => {
     try {
       const { id } = req.params;
@@ -675,6 +691,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching provider:", error);
       res.status(500).json({ message: "Failed to fetch provider" });
+    }
+  });
+
+  // Booking routes
+  app.post('/api/bookings', isReplitAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      const bookingData = insertBookingSchema.parse({
+        ...req.body,
+        userId,
+        scheduledDate: new Date(req.body.scheduledDate + 'T' + req.body.scheduledTime),
+      });
+
+      const booking = await storage.createBooking(bookingData);
+      res.status(201).json(booking);
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      res.status(500).json({ message: 'Failed to create booking' });
+    }
+  });
+
+  app.get('/api/bookings', isReplitAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      const bookings = await storage.getUserBookings(userId);
+      res.json(bookings);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      res.status(500).json({ message: 'Failed to fetch bookings' });
+    }
+  });
+
+  app.get('/api/bookings/:id', isReplitAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      const booking = await storage.getBookingById(req.params.id);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Ensure user can only access their own bookings
+      if (booking.userId !== userId) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      res.json(booking);
+    } catch (error) {
+      console.error('Error fetching booking:', error);
+      res.status(500).json({ message: 'Failed to fetch booking' });
+    }
+  });
+
+  app.patch('/api/bookings/:id/status', isReplitAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      const { status } = req.body;
+      const validStatuses = ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'];
+      
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+      }
+
+      const booking = await storage.updateBookingStatus(req.params.id, status);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      res.json(booking);
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      res.status(500).json({ message: 'Failed to update booking status' });
     }
   });
 
