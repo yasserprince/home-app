@@ -47,8 +47,8 @@ export async function setupGoogleAuth(app: Express) {
     return;
   }
   
-  // Use the deployed domain for OAuth callback
-  const callbackURL = "https://home-app-yasserdaddi.replit.app/api/auth/google/callback";
+  // Use the correct deployed domain for OAuth callback
+  const callbackURL = "https://home-app-1-yasserdaddi.replit.app/api/auth/google/callback";
     
   console.log("Setting up Google OAuth with:", {
     clientId: process.env.GOOGLE_CLIENT_ID?.substring(0, 10) + "...",
