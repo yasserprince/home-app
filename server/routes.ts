@@ -2618,7 +2618,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ===============================
   
   // Add image to modern portfolio gallery
-  app.post('/api/portfolios/modern-images', isReplitAuthenticated, async (req, res) => {
+  app.post('/api/portfolios/modern-images', isAuthenticated, async (req, res) => {
     try {
       const userId = (req as any).user?.claims?.sub;
       const { galleryId, objectPath, filename, description, imageType } = req.body;
@@ -2728,16 +2728,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get galleries for current user (simplified API)
-  app.get('/api/portfolios/galleries/:userId?', isAuthenticated, async (req, res) => {
+  // Get galleries for current user 
+  app.get('/api/portfolios/galleries/:userId?', async (req, res) => {
     try {
-      const authenticatedUserId = (req as any).user?.claims?.sub;
-      const requestedUserId = req.params.userId || authenticatedUserId;
+      console.log("📂 Portfolio galleries request");
+      
+      // Check if user is authenticated via any method
+      const isAuthenticated = req.isAuthenticated() && req.user;
+      
+      if (!isAuthenticated) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // Get user ID from different auth sources
+      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub;
+      const requestedUserId = req.params.userId || userId;
+      
+      console.log("✅ Authenticated user:", userId, "requesting data for:", requestedUserId);
       
       // Get galleries from storage - if none exist, create default galleries
       let galleries = await storage.getModernPortfolioGalleries(requestedUserId);
       
       if (!galleries || galleries.length === 0) {
+        console.log("Creating default galleries for user:", requestedUserId);
         // Create default galleries
         const defaultGalleries = [
           {
@@ -2805,11 +2818,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         galleries = defaultGalleries;
       }
       
-      console.log("📊 Portfolio galleries for user", requestedUserId, ":", JSON.stringify(galleries, null, 2));
+      console.log(`📊 Returning ${galleries.length} galleries for user ${requestedUserId}`);
       res.json(galleries);
     } catch (error) {
       console.error("Error fetching modern portfolio galleries:", error);
       res.status(500).json({ message: "Failed to fetch galleries" });
+    }
+  });
+
+  // Get modern portfolio images for current user
+  app.get('/api/portfolios/modern-images', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req as any).user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const images = await storage.getModernPortfolioImages(userId);
+      res.json(images || []);
+    } catch (error) {
+      console.error("Error fetching modern portfolio images:", error);
+      res.status(500).json({ message: "Failed to fetch images" });
     }
   });
 
