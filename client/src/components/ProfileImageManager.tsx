@@ -155,7 +155,7 @@ export function ProfileImageManager({
       
       // Update profile with new image
       const response = await apiRequest("PUT", "/api/profile/image", {
-        imageURL: uploadURL
+        imageURL: uploadURL.split('?')[0] // Remove query params for storage URL
       });
       
       return await response.json();
