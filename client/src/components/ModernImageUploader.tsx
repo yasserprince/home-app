@@ -41,7 +41,7 @@ export function ModernImageUploader({ children, onSuccess }: ModernImageUploader
       try {
         // Get upload URL
         console.log("Getting upload URL...");
-        const uploadResponse = await apiRequest("POST", "/api/objects/upload");
+        const uploadResponse = await apiRequest("/api/objects/upload", "POST");
         console.log("Raw upload response:", uploadResponse);
         const uploadData = await uploadResponse.json();
         console.log("Parsed response data:", uploadData);
@@ -72,7 +72,7 @@ export function ModernImageUploader({ children, onSuccess }: ModernImageUploader
 
         // Set ACL policy and update profile
         console.log("Setting ACL policy and updating profile...");
-        const response = await apiRequest("PUT", "/api/profile/image", { 
+        const response = await apiRequest("/api/profile/image", "PUT", { 
           imageURL: uploadURL
         });
         const responseData = await response.json();

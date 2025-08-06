@@ -631,7 +631,7 @@ export class DatabaseStorage implements IStorage {
             userId: gallery.userId,
             businessName: 'Portfolio Provider',
             description: 'Default provider for portfolio management',
-            categoryId: 'cb8aeab6-3fb4-44ba-9efe-00fe3217e549', // Default to first category
+            categoryId: '641bce0d-f3fe-42b1-988b-b36d17f4f067', // Default to General Handyman category
             hourlyRate: '50.00',
             isAvailable: true,
             experienceYears: 1,
@@ -693,7 +693,7 @@ export class DatabaseStorage implements IStorage {
             userId: userId,
             businessName: 'Portfolio Provider',
             description: 'Default provider for portfolio management',
-            categoryId: 'cb8aeab6-3fb4-44ba-9efe-00fe3217e549', // Default to first category
+            categoryId: '641bce0d-f3fe-42b1-988b-b36d17f4f067', // Default to General Handyman category
             hourlyRate: '50.00',
             isAvailable: true,
             experienceYears: 1,
