@@ -1,16 +1,17 @@
 import { Express, Request, Response } from 'express';
-import { requireAuth } from './simpleAuth';
+// Use existing auth middleware instead
+import { isAuthenticated } from './replitAuth';
 import { ObjectStorageService } from './objectStorage';
 
 interface AuthRequest extends Request {
-  user?: { userId: string; email: string };
+  user?: any; // Use existing auth user type
 }
 
 // Simple upload service following 2024 best practices
 export function setupSimpleUpload(app: Express) {
   
   // Get presigned URL for file upload
-  app.post('/api/upload/presigned-url', requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post('/api/upload/presigned-url', isAuthenticated, async (req: AuthRequest, res: Response) => {
     try {
       const { fileName, fileType, fileSize } = req.body;
       
@@ -53,7 +54,7 @@ export function setupSimpleUpload(app: Express) {
   });
   
   // Complete upload - set ACL and store metadata
-  app.post('/api/upload/complete', requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post('/api/upload/complete', isAuthenticated, async (req: AuthRequest, res: Response) => {
     try {
       const { uploadURL, fileName, fileType, fileSize } = req.body;
       
@@ -63,16 +64,19 @@ export function setupSimpleUpload(app: Express) {
       
       const objectStorageService = new ObjectStorageService();
       
+      // Get user ID from existing auth system
+      const userId = ((req.user as any)?.claims || {}).sub || req.user?.id || 'unknown';
+      
       // Set ACL policy for uploaded file
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(uploadURL, {
-        owner: req.user!.userId,
+        owner: userId,
         visibility: 'private', // Default to private
         aclRules: [] // No additional rules by default
       });
       
       // Store file metadata (you can save to database here)
       console.log('File uploaded:', {
-        userId: req.user!.userId,
+        userId,
         fileName,
         fileType,
         fileSize,
@@ -95,7 +99,7 @@ export function setupSimpleUpload(app: Express) {
   });
   
   // Get user's uploaded files
-  app.get('/api/upload/my-files', requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get('/api/upload/my-files', isAuthenticated, async (req: AuthRequest, res: Response) => {
     try {
       // In a real app, query database for user's files
       // For demo, return empty array

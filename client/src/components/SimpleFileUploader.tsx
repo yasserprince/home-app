@@ -40,9 +40,9 @@ export function SimpleFileUploader({
         fileName: file.name
       });
 
-      // Get JWT token from localStorage
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
+      // Check if user is authenticated (using existing auth system)
+      const authCheck = await fetch('/api/auth/user', { credentials: 'include' });
+      if (!authCheck.ok) {
         throw new Error('Please log in to upload files');
       }
 
@@ -52,9 +52,9 @@ export function SimpleFileUploader({
       const presignedResponse = await fetch('/api/upload/presigned-url', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           fileName: file.name,
           fileType: file.type,
@@ -90,9 +90,9 @@ export function SimpleFileUploader({
       const completeResponse = await fetch('/api/upload/complete', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           uploadURL,
           fileName: file.name,

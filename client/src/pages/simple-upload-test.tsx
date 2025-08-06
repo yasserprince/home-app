@@ -6,92 +6,69 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function SimpleUploadTestPage() {
-  const [authToken, setAuthToken] = useState(localStorage.getItem('auth_token') || '');
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('auth_token'));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Simple login
-  const handleLogin = async () => {
+  // Check authentication status
+  const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginForm)
-      });
-
+      const response = await fetch('/api/auth/user', { credentials: 'include' });
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem('auth_token', token);
-        setAuthToken(token);
+        const userData = await response.json();
+        setUser(userData);
         setIsLoggedIn(true);
-        console.log('Login successful');
       } else {
-        const error = await response.json();
-        console.error('Login failed:', error.error);
-        alert('Login failed: ' + error.error);
+        setIsLoggedIn(false);
+        setUser(null);
       }
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Login error');
+      setIsLoggedIn(false);
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Quick register for testing
-  const handleQuickRegister = async () => {
-    try {
-      const testUser = {
-        email: 'test@example.com',
-        password: 'password123',
-        firstName: 'Test',
-        lastName: 'User'
-      };
+  // Replit Auth login
+  const handleReplitLogin = () => {
+    window.location.href = '/api/auth/replit';
+  };
 
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(testUser)
-      });
-
-      if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem('auth_token', token);
-        setAuthToken(token);
-        setIsLoggedIn(true);
-        setLoginForm({ email: testUser.email, password: testUser.password });
-        console.log('Test user created and logged in');
-      } else {
-        const error = await response.json();
-        console.error('Registration failed:', error.error);
-        alert('Registration failed: ' + error.error);
-      }
-    } catch (error) {
-      console.error('Registration error:', error);
-      alert('Registration error');
-    }
+  // Google Auth login
+  const handleGoogleLogin = () => {
+    window.location.href = '/api/auth/google';
   };
 
   // Logout
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token');
-    setAuthToken('');
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      setIsLoggedIn(false);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
+  // Check auth on component mount
+  React.useEffect(() => {
+    checkAuth();
+  }, []);
+
   // Test API endpoints
-  const testMe = async () => {
+  const testUserAPI = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
-        headers: { 'Authorization': `Bearer ${authToken}` }
-      });
+      const response = await fetch('/api/auth/user', { credentials: 'include' });
       
       if (response.ok) {
-        const user = await response.json();
-        console.log('Current user:', user);
+        const userData = await response.json();
+        console.log('Current user:', userData);
       } else {
-        console.error('Me API failed:', response.status);
+        console.error('User API failed:', response.status);
       }
     } catch (error) {
-      console.error('Me API error:', error);
+      console.error('User API error:', error);
     }
   };
 
@@ -126,40 +103,37 @@ export default function SimpleUploadTestPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 
-                {!isLoggedIn ? (
+                {loading ? (
+                  <div className="text-center py-4">
+                    <p className="text-white/60">Checking authentication...</p>
+                  </div>
+                ) : !isLoggedIn ? (
                   <>
-                    <div className="space-y-2">
-                      <Input
-                        type="email"
-                        placeholder="Email"
-                        value={loginForm.email}
-                        onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50"
-                      />
-                      <Input
-                        type="password"
-                        placeholder="Password"
-                        value={loginForm.password}
-                        onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50"
-                      />
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button onClick={handleLogin} className="flex-1">
-                        Login
-                      </Button>
-                      <Button onClick={handleQuickRegister} variant="outline" className="flex-1">
-                        Quick Test Register
-                      </Button>
+                    <div className="space-y-3">
+                      <p className="text-white/80 text-center">
+                        Use existing authentication system
+                      </p>
+                      
+                      <div className="flex gap-2">
+                        <Button onClick={handleReplitLogin} className="flex-1">
+                          Login with Replit
+                        </Button>
+                        <Button onClick={handleGoogleLogin} variant="outline" className="flex-1">
+                          Login with Google
+                        </Button>
+                      </div>
                     </div>
                   </>
                 ) : (
                   <div className="space-y-4">
                     <p className="text-green-400">✅ Logged in successfully</p>
-                    <p className="text-white/80 text-sm break-all">
-                      Token: {authToken.substring(0, 50)}...
-                    </p>
+                    {user && (
+                      <div className="text-white/80 text-sm">
+                        <p>User: {user.firstName} {user.lastName}</p>
+                        <p>Email: {user.email}</p>
+                        <p>ID: {user.id}</p>
+                      </div>
+                    )}
                     <Button onClick={handleLogout} variant="outline">
                       Logout
                     </Button>
@@ -209,19 +183,19 @@ export default function SimpleUploadTestPage() {
               <CardContent className="space-y-3">
                 
                 <Button 
-                  onClick={testMe}
+                  onClick={testUserAPI}
                   disabled={!isLoggedIn}
                   className="w-full"
                   variant="outline"
                 >
-                  Test GET /api/auth/me
+                  Test GET /api/auth/user
                 </Button>
 
                 <Button 
                   onClick={async () => {
                     try {
-                      const response = await fetch('/api/upload/my-files', {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
+                      const response = await fetch('/api/upload/my-files', { 
+                        credentials: 'include' 
                       });
                       const files = await response.json();
                       console.log('User files:', files);

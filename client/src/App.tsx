@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React, { lazy, Suspense } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -35,6 +35,7 @@ import EmailSignin from "@/pages/email-signin";
 
 import IconTest from "@/pages/icon-test";
 import UploadTestPage from "@/pages/upload-test";
+import SimpleUploadTestPage from "@/pages/simple-upload-test";
 import PortfolioGallery from "@/pages/portfolio-gallery";
 import GalleryDetail from "@/pages/gallery-detail";
 import ModernPortfolio from "@/pages/modern-portfolio";
@@ -65,7 +66,7 @@ function Router() {
           <Route path="/booking" component={Booking} />
           <Route path="/bookings" component={Bookings} />
           <Route path="/upload-test" component={UploadTestPage} />
-        <Route path="/simple-upload" component={lazy(() => import("./pages/simple-upload-test"))} />
+          <Route path="/simple-upload" component={SimpleUploadTestPage} />
           <Route path="/portfolio-modern" component={ModernPortfolio} />
           <Route path="/portfolio/:providerId?" component={PortfolioGallery} />
           <Route path="/portfolio/:providerId/gallery/:galleryId" component={GalleryDetail} />
