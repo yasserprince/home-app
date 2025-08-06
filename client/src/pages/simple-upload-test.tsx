@@ -161,7 +161,7 @@ export default function SimpleUploadTestPage() {
                       console.log('Upload completed:', result);
                       alert('File uploaded successfully!');
                     }}
-                    accept={['image/*', '.pdf', '.doc', '.docx']}
+                    accept={['image/jpeg', 'image/png', 'image/gif', 'application/pdf']}
                     maxSize={10 * 1024 * 1024}
                   />
                 ) : (

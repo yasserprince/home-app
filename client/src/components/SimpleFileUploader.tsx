@@ -146,7 +146,13 @@ export function SimpleFileUploader({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: accept.reduce((acc, type) => ({ ...acc, [type]: [] }), {}),
+    accept: {
+      'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'text/plain': ['.txt']
+    },
     maxSize,
     multiple: false,
     disabled: uploadState.status === 'uploading'

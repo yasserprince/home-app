@@ -1,0 +1,64 @@
+inject.js?settings=%7B%22rvm%22%3A%7B%22inject%22%3A%7B%22disabled%22%3Afalse%2C%22timestamp%22%3A0%7D%7D%7D:1 hello from injected code
+contentscript.js:1 Hello from the content-script
+simple-upload:1 Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+api/upload/presigned-url:1  Failed to load resource: the server responded with a status of 401 ()
+index-Coko0NJ5.js:7820 Upload error: Error: Authentication required
+    at o (index-Coko0NJ5.js:7820:25920)
+o @ index-Coko0NJ5.js:7820
+index-Coko0NJ5.js:7818 Skipped ".pdf" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".doc" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7818 Skipped ".docx" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.
+(anonymous) @ index-Coko0NJ5.js:7818
+index-Coko0NJ5.js:7826 Current user: Object
+api/upload/my-files:1  Failed to load resource: the server responded with a status of 401 ()
+index-Coko0NJ5.js:7826 User files: Object

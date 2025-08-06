@@ -109,8 +109,13 @@ export function setupSimpleUpload(app: Express) {
   });
   
   // Get user's uploaded files
-  app.get('/api/upload/my-files', isAuthenticated, async (req: AuthRequest, res: Response) => {
+  app.get('/api/upload/my-files', async (req: AuthRequest, res: Response) => {
     try {
+      // Check authentication manually
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
       // In a real app, query database for user's files
       // For demo, return empty array
       res.json([]);
