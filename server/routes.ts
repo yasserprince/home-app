@@ -418,14 +418,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Unified auth middleware - checks all auth types
+  // Enhanced auth middleware with detailed debugging
   const isAnyAuthenticated: RequestHandler = async (req, res, next) => {
-    // Check if user is authenticated
-    if (!req.isAuthenticated() || !req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
+    console.log("🔒 Auth middleware check:", {
+      hasSession: !!req.session,
+      sessionUser: !!(req.session as any)?.user,
+      hasPassportUser: !!req.user,
+      isPassportAuth: req.isAuthenticated?.(),
+      sessionId: req.sessionID,
+      cookies: req.headers.cookie?.substring(0, 100),
+      userAgent: req.headers['user-agent']?.substring(0, 50)
+    });
+    
+    // Check Replit Auth first (via custom setup)
+    if (((req as any).user?.claims || {}).sub) {
+      console.log("✅ Replit auth detected");
+      return next();
     }
     
-    return next();
+    // Check Passport-based auth (Google, Email)
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      console.log("✅ Passport auth detected");
+      return next();
+    }
+    
+    // Check direct session auth
+    if ((req as any).session?.user) {
+      console.log("✅ Session auth detected");
+      return next();
+    }
+    
+    console.log("❌ No authentication found");
+    return res.status(401).json({ message: "Unauthorized" });
   };
 
   // Auth routes

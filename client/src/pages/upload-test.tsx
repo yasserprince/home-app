@@ -184,16 +184,42 @@ export default function UploadTestPage() {
               <Button 
                 variant="outline" 
                 className="bg-white/10 text-white border-white/20 hover:bg-white/20"
-                onClick={() => fetch('/api/portfolios/galleries').then(r => r.json()).then(console.log)}
+                onClick={async () => {
+                  console.log("Testing gallery API...");
+                  try {
+                    const result = await fetch('/api/portfolios/galleries', { credentials: 'include' });
+                    if (result.ok) {
+                      const data = await result.json();
+                      console.log("Gallery data:", data);
+                    } else {
+                      console.error("Gallery API failed:", result.status, await result.text());
+                    }
+                  } catch (error) {
+                    console.error("Gallery API error:", error);
+                  }
+                }}
               >
                 Test Gallery API
               </Button>
               <Button 
                 variant="outline" 
                 className="bg-white/10 text-white border-white/20 hover:bg-white/20"
-                onClick={() => fetch('/api/auth/debug', { credentials: 'include' }).then(r => r.json()).then(console.log)}
+                onClick={async () => {
+                  console.log("Testing authentication...");
+                  try {
+                    const authResult = await fetch('/api/auth/debug', { credentials: 'include' });
+                    const authData = await authResult.json();
+                    console.log("Auth debug result:", authData);
+                    
+                    const userResult = await fetch('/api/auth/user', { credentials: 'include' });
+                    const userData = await userResult.json();
+                    console.log("User data result:", userData);
+                  } catch (error) {
+                    console.error("Auth test failed:", error);
+                  }
+                }}
               >
-                Test Auth Debug
+                Test Authentication Flow
               </Button>
             </div>
             <p className="text-gray-400 text-xs mt-2">
