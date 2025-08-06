@@ -64,6 +64,7 @@ function Router() {
           <Route path="/booking" component={Booking} />
           <Route path="/bookings" component={Bookings} />
           <Route path="/upload-test" component={UploadTestPage} />
+        <Route path="/simple-upload" component={lazy(() => import("./pages/simple-upload-test"))} />
           <Route path="/portfolio-modern" component={ModernPortfolio} />
           <Route path="/portfolio/:providerId?" component={PortfolioGallery} />
           <Route path="/portfolio/:providerId/gallery/:galleryId" component={GalleryDetail} />

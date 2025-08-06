@@ -80,6 +80,14 @@ app.use((req, res, next) => {
     process.exit(1);
   }
   
+  // Import and setup new simple architecture
+  const { setupSimpleAuth } = await import('./simpleAuth.js');
+  const { setupSimpleUpload } = await import('./simpleUpload.js');
+  
+  // Setup simple auth and upload (new architecture)
+  setupSimpleAuth(app);
+  setupSimpleUpload(app);
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
