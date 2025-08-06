@@ -13,6 +13,10 @@ console.log(`🚀 Starting server in ${isProduction ? 'PRODUCTION' : 'DEVELOPMEN
 app.use(express.json({ limit: '50mb' })); // Increase limit for file uploads
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
+// Add cookie parser for JWT auth
+const cookieParser = (await import('cookie-parser')).default;
+app.use(cookieParser());
+
 // Environment consistency check for deployment
 const requiredEnvVars = [
   'DATABASE_URL',
@@ -80,13 +84,13 @@ app.use((req, res, next) => {
     process.exit(1);
   }
   
-  // Import and setup new simple architecture
-  const { setupSimpleAuth } = await import('./simpleAuth.js');
+  // Import and setup JWT-based architecture
+  const { setupJWTAuth } = await import('./authService.js');
   const { setupSimpleUpload } = await import('./simpleUpload.js');
   const { setupDebugRoutes } = await import('./debugRoutes.js');
   
-  // Setup simple auth and upload (new architecture)
-  setupSimpleAuth(app);
+  // Setup JWT auth and upload (simplified architecture)
+  setupJWTAuth(app);
   setupSimpleUpload(app);
   setupDebugRoutes(app);
   

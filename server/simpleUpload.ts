@@ -1,6 +1,6 @@
 import { Express, Request, Response } from 'express';
 // Use existing auth middleware instead
-import { isAuthenticated } from './replitAuth';
+import { jwtAuth } from './jwtAuth.js';
 import { ObjectStorageService } from './objectStorage';
 
 interface AuthRequest extends Request {
@@ -10,13 +10,9 @@ interface AuthRequest extends Request {
 // Simple upload service following 2024 best practices
 export function setupSimpleUpload(app: Express) {
   
-  // Get presigned URL for file upload
-  app.post('/api/upload/presigned-url', async (req: AuthRequest, res: Response) => {
+  // Get presigned URL for file upload (JWT-protected)
+  app.post('/api/upload/presigned-url', jwtAuth, async (req: AuthRequest, res: Response) => {
     try {
-      // Check authentication manually
-      if (!req.user) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { fileName, fileType, fileSize } = req.body;
       
@@ -59,12 +55,8 @@ export function setupSimpleUpload(app: Express) {
   });
   
   // Complete upload - set ACL and store metadata
-  app.post('/api/upload/complete', async (req: AuthRequest, res: Response) => {
+  app.post('/api/upload/complete', jwtAuth, async (req: AuthRequest, res: Response) => {
     try {
-      // Check authentication manually
-      if (!req.user) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { uploadURL, fileName, fileType, fileSize } = req.body;
       
@@ -109,12 +101,8 @@ export function setupSimpleUpload(app: Express) {
   });
   
   // Get user's uploaded files
-  app.get('/api/upload/my-files', async (req: AuthRequest, res: Response) => {
+  app.get('/api/upload/my-files', jwtAuth, async (req: AuthRequest, res: Response) => {
     try {
-      // Check authentication manually
-      if (!req.user) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       // In a real app, query database for user's files
       // For demo, return empty array
