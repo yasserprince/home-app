@@ -1,12 +1,9 @@
 import type { Express, RequestHandler } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupGoogleAuth, isAuthenticated } from "./googleAuth";
-import { setupEmailAuth } from "./emailAuth";
-import { setupAuth, isAuthenticated as isReplitAuthenticated } from "./replitAuth";
-import { setupTestAuth } from "./testAuth";
-import { setupAuthTest } from "./authTest";
-import { setupDebugAuth } from "./debugAuth";
+// Authentication is now handled by JWT system in authService.ts
+import { verifyToken } from "./jwtAuth";
+import { jwtAuthMiddleware, optionalJwtAuth } from "./jwtMiddleware";
 import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
@@ -81,6 +78,11 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔧 Configuring routes for", process.env.NODE_ENV);
   
+  // JWT Authentication middleware (must be defined first)
+  const isAuthenticated = jwtAuthMiddleware;
+  const isAnyAuthenticated = jwtAuthMiddleware; // Alias for compatibility
+  const isReplitAuthenticated = jwtAuthMiddleware; // Legacy alias
+  
   // Early API route test to ensure proper registration
   app.get('/api/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });
@@ -102,9 +104,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth middleware
-  await setupGoogleAuth(app);
-  await setupEmailAuth(app);
-  await setupAuth(app); // Replit Auth
+  // Google auth now handled by JWT OAuth handlers in index.ts
+  // Email auth now handled by JWT system in authService.ts
+  // Replit auth now handled by JWT OAuth handlers in index.ts
   
   // Auto-initialize data for production deployments
   if (isProduction || isGitHubDeployment) {
@@ -152,9 +154,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   
   // Test endpoints for debugging
-  setupTestAuth(app);
-  setupAuthTest(app);
-  setupDebugAuth(app);
+  // Test auth now handled by JWT system
+  // Auth test endpoints now handled by JWT debug routes
+  // Debug auth now handled by JWT debug endpoints in debugRoutes.ts
 
   // Comprehensive deployment verification endpoint
   app.get('/api/deployment/verify', async (req, res) => {
@@ -418,42 +420,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Enhanced auth middleware with detailed debugging
-  const isAnyAuthenticated: RequestHandler = async (req, res, next) => {
-    console.log("🔒 Auth middleware check:", {
-      hasSession: !!req.session,
-      sessionUser: !!(req.session as any)?.user,
-      hasPassportUser: !!req.user,
-      isPassportAuth: req.isAuthenticated?.(),
-      sessionId: req.sessionID,
-      cookies: req.headers.cookie?.substring(0, 100),
-      userAgent: req.headers['user-agent']?.substring(0, 50)
-    });
-    
-    // Check Replit Auth first (via custom setup)
-    if (((req as any).user?.claims || {}).sub) {
-      console.log("✅ Replit auth detected");
-      return next();
-    }
-    
-    // Check Passport-based auth (Google, Email)
-    if (req.isAuthenticated && req.isAuthenticated()) {
-      console.log("✅ Passport auth detected");
-      return next();
-    }
-    
-    // Check direct session auth
-    if ((req as any).session?.user) {
-      console.log("✅ Session auth detected");
-      return next();
-    }
-    
-    console.log("❌ No authentication found");
-    return res.status(401).json({ message: "Unauthorized" });
-  };
+  // JWT middleware already defined at top of function
 
-  // Auth routes
-  app.get('/api/auth/user', isAnyAuthenticated, async (req: any, res) => {
+  // Auth routes - now using JWT middleware
+  app.get('/api/auth/user', jwtAuthMiddleware, async (req: any, res) => {
     try {
       // Handle different auth types
       if (((req.user as any)?.claims || {})?.sub) {
@@ -977,7 +947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Booking routes
-  app.post('/api/bookings', isReplitAuthenticated, async (req: any, res) => {
+  app.post('/api/bookings', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
@@ -1013,7 +983,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/bookings/:id', isReplitAuthenticated, async (req: any, res) => {
+  app.get('/api/bookings/:id', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
@@ -1037,7 +1007,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/bookings/:id/status', isReplitAuthenticated, async (req: any, res) => {
+  app.patch('/api/bookings/:id/status', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
@@ -2407,9 +2377,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // OLD: Conflicting route removed - now handled by modern portfolio API
 
-  app.post('/api/portfolios/galleries', isAuthenticated, async (req, res) => {
+  app.post('/api/portfolios/galleries', async (req, res) => {
+    // Check JWT authentication
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : req.cookies?.auth_token;
+    
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = decoded.sub;
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
