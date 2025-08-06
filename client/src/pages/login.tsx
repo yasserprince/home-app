@@ -42,7 +42,7 @@ export default function Login() {
               <CardContent className="space-y-6">
                 {/* Google OAuth Login */}
                 <Button 
-                  onClick={() => window.location.href = '/api/login'}
+                  onClick={() => window.location.href = '/api/auth/google'}
                   className="w-full bg-white hover:bg-gray-50 text-gray-900 font-medium py-3 h-auto border-2 border-transparent hover:border-white/20 transition-all duration-200"
                 >
                   <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
