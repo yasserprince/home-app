@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AdvancedFileUploader } from '@/components/modern-upload/AdvancedFileUploader';
+import { SimpleUploadTest } from '@/components/modern-upload/SimpleUploadTest';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -84,10 +85,13 @@ export default function UploadTestPage() {
           </CardContent>
         </Card>
 
-        {/* Upload Component */}
+        {/* Simple Upload Test */}
+        <SimpleUploadTest />
+
+        {/* Advanced Upload Component */}
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader>
-            <CardTitle className="text-white">File Upload</CardTitle>
+            <CardTitle className="text-white">Advanced File Upload</CardTitle>
           </CardHeader>
           <CardContent>
             <AdvancedFileUploader
@@ -187,9 +191,9 @@ export default function UploadTestPage() {
               <Button 
                 variant="outline" 
                 className="bg-white/10 text-white border-white/20 hover:bg-white/20"
-                onClick={() => fetch('/api/auth/user').then(r => r.json()).then(console.log)}
+                onClick={() => fetch('/api/auth/debug', { credentials: 'include' }).then(r => r.json()).then(console.log)}
               >
-                Test Auth API
+                Test Auth Debug
               </Button>
             </div>
             <p className="text-gray-400 text-xs mt-2">

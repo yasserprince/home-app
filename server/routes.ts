@@ -79,6 +79,12 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  console.log("🔧 Configuring routes for", process.env.NODE_ENV);
+  
+  // Early API route test to ensure proper registration
+  app.get('/api/health', (req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  });
   // Production-specific middleware for consistent behavior
   const isProduction = process.env.NODE_ENV === "production";
   const isGitHubDeployment = Boolean(process.env.REPL_DEPLOYMENT_ID);
@@ -459,6 +465,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
+  });
+
+  // Debug authentication endpoint - test route to verify API access
+  app.get('/api/auth/debug', (req, res) => {
+    console.log("🔍 Authentication Debug endpoint reached");
+    
+    const debugInfo = {
+      endpoint: "debug endpoint working",
+      sessionId: req.sessionID || "none",
+      hasSession: !!req.session,
+      hasUser: !!req.user,
+      isAuthenticated: req.isAuthenticated?.() || false,
+      cookies: req.headers.cookie || "none",
+      userAgent: req.headers['user-agent'] || "none",
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log("Debug info:", debugInfo);
+    res.json(debugInfo);
   });
 
   // Enhanced logout endpoint that works for all auth types
@@ -1737,30 +1762,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Modern upload endpoints with authentication
   const { uploadService } = await import('./uploadService');
 
-  // Generate presigned upload URLs
-  app.post("/api/upload/presigned-url", async (req, res) => {
+  // Generate presigned upload URLs (using existing auth middleware)
+  app.post("/api/upload/presigned-url", isAnyAuthenticated, async (req: any, res) => {
     try {
-      console.log("🔒 Presigned URL request");
-      console.log("Request user:", (req as any).user);
-      console.log("Session:", (req as any).session);
+      console.log("🔒 Presigned URL request with auth middleware");
       
-      // Check authentication from session
-      const sessionUser = (req as any).session?.user;
-      console.log("Session user:", sessionUser);
-      console.log("Passport user:", req.user);
-      console.log("Is authenticated:", req.isAuthenticated?.());
-      
-      // Check multiple auth sources
-      const userId = req.user?.id || 
-                    (req.user as any)?.claims?.sub || 
-                    sessionUser?.id || 
-                    sessionUser?.claims?.sub ||
-                    sessionUser?.sub;
-
-      if (!userId) {
-        console.log("❌ No user ID found in any auth source");
-        return res.status(401).json({ error: "Authentication required" });
-      }
+      // Get user ID using same pattern as other endpoints
+      const userId = ((req.user as any)?.claims || {})?.sub || req.user?.id;
 
       console.log("✅ Found user ID:", userId);
 
@@ -1785,15 +1793,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Set ACL policy for uploaded files
-  app.post("/api/upload/set-acl", async (req, res) => {
+  // Set ACL policy for uploaded files (using existing auth middleware)
+  app.post("/api/upload/set-acl", isAnyAuthenticated, async (req: any, res) => {
     try {
-      const isAuthenticatedUser = req.isAuthenticated && req.isAuthenticated() && req.user;
-      if (!isAuthenticatedUser) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub;
+      // Get user ID using same pattern as other endpoints
+      const userId = ((req.user as any)?.claims || {})?.sub || req.user?.id;
       const { fileUrl, visibility = 'private', uploadType = 'portfolio' } = req.body;
 
       if (!fileUrl) {
@@ -1835,15 +1839,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete uploaded file
-  app.delete("/api/upload/file/:objectPath(*)", async (req, res) => {
+  // Delete uploaded file (using existing auth middleware)
+  app.delete("/api/upload/file/:objectPath(*)", isAnyAuthenticated, async (req: any, res) => {
     try {
-      const isAuthenticatedUser = req.isAuthenticated && req.isAuthenticated() && req.user;
-      if (!isAuthenticatedUser) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub;
+      // Get user ID using same pattern as other endpoints
+      const userId = ((req.user as any)?.claims || {})?.sub || req.user?.id;
       const success = await uploadService.deleteFile(req.params.objectPath, userId);
 
       if (success) {
@@ -2835,29 +2835,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get galleries for current user 
-  app.get('/api/portfolios/galleries/:userId?', async (req, res) => {
+  // Get galleries for current user (using existing auth middleware)
+  app.get('/api/portfolios/galleries/:userId?', isAnyAuthenticated, async (req: any, res) => {
     try {
-      console.log("📂 Portfolio galleries request");
+      console.log("📂 Portfolio galleries request with auth middleware");
       
-      // Check authentication from session and passport
-      const sessionUser = (req as any).session?.user;
-      console.log("📂 Gallery request - Session user:", sessionUser);
-      console.log("📂 Gallery request - Passport user:", req.user);
-      console.log("📂 Gallery request - Is authenticated:", req.isAuthenticated?.());
-      
-      // Get user ID from different auth sources
-      const userId = req.user?.id || 
-                    (req.user as any)?.claims?.sub || 
-                    sessionUser?.id || 
-                    sessionUser?.claims?.sub ||
-                    sessionUser?.sub;
-
-      if (!userId) {
-        console.log("❌ No user ID found for galleries request");
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-      
+      // Get user ID using same pattern as other endpoints
+      const userId = ((req.user as any)?.claims || {})?.sub || req.user?.id;
       const requestedUserId = req.params.userId || userId;
       
       console.log("✅ Authenticated user:", userId, "requesting data for:", requestedUserId);
