@@ -33,6 +33,7 @@ import EmailSignup from "@/pages/email-signup";
 import EmailSignin from "@/pages/email-signin";
 
 import IconTest from "@/pages/icon-test";
+import UploadTestPage from "@/pages/upload-test";
 import PortfolioGallery from "@/pages/portfolio-gallery";
 import GalleryDetail from "@/pages/gallery-detail";
 import ModernPortfolio from "@/pages/modern-portfolio";
@@ -62,6 +63,7 @@ function Router() {
           <Route path="/provider/:id" component={ProviderDetail} />
           <Route path="/booking" component={Booking} />
           <Route path="/bookings" component={Bookings} />
+          <Route path="/upload-test" component={UploadTestPage} />
           <Route path="/portfolio-modern" component={ModernPortfolio} />
           <Route path="/portfolio/:providerId?" component={PortfolioGallery} />
           <Route path="/portfolio/:providerId/gallery/:galleryId" component={GalleryDetail} />

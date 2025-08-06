@@ -1734,19 +1734,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+  // Modern upload endpoints with authentication
+  const { uploadService } = await import('./uploadService');
+
+  // Generate presigned upload URLs
+  app.post("/api/upload/presigned-url", async (req, res) => {
     try {
-      console.log("Upload URL request from user:", ((req.user as any)?.claims || {})?.sub);
-      const objectStorageService = new ObjectStorageService();
-      console.log("About to call getObjectEntityUploadURL...");
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      console.log("Upload URL result:", uploadURL);
-      console.log("Upload URL length:", uploadURL?.length);
-      console.log("Upload URL type:", typeof uploadURL);
-      res.json({ uploadURL });
+      console.log("🔒 Presigned URL request");
+      console.log("Request user:", (req as any).user);
+      console.log("Session:", (req as any).session);
+      
+      // Check authentication from session
+      const sessionUser = (req as any).session?.user;
+      console.log("Session user:", sessionUser);
+      console.log("Passport user:", req.user);
+      console.log("Is authenticated:", req.isAuthenticated?.());
+      
+      // Check multiple auth sources
+      const userId = req.user?.id || 
+                    (req.user as any)?.claims?.sub || 
+                    sessionUser?.id || 
+                    sessionUser?.claims?.sub ||
+                    sessionUser?.sub;
+
+      if (!userId) {
+        console.log("❌ No user ID found in any auth source");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      console.log("✅ Found user ID:", userId);
+
+      const { uploadType = 'portfolio', fileCount = 1, fileExtensions = [] } = req.body;
+
+      console.log("✅ Generating presigned URLs for user:", userId, "type:", uploadType, "count:", fileCount);
+
+      const result = await uploadService.generatePresignedUploadUrls({
+        userId,
+        uploadType,
+        fileCount,
+        fileExtensions
+      });
+
+      res.json(result);
     } catch (error) {
-      console.error("Error generating upload URL:", error);
-      res.status(500).json({ error: "Failed to generate upload URL", message: (error as Error).message });
+      console.error("Error generating presigned URLs:", error);
+      res.status(500).json({ 
+        error: "Failed to generate upload URLs", 
+        message: (error as Error).message 
+      });
+    }
+  });
+
+  // Set ACL policy for uploaded files
+  app.post("/api/upload/set-acl", async (req, res) => {
+    try {
+      const isAuthenticatedUser = req.isAuthenticated && req.isAuthenticated() && req.user;
+      if (!isAuthenticatedUser) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub;
+      const { fileUrl, visibility = 'private', uploadType = 'portfolio' } = req.body;
+
+      if (!fileUrl) {
+        return res.status(400).json({ error: "File URL is required" });
+      }
+
+      const objectPath = await uploadService.setFileAcl({
+        fileUrl,
+        userId,
+        visibility,
+        uploadType
+      });
+
+      res.json({ objectPath, message: "ACL policy set successfully" });
+    } catch (error) {
+      console.error("Error setting ACL:", error);
+      res.status(500).json({ 
+        error: "Failed to set file permissions", 
+        message: (error as Error).message 
+      });
+    }
+  });
+
+  // Serve uploaded files
+  app.get("/api/files/:objectPath(*)", async (req, res) => {
+    try {
+      const userId = req.isAuthenticated && req.isAuthenticated() && req.user 
+        ? ((req.user as any)?.id || (req.user as any)?.claims?.sub)
+        : undefined;
+
+      await uploadService.serveFile({
+        objectPath: req.params.objectPath,
+        userId,
+        response: res
+      });
+    } catch (error) {
+      console.error("Error serving file:", error);
+      res.status(500).json({ error: "Error serving file" });
+    }
+  });
+
+  // Delete uploaded file
+  app.delete("/api/upload/file/:objectPath(*)", async (req, res) => {
+    try {
+      const isAuthenticatedUser = req.isAuthenticated && req.isAuthenticated() && req.user;
+      if (!isAuthenticatedUser) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub;
+      const success = await uploadService.deleteFile(req.params.objectPath, userId);
+
+      if (success) {
+        res.json({ message: "File deleted successfully" });
+      } else {
+        res.status(500).json({ error: "Failed to delete file" });
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      res.status(500).json({ error: "Error deleting file" });
     }
   });
 
@@ -2733,15 +2840,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("📂 Portfolio galleries request");
       
-      // Check if user is authenticated via any method
-      const isAuthenticated = req.isAuthenticated() && req.user;
+      // Check authentication from session and passport
+      const sessionUser = (req as any).session?.user;
+      console.log("📂 Gallery request - Session user:", sessionUser);
+      console.log("📂 Gallery request - Passport user:", req.user);
+      console.log("📂 Gallery request - Is authenticated:", req.isAuthenticated?.());
       
-      if (!isAuthenticated) {
+      // Get user ID from different auth sources
+      const userId = req.user?.id || 
+                    (req.user as any)?.claims?.sub || 
+                    sessionUser?.id || 
+                    sessionUser?.claims?.sub ||
+                    sessionUser?.sub;
+
+      if (!userId) {
+        console.log("❌ No user ID found for galleries request");
         return res.status(401).json({ message: "User not authenticated" });
       }
       
-      // Get user ID from different auth sources
-      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub;
       const requestedUserId = req.params.userId || userId;
       
       console.log("✅ Authenticated user:", userId, "requesting data for:", requestedUserId);
