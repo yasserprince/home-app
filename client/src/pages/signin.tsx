@@ -34,7 +34,7 @@ export default function Signin() {
         
         <CardContent className="space-y-4">
           <Button 
-            onClick={handleGoogleSignin}
+            onClick={() => window.location.href = '/api/auth/google'}
             className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@ export default function Signin() {
           </Button>
 
           <Button 
-            onClick={() => window.location.href = '/api/login'}
+            onClick={() => window.location.href = '/api/auth/replit'}
             className="w-full bg-orange-500 hover:bg-orange-600 text-white"
           >
             <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">

@@ -86,11 +86,13 @@ app.use((req, res, next) => {
   
   // Import and setup JWT-based architecture
   const { setupJWTAuth } = await import('./authService.js');
+  const { setupOAuthHandlers } = await import('./oauthHandlers.js');
   const { setupSimpleUpload } = await import('./simpleUpload.js');
   const { setupDebugRoutes } = await import('./debugRoutes.js');
   
   // Setup JWT auth and upload (simplified architecture)
   setupJWTAuth(app);
+  setupOAuthHandlers(app);
   setupSimpleUpload(app);
   setupDebugRoutes(app);
   
