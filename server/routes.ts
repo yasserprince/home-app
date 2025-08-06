@@ -2665,7 +2665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update modern portfolio image
-  app.put('/api/portfolios/images/:imageId', isReplitAuthenticated, async (req, res) => {
+  app.put('/api/portfolios/images/:imageId', isAuthenticated, async (req, res) => {
     try {
       const userId = (req as any).user?.claims?.sub;
       const { imageId } = req.params;
@@ -2689,7 +2689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete all portfolio images for user (must come before specific image delete)
-  app.delete('/api/portfolios/images/all', isReplitAuthenticated, async (req, res) => {
+  app.delete('/api/portfolios/images/all', isAuthenticated, async (req, res) => {
     try {
       const userId = (req as any).user?.claims?.sub;
       
@@ -2706,7 +2706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete modern portfolio image
-  app.delete('/api/portfolios/images/:imageId', isReplitAuthenticated, async (req, res) => {
+  app.delete('/api/portfolios/images/:imageId', isAuthenticated, async (req, res) => {
     try {
       const userId = (req as any).user?.claims?.sub;
       const { imageId } = req.params;
@@ -2729,7 +2729,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get galleries for current user (simplified API)
-  app.get('/api/portfolios/galleries/:userId?', isReplitAuthenticated, async (req, res) => {
+  app.get('/api/portfolios/galleries/:userId?', isAuthenticated, async (req, res) => {
     try {
       const authenticatedUserId = (req as any).user?.claims?.sub;
       const requestedUserId = req.params.userId || authenticatedUserId;
@@ -2814,7 +2814,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new gallery
-  app.post('/api/portfolios/galleries', isReplitAuthenticated, async (req, res) => {
+  app.post('/api/portfolios/galleries', isAuthenticated, async (req, res) => {
     try {
       const userId = req.user?.claims?.sub;
       const { title, category, serviceType, isPublic } = req.body;
@@ -2841,7 +2841,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload images to a gallery - handles post-upload metadata from object storage
-  app.post('/api/portfolios/galleries/:galleryId/images', isReplitAuthenticated, async (req, res) => {
+  app.post('/api/portfolios/galleries/:galleryId/images', isAuthenticated, async (req, res) => {
     try {
       const userId = (req as any).user?.claims?.sub;
       const { galleryId } = req.params;
