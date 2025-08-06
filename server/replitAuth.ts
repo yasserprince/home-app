@@ -103,15 +103,8 @@ export async function setupAuth(app: Express) {
     passport.use(strategy);
   }
 
-  // Serialize user for the session
-  passport.serializeUser((user: any, done) => {
-    done(null, user);
-  });
-
-  // Deserialize user from the session
-  passport.deserializeUser((user: any, done) => {
-    done(null, user);
-  });
+  // Note: serializeUser and deserializeUser are handled by googleAuth.js
+  // Don't override them here to avoid conflicts
 
   app.get("/api/login", (req, res, next) => {
     passport.authenticate(`replitauth:${req.hostname}`, {
@@ -144,7 +137,15 @@ export async function setupAuth(app: Express) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
 
-  if (!req.isAuthenticated || (typeof req.isAuthenticated === 'function' && !req.isAuthenticated()) || !user?.expires_at) {
+  console.log("🔐 Auth Check:", {
+    hasSession: !!req.session,
+    hasUser: !!req.user,
+    sessionID: req.sessionID,
+    cookies: req.headers.cookie?.substring(0, 50) + '...',
+    userType: user?.type || 'unknown'
+  });
+
+  if (!user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 

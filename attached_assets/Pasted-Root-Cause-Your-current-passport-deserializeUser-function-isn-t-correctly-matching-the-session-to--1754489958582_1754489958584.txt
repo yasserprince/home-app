@@ -1,0 +1,134 @@
+Root Cause
+Your current passport.deserializeUser() function isn't correctly matching the session to a user. That’s why:
+
+The session exists (connect.sid cookie is present).
+
+But req.user is undefined, meaning the user isn’t restored into the session.
+
+So protected endpoints return 401 Unauthorized.
+
+✅ Fix Summary
+You need to:
+
+Ensure passport.deserializeUser() is implemented and correctly linked to your database.
+
+Verify the middleware order in server/index.ts so that:
+
+session → passport.initialize() → passport.session() → routes.
+
+Adjust replitAuth.ts to be less strict initially and include logging for debugging.
+
+✅ Step-by-Step Fix
+1. ✅ server/auth/passport.ts (or similar)
+Make sure you have both serialize and deserialize implemented:
+
+ts
+Copy
+Edit
+passport.serializeUser((user: any, done) => {
+  done(null, user.id); // Store user ID in session
+});
+
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await db.query.users.findFirst({ where: { id } }); // Replace with your DB lookup
+    if (!user) return done(null, false);
+    return done(null, user);
+  } catch (error) {
+    return done(error, null);
+  }
+});
+🔁 Adjust DB query depending on whether you're using Drizzle or Prisma.
+
+2. ✅ server/index.ts – Middleware Order
+Ensure middleware order is exactly:
+
+ts
+Copy
+Edit
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET!,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    sameSite: "none",
+    secure: true,
+    httpOnly: true
+  },
+  store: new PgSession({
+    pool, // your pg pool
+    tableName: 'user_sessions'
+  }),
+}));
+
+app.use(passport.initialize());
+app.use(passport.session()); // Required for deserializeUser
+Make sure passport.session() comes after session() and passport.initialize().
+
+3. ✅ server/replitAuth.ts – Add Fallback Logging
+Update your isAuthenticated middleware:
+
+ts
+Copy
+Edit
+export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  const user = req.user as any;
+
+  console.log("🔐 Auth Check:", {
+    hasSession: !!req.session,
+    hasUser: !!req.user,
+    sessionID: req.sessionID,
+    cookies: req.headers.cookie,
+  });
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  next();
+};
+4. ✅ Verify with Debug Route
+Create a debug route:
+
+ts
+Copy
+Edit
+app.get('/api/debug-session', (req, res) => {
+  res.json({
+    session: req.session,
+    user: req.user,
+    isAuthenticated: req.isAuthenticated?.(),
+  });
+});
+Test it from browser after login:
+
+pgsql
+Copy
+Edit
+GET /api/debug-session
+You should see:
+
+json
+Copy
+Edit
+{
+  "session": {...},
+  "user": { id: "...", email: "..."},
+  "isAuthenticated": true
+}
+✅ Test Command (Terminal / curl)
+After login, try:
+
+bash
+Copy
+Edit
+curl -H "Cookie: connect.sid=YOUR_COOKIE_HERE" https://your-deployment/api/debug-session
+You should see the session and user.
+
+✅ Final Notes
+This issue is not related to CORS anymore. It’s purely passport session deserialization failure.
+
+Ensure your SESSION_SECRET is present in Replit secrets.
+
+Avoid mixing file uploads with failed authentication – always check req.user first.

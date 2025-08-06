@@ -233,15 +233,7 @@ export async function setupGoogleAuth(app: Express) {
     });
   });
   
-  // Debug endpoint to test session
-  app.get("/api/debug-session", (req, res) => {
-    res.json({
-      isAuthenticated: req.isAuthenticated(),
-      user: req.user,
-      sessionID: req.sessionID,
-      hasSession: !!req.session
-    });
-  });
+  // Debug endpoint removed - using dedicated debugRoutes.ts
 }
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {

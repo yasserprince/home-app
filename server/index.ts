@@ -83,10 +83,12 @@ app.use((req, res, next) => {
   // Import and setup new simple architecture
   const { setupSimpleAuth } = await import('./simpleAuth.js');
   const { setupSimpleUpload } = await import('./simpleUpload.js');
+  const { setupDebugRoutes } = await import('./debugRoutes.js');
   
   // Setup simple auth and upload (new architecture)
   setupSimpleAuth(app);
   setupSimpleUpload(app);
+  setupDebugRoutes(app);
   
   const server = await registerRoutes(app);
 
