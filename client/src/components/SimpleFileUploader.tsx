@@ -20,7 +20,7 @@ interface SimpleFileUploaderProps {
 
 export function SimpleFileUploader({ 
   onUploadComplete, 
-  accept = ['image/*', '.pdf', '.doc', '.docx'],
+  accept = ['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
   maxSize = 10 * 1024 * 1024, // 10MB
   className 
 }: SimpleFileUploaderProps) {
@@ -184,7 +184,7 @@ export function SimpleFileUploader({
                 {isDragActive ? 'Drop the file here' : 'Drop a file or click to select'}
               </p>
               <p className="text-sm text-gray-500">
-                Supports: {accept.join(', ')} (max {Math.round(maxSize / 1024 / 1024)}MB)
+                Supports: {accept ? accept.join(', ') : 'images'} (max {Math.round(maxSize / 1024 / 1024)}MB)
               </p>
             </div>
           </div>

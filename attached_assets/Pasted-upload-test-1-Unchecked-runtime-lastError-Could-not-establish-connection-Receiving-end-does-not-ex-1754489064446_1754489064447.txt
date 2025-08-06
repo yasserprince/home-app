@@ -1,0 +1,58 @@
+upload-test:1 Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+inject.js?settings=%7B%22rvm%22%3A%7B%22inject%22%3A%7B%22disabled%22%3Afalse%2C%22timestamp%22%3A0%7D%7D%7D:1 hello from injected code
+contentscript.js:1 Hello from the content-script
+index-B6YqMMHh.js:7820 🔄 Starting upload for: undefined
+index-B6YqMMHh.js:7820 ❌ Upload error: TypeError: Cannot read properties of undefined (reading 'split')
+    at d (index-B6YqMMHh.js:7820:15783)
+    at p (index-B6YqMMHh.js:7820:17119)
+    at Object.Ple (index-B6YqMMHh.js:37:9873)
+    at Ele (index-B6YqMMHh.js:37:10030)
+    at Tle (index-B6YqMMHh.js:37:10090)
+    at KH (index-B6YqMMHh.js:37:31563)
+    at XK (index-B6YqMMHh.js:37:31981)
+    at index-B6YqMMHh.js:37:36914
+    at HB (index-B6YqMMHh.js:40:36984)
+    at kK (index-B6YqMMHh.js:37:9007)
+d @ index-B6YqMMHh.js:7820
+index-B6YqMMHh.js:7820 Upload error: TypeError: Failed to execute 'fetch' on 'Window': '/api/upload/presigned-url' is not a valid HTTP method.
+    at We (index-B6YqMMHh.js:48:42902)
+    at Object.mutationFn (index-B6YqMMHh.js:7820:9695)
+    at Object.fn (index-B6YqMMHh.js:48:19623)
+    at v (index-B6YqMMHh.js:48:10067)
+    at Object.start (index-B6YqMMHh.js:48:10528)
+    at OZ.execute (index-B6YqMMHh.js:48:20428)
+    at async M (index-B6YqMMHh.js:7820:11347)
+M @ index-B6YqMMHh.js:7820
+api/upload/presigned-url:1  Failed to load resource: the server responded with a status of 500 ()
+upload-test:1 Uncaught (in promise) SyntaxError: Unexpected token 'I', "Internal S"... is not valid JSON
+index-B6YqMMHh.js:7820 Testing gallery API...
+api/portfolios/galleries:1  Failed to load resource: the server responded with a status of 500 ()
+index-B6YqMMHh.js:7820 Gallery API failed: 500 Internal Server Error
+onClick @ index-B6YqMMHh.js:7820
+index-B6YqMMHh.js:7820 Testing authentication...
+api/auth/debug:1  Failed to load resource: the server responded with a status of 500 ()
+index-B6YqMMHh.js:7820 Auth test failed: SyntaxError: Unexpected token 'I', "Internal S"... is not valid JSON
+onClick @ index-B6YqMMHh.js:7820
+index-B6YqMMHh.js:7820 🔄 Starting upload for: undefined
+index-B6YqMMHh.js:7820 ❌ Upload error: TypeError: Cannot read properties of undefined (reading 'split')
+    at d (index-B6YqMMHh.js:7820:15783)
+    at p (index-B6YqMMHh.js:7820:17119)
+    at Object.Ple (index-B6YqMMHh.js:37:9873)
+    at Ele (index-B6YqMMHh.js:37:10030)
+    at Tle (index-B6YqMMHh.js:37:10090)
+    at KH (index-B6YqMMHh.js:37:31563)
+    at XK (index-B6YqMMHh.js:37:31981)
+    at index-B6YqMMHh.js:37:36914
+    at HB (index-B6YqMMHh.js:40:36984)
+    at kK (index-B6YqMMHh.js:37:9007)
+d @ index-B6YqMMHh.js:7820
+index-B6YqMMHh.js:7820 Upload error: TypeError: Failed to execute 'fetch' on 'Window': '/api/upload/presigned-url' is not a valid HTTP method.
+    at We (index-B6YqMMHh.js:48:42902)
+    at Object.mutationFn (index-B6YqMMHh.js:7820:9695)
+    at Object.fn (index-B6YqMMHh.js:48:19623)
+    at v (index-B6YqMMHh.js:48:10067)
+    at Object.start (index-B6YqMMHh.js:48:10528)
+    at OZ.execute (index-B6YqMMHh.js:48:20428)
+    at async M (index-B6YqMMHh.js:7820:11347)
+M @ index-B6YqMMHh.js:7820
+index-D37YRMtK.css:1  Failed to load resource: the server responded with a status of 500 ()

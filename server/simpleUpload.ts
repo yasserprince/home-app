@@ -11,8 +11,13 @@ interface AuthRequest extends Request {
 export function setupSimpleUpload(app: Express) {
   
   // Get presigned URL for file upload
-  app.post('/api/upload/presigned-url', isAuthenticated, async (req: AuthRequest, res: Response) => {
+  app.post('/api/upload/presigned-url', async (req: AuthRequest, res: Response) => {
     try {
+      // Check authentication manually
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
       const { fileName, fileType, fileSize } = req.body;
       
       // Validate inputs
@@ -54,8 +59,13 @@ export function setupSimpleUpload(app: Express) {
   });
   
   // Complete upload - set ACL and store metadata
-  app.post('/api/upload/complete', isAuthenticated, async (req: AuthRequest, res: Response) => {
+  app.post('/api/upload/complete', async (req: AuthRequest, res: Response) => {
     try {
+      // Check authentication manually
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
       const { uploadURL, fileName, fileType, fileSize } = req.body;
       
       if (!uploadURL || !fileName) {
