@@ -69,9 +69,9 @@ export function setupOAuthHandlers(app: Express) {
       if (existingUser) {
         // Update existing user
         dbUser = await storage.updateUser(existingUser.id, {
-          firstName: googleUser.given_name || existingUser.firstName || undefined,
-          lastName: googleUser.family_name || existingUser.lastName || undefined,
-          profileImageUrl: googleUser.picture || existingUser.profileImageUrl || undefined,
+          firstName: googleUser.given_name || existingUser.firstName,
+          lastName: googleUser.family_name || existingUser.lastName,
+          profileImageUrl: googleUser.picture || existingUser.profileImageUrl,
           lastLoginAt: new Date()
         });
       } else {

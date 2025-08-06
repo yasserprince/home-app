@@ -66,8 +66,8 @@ export function setupSimpleUpload(app: Express) {
       
       const objectStorageService = new ObjectStorageService();
       
-      // Get user ID from existing auth system
-      const userId = ((req.user as any)?.claims || {}).sub || req.user?.id || 'unknown';
+      // Get user ID from JWT auth
+      const userId = req.user?.id || 'unknown';
       
       // Set ACL policy for uploaded file
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(uploadURL, {

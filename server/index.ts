@@ -96,6 +96,10 @@ app.use((req, res, next) => {
   setupSimpleUpload(app);
   setupDebugRoutes(app);
   
+  // Test JWT system on startup
+  const { testJWTSystem } = await import('./testJWT.js');
+  testJWTSystem();
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
